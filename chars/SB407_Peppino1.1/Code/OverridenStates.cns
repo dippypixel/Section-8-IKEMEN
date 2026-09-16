@@ -1,0 +1,1375 @@
+;---------------------------------------------------------------------------
+; Stand
+[Statedef 0]
+type = S
+sprpriority = 0
+
+[State 0, ChangeAnim]
+type = ChangeAnim
+trigger1 = prevstateno = 1921 || prevstateno = 636 || prevstateno = 3303
+trigger1 = !time
+value = 1913
+persistent = 0
+
+[State 0, ChangeAnim]
+type = ChangeAnim
+trigger1 = prevstateno = 101
+trigger1 = !time
+value = 1
+persistent = 0
+[State 0, 1]
+type = ChangeAnim
+trigger1 = anim = 21 || anim = 26
+value = 5
+
+[State 0, Idle animation]
+type = ChangeAnim
+trigger1 = Anim = [0,4]
+trigger1 = AnimTime = 0
+trigger1 = random < 125
+value = 70+(random%6)
+
+[State 0, 1]
+type = ChangeAnim
+trigger1 = (Anim != [0,5]) && Anim != 21 && Anim != 1913 && Anim != [70,79]
+trigger2 = (Anim = [0,5]) || Anim = 1913 || Anim = 21 || Anim = [70,79]
+trigger2 = AnimTime = 0
+value = ifelse(var(21)<25, ifelse(life<=lifemax/4, 2, 0), 3+(var(21)>=50))
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 1
+trigger1 = anim = [70,79]
+trigger1 = random > 500
+value = S70,0+random%4
+channel = 0
+freqmul = 1+(sin(gametime/60)/4)
+
+[State 0, 2]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 0, 3] ;Stop moving if low velocity or 4 ticks pass
+type = VelSet
+triggerall = !var(50)
+trigger1 = abs(vel x) < Const(movement.stand.friction.threshold)
+trigger2 = Time = 4
+x = 0
+
+[State 0, 4] ;Are you dead?
+type = ChangeState
+trigger1 = !alive
+value = 5050
+ctrl = 0
+
+;---------------------------------------------------------------------------
+; Crouching
+[Statedef 11]
+type    = C
+physics = C
+anim = 11
+sprpriority = 0
+
+[State 0, ChangeAnim]
+type = ChangeAnim
+trigger1 = anim != 15
+trigger1 = command = "holdfwd"
+value = 15
+[State 0, ChangeAnim]
+type = ChangeAnim
+trigger1 = anim != 16
+trigger1 = command = "holdback"
+value = 16
+
+[State 11, 1] ;Change from turning animation
+type = ChangeAnim
+trigger1 = Anim = 6 && AnimTime = 0
+trigger2 = anim = [15,16]
+trigger2 = (command != "holdfwd" && command != "holdback") || (command = "holdfwd" && command = "holdback")
+value = 11
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = anim = 15
+x = const(velocity.walk.fwd.x)*.667
+[State 0, VelSet]
+type = VelSet
+trigger1 = anim = 16
+x = const(velocity.walk.back.x)*.667
+
+[State 0, StateTypeSet]
+type = StateTypeSet
+trigger1 = anim = [15,16]
+physics = N
+[State 0, StateTypeSet]
+type = StateTypeSet
+trigger1 = anim != [15,16]
+physics = C
+
+[State 11, 2] ;Stop moving if low velocity
+type = VelSet
+trigger1 = abs(vel x) < Const(movement.crouch.friction.threshold)
+x = 0
+
+;---------------------------------------------------------------------------
+; Walk
+[Statedef 20]
+type    = S
+physics = N
+sprpriority = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = (anim = 20 || anim = 25 || anim = 27) && (animelem = 4 || animelem = 9)
+trigger2 = (anim = 21 || anim = 26 || anim = 28) && (animelem = 7 || animelem = 12)
+trigger3 = anim = 29 && (animelem = 4 || animelem = 9 || animelem = 14 || animelem = 19 || animelem = 24 || animelem = 29 || animelem = 34 || animelem = 39 || animelem = 44 || animelem = 49)
+trigger4 = anim = 30 && (animelem = 7 || animelem = 12 || animelem = 17 || animelem = 22 || animelem = 27 || animelem = 32 || animelem = 37 || animelem = 42 || animelem = 47 || animelem = 52)
+value = S20,0
+
+[State 100, Walk Dust]
+type = Explod
+trigger1 = (anim = 20 || anim = 25 || anim = 27) && (animelem = 4 || animelem = 9)
+trigger2 = (anim = 21 || anim = 26 || anim = 28) && (animelem = 7 || animelem = 12)
+trigger3 = anim = 29 && (animelem = 4 || animelem = 9 || animelem = 14 || animelem = 19 || animelem = 24 || animelem = 29 || animelem = 34 || animelem = 39 || animelem = 44 || animelem = 49)
+trigger4 = anim = 30 && (animelem = 7 || animelem = 12 || animelem = 17 || animelem = 22 || animelem = 27 || animelem = 32 || animelem = 37 || animelem = 42 || animelem = 47 || animelem = 52)
+anim = 6803
+pos = 0,0
+postype = p1
+bindtime = 1
+removetime = -2
+scale = ceil(const(size.xscale)/2),ceil(const(size.yscale)/2)
+pausemovetime = -1
+supermovetime = -1
+sprpriority = -4
+ownpal = 1
+
+[State 20, 1]
+type = VelSet
+trigger1 = command = "holdfwd"
+x = const(velocity.walk.fwd.x)
+
+[State 20, 2]
+type = VelSet
+trigger1 = command = "holdback"
+x = const(velocity.walk.back.x)
+
+[State 20, 3]
+type = ChangeAnim
+triggerall = vel x > 0
+trigger1 = Anim != 20 && Anim != 25 && Anim != 27 && Anim != 29 && Anim != 5
+trigger2 = Anim = 5 && AnimTime = 0
+value = ifelse(var(21)<25, ifelse(life<=lifemax/4, 25, 20), 27+((var(21)>=50)*2))
+
+[State 20, 4]
+type = ChangeAnim
+triggerall = vel x < 0
+trigger1 = Anim != 21 && Anim != 26 && Anim != 28 && Anim != 30 && Anim != 5
+trigger2 = Anim = 5 && AnimTime = 0
+value = ifelse(var(21)<25, ifelse(life<=lifemax/4, 25, 20), 27+((var(21)>=50)*2))+1
+
+;---------------------------------------------------------------------------
+; Jump Start
+[Statedef 40]
+type    = S
+physics = S
+anim = ifelse(var(1) = 1, 50+(vel x < 0), 40-(vel x > 0))
+ctrl = 0
+sprpriority = 1
+facep2 = 1
+
+[State 40, Explod]
+type = Explod
+trigger1 = AnimTime = 0 ;animelemtime(3) = 1
+anim = 6850
+pos = 0,0
+postype = p1
+removetime = -2
+pausemovetime = -1
+supermovetime = -1
+sprpriority = -1
+ownpal = 1
+scale = ceil(const(size.xscale)),ceil(const(size.yscale))
+
+[State 0, HitBy]
+type = HitBy
+trigger1 = !var(50)
+value = SCA,NA,SA,HA,NP,SP,HP
+
+[State 40, 1]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 40, 2]
+type = VarSet
+trigger1 = command = "holdfwd"
+sysvar(1) = 1
+
+[State 40, 3]
+type = VarSet
+trigger1 = command = "holdback"
+sysvar(1) = -1
+
+[State 40, the rest.]
+type = VelSet
+triggerall = AnimTime = 0 && prevstateno != 1100
+trigger1 = (prevstateno != [100,105])
+trigger2 = (prevstateno = [100,105]) && sysvar(1)=0
+x = ifelse(sysvar(1)=0, const(velocity.jump.neu.x), ifelse(sysvar(1)=1, const(velocity.jump.fwd.x), const(velocity.jump.back.x)))
+y = ifelse((command = "holdup" && command != "hold_c"), const(velocity.jump.y), const(velocity.jump.y)*0.65)
+
+[State 40, 5]
+type = VelSet
+trigger1 = AnimTime = 0 && sysvar(1) = 1
+trigger1 = (prevstateno = [100,105]) && prevstateno != 101
+x = const(velocity.runjump.fwd.x)
+y = ifelse((command = "holdup" && command != "hold_c"), const(velocity.jump.y), const(velocity.jump.y)*0.65)
+[State 40, 5]
+type = VelSet
+trigger1 = AnimTime = 0 && sysvar(1) = -1
+trigger1 = (prevstateno = [100,105]) && prevstateno != 101
+x = const(velocity.runjump.back.x)
+y = ifelse((command = "holdup" && command != "hold_c"), const(velocity.jump.y), const(velocity.jump.y)*0.65)
+
+[State 40, Jump SFX]
+type = PlaySnd
+trigger1 = AnimTime = 0
+value = S40,0
+
+[State 40, 6]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 50
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; AirJump Start
+[Statedef 45]
+type    = A
+physics = N
+ctrl = 0
+velset = 0,0
+anim = 41
+
+[State 45, 3]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 45, 4]
+type = VarSet
+trigger1 = command = "holdfwd"
+sysvar(1) = 1
+
+[State 45, 5]
+type = VarSet
+trigger1 = command = "holdback"
+sysvar(1) = -1
+
+[State 45, 6]
+type = VelSet
+trigger1 = Time = 2
+x = ifelse(sysvar(1)=0, const(velocity.airjump.neu.x), ifelse(sysvar(1)=1, const(velocity.airjump.fwd.x), const(velocity.airjump.back.x)))
+y = ifelse((prevstateno = 1200 || prevstateno=[600,699]), const(velocity.airjump.y)*.6, const(velocity.airjump.y))
+
+[State -3, Landing Sound]
+type = PlaySnd
+trigger1 = Time = 2
+value = 45, 0
+
+[State 45, 7]
+type = ChangeState
+trigger1 = Time = 2
+value = 50
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Jump Up
+[Statedef 50]
+type    = A
+physics = A
+
+[State 0, VarAdd]
+type = VarAdd
+trigger1 = !time
+triggerall = prevstateno = 45
+v = 45
+value = 1
+
+[State 50, 1]
+type = VarSet
+trigger1 = !time
+sysvar(1) = 0
+
+[State 50, 2]
+type = ChangeAnim
+triggerall = !time && prevstateno != 55
+trigger1 = !var(1)
+trigger2 = var(1) && (vel x = 0 || prevstateno = 41)
+value = ifelse((vel x)=0, 41, ifelse((vel x)>0, 42, 43))
+[State 50, 2]
+type = ChangeAnim
+trigger1 = !time && prevstateno != 55 && var(1) = 1 && vel x != 0 && prevstateno != 41
+value = 52+(vel x < 0)
+[State 50, 2]
+type = ChangeAnim
+trigger1 = !time && prevstateno != 55 && var(1) = 2 && vel x != 0 && prevstateno != 41
+value = 111+(vel x < 0)
+
+[State 50, 3]
+type = ChangeAnim
+trigger1 = Vel y > Const720p(-8)
+trigger1 = SelfAnimExist(anim + 3)
+trigger1 = anim >= 41 && anim <= 43
+persistent = 0
+value = Anim + 3
+
+;---------------------------------------------------------------------------
+; Jump Land
+[Statedef 52]
+type = S
+ctrl = 0
+anim = 47
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = !time
+value = S20,0
+
+[State 52, 1]
+type = VelSet
+trigger1 = var(50)
+trigger1 = Time = 0
+x = vel X*.85
+[State 52, 1]
+type = VelSet
+trigger1 = !var(50)
+trigger1 = Time = 0
+x = 0
+
+[State 52, 1]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+[State 52, 2]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 52, 5]
+type = ChangeState
+trigger1 = command = "holdfwd"
+trigger1 = var(1) > 0
+value = 100
+[State 52, 5]
+type = ChangeState
+trigger1 = command = "holdback"
+trigger1 = var(1) > 0
+value = 105
+
+[State 0, VarSet]
+type = VarAdd
+trigger1 = !time
+trigger1 = prevstateno = [600,699]
+v = 8
+value = 1
+
+[State 0, CtrlSet]
+type = CtrlSet
+trigger1 = prevstateno != 707 && prevstateno != [600,699]
+trigger2 = prevstateno = [600,699]
+trigger2 = var(8) < 2
+trigger3 = prevstateno = [600,699]
+trigger3 = var(8) >= 2
+trigger3 = time >= (var(8)*2)
+trigger4 = prevstateno = 707
+trigger4 = time >= 4
+value = 1
+
+[State 52, Guard]
+type= changestate
+triggerall= inguarddist && ctrl
+trigger1 = command="holdback" && !aiLevel
+trigger2 = AiLevel
+value= 120
+
+[State 52, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Wall Jump
+[Statedef 55]
+type = A
+physics = N
+velset = 0,0
+anim = 55
+ctrl = 0
+  
+[State 45, 3]
+type = VarSet
+trigger1 = var(1) > 1
+v = 1
+value = 1   
+[State 45, 3]
+type = VarSet
+trigger1 = Time = 0
+var(53) = 1
+[State 55, Turn]
+type = Turn
+trigger1 = !time && frontedgebodydist <= 0
+ 
+[State 55, Jump Dust Back]
+type = Explod
+trigger1 = Animelem = 4
+anim = 8655
+pos = 0,10
+postype = p1
+bindtime = 1
+removetime = -2
+scale = 2.2,2.2
+pausemovetime = -1
+supermovetime = -1
+sprpriority = -4
+ownpal = 1
+[State 55, Jump Dust Front]
+type = Explod
+trigger1 = Animelem = 4
+anim = 8656
+pos = 0,10
+postype = p1
+bindtime = 1
+removetime = -2
+scale = 2.2,2.2
+pausemovetime = -1
+supermovetime = -1
+sprpriority = -3
+ownpal = 1    
+[State 55, VelSet]
+type = VelSet
+trigger1 = Animelem = 4
+x = const(velocity.airjump.fwd.x)
+y = const(velocity.airjump.y)
+
+[State 40, Jump SFX]
+type = PlaySnd
+trigger1 = Animelem = 4
+value = S45,0
+[State 60, 2]
+type = ChangeState
+trigger1 = Animelem = 4
+value = 50
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; GUARD (start)
+[Statedef 120]
+type = U    ;Leave state type unchanged
+physics = U ;Leave physics unchanged
+
+[State 120]
+Type=CtrlSet
+Trigger1=AILevel && numenemy
+value = (enemynear, time >= 120 || time >= 180)
+
+[State 120, 1]
+type = ChangeAnim
+trigger1 = Time = 0
+value = 120 + (statetype = C) + (statetype = A)*2
+
+[State 120, 2]
+type = StateTypeSet
+trigger1 = Time = 0 && statetype = S
+physics = S
+
+[State 120, 3]
+type = StateTypeSet
+trigger1 = Time = 0 && statetype = C
+physics = C
+
+[State 120, 4]
+type = StateTypeSet
+trigger1 = Time = 0 && statetype = A
+physics = A
+
+[State 120, Hi to Lo]
+type = StateTypeSet
+triggerall = statetype != A
+trigger1 = !ailevel
+trigger1 = statetype = S && command = "holddown"
+trigger2 = ailevel
+trigger2 = p2statetype !=A
+statetype = C
+physics = C
+
+[State 120, Lo to Hi]
+type = StateTypeSet
+triggerall = statetype != A
+trigger1 = !ailevel
+trigger1 = statetype = C && command != "holddown"
+trigger2 = ailevel
+trigger2 = p2statetype = A
+statetype = S
+physics = S
+
+[State 120, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 130 + (statetype = C) + (statetype = A)*2
+
+[State 132, Stop Guarding]
+type = ChangeState
+trigger1 = cond(p2dist x<0,(command!="holdfwd"),(command!="holdback"))
+trigger1 = !AILevel
+trigger2 = !inguarddist
+trigger3 = AILevel && numenemy
+trigger3 = enemynear, hitdefattr = SCA, AT || enemynear, movetype != A || enemynear,animtime > -5  
+value = 140
+
+;---------------------------------------------------------------------------
+; Stand guard (guarding)
+[Statedef 130]
+type    = S
+physics = S
+
+[State 120]
+Type=CtrlSet
+Trigger1=AILevel && numenemy
+value = (enemynear, time >= 120 || time >= 180)
+
+[State 130, 1]
+type = ChangeAnim
+trigger1 = Anim != 130
+value = 130
+
+[State 130, Hi to Lo]
+type = ChangeState
+trigger1 = command = "holddown"
+trigger1 = !AILevel
+trigger2 = AILevel
+trigger2 = (abs(P2Dist X)>120) || (P2MoveType=H) || (P2StateType=C)
+trigger2 = P2StateType!=A
+value = 131
+
+[State 132, Stop Guarding]
+type = ChangeState
+trigger1 = cond(p2dist x<0,(command!="holdfwd"),(command!="holdback"))
+trigger1 = !AILevel
+trigger2 = !inguarddist
+trigger3 = AILevel && numenemy
+trigger3 = enemynear, hitdefattr = SCA, AT || enemynear, movetype != A || enemynear,animtime > -5  
+value = 140
+
+;---------------------------------------------------------------------------
+; Crouch guard (guarding)
+[Statedef 131]
+type    = C
+physics = C
+
+[State 120]
+Type=CtrlSet
+Trigger1=AILevel && numenemy
+value = (enemynear, time >= 120 || time >= 180)
+
+[State 131, 1]
+type = ChangeAnim
+trigger1 = Anim != 131
+value = 131
+
+[State 131, Lo to Hi]
+type = ChangeState
+trigger1 = command!= "holddown"
+trigger1 = !AILevel
+trigger2 = AILevel
+trigger2 = p2statetype = A
+value = 130
+
+[State 132, Stop Guarding]
+type = ChangeState
+trigger1 = cond(p2dist x<0,(command!="holdfwd"),(command!="holdback"))
+trigger1 = !AILevel
+trigger2 = !inguarddist
+trigger3 = AILevel && numenemy
+trigger3 = enemynear, hitdefattr = SCA, AT || enemynear, movetype != A || enemynear,animtime > -5  
+value = 140
+
+;---------------------------------------------------------------------------
+; Air guard (guarding)
+[Statedef 132]
+type    = A
+physics = N
+
+[State 120]
+Type=CtrlSet
+Trigger1=AILevel && numenemy
+value = (enemynear, time >= 120 || time >= 180)
+
+[State 132, 1]
+type = ChangeAnim
+trigger1 = Anim != 132
+value = 132
+
+[State 132, 2]
+type = VelAdd
+trigger1 = 1
+y = Const(movement.yaccel)
+
+[State 132, 3]
+type = VarSet
+trigger1 = 1
+sysvar(0) = (pos y >= 0) && (vel y > 0)
+
+[State 132, 4]
+type = VelSet
+trigger1 = sysvar(0)
+y = 0
+
+[State 132, 5]
+type = PosSet
+trigger1 = sysvar(0)
+y = 0
+
+[State 132, 6]
+type = ChangeState
+trigger1 = sysvar(0)
+trigger1 = cond(p2dist x<0,(command="holdfwd"),(command="holdback"))
+trigger1 = inguarddist
+value = 130
+
+[State 132, 7]
+type = ChangeState
+trigger1 = sysvar(0)
+value = 52
+
+[State 132, Stop Guarding]
+type = ChangeState
+trigger1 = cond(p2dist x<0,(command!="holdfwd"),(command!="holdback"))
+trigger1 = !AILevel
+trigger2 = !inguarddist
+trigger3 = AILevel && numenemy
+trigger3 = enemynear, hitdefattr = SCA, AT || enemynear, movetype != A || enemynear,animtime > -5  
+value = 140
+
+;---------------------------------------------------------------------------
+; Stand guard hit (shaking)
+[Statedef 150]
+type    = S
+movetype= H
+physics = N
+velset = 0,0
+
+[State 150, 1]
+type = ChangeAnim
+trigger1 = 1
+value = 150
+
+[State 150, 2]
+type = ChangeState
+trigger1 = HitShakeOver
+value = 151 + 2*(StateType=C)
+
+[State 120, Hi to Lo]
+type = StateTypeSet
+triggerall = statetype = S
+trigger1 = !AILevel
+trigger1 = command = "holddown"
+trigger2 = AILevel
+trigger2 = (abs(P2Dist X)>120) || (P2MoveType=H) || (P2StateType=C)
+trigger2 = P2StateType!=A
+statetype = C
+physics = C
+
+[State 120, Lo to Hi]
+type = StateTypeSet
+triggerall = statetype = C
+trigger1 = !AILevel
+trigger1 = command!= "holddown"
+trigger2 = AILevel
+trigger2 = p2statetype = A
+trigger2 = abs(P2BodyDist X)=3
+statetype = S
+physics = S
+
+[State 150, 3]
+type = ForceFeedback
+trigger1 = time = 0
+waveform = square
+time = 3
+
+;---------------------------------------------------------------------------
+; Stand guard hit (knocked back)
+[Statedef 151]
+type    = S
+movetype= H
+physics = S
+anim = 150
+
+[State 151, 1]
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+
+[State 151, 2]
+type = VelSet
+trigger1 = Time = GetHitVar(slidetime)
+trigger2 = HitOver
+x = 0
+
+[State 151, 3]
+type = CtrlSet
+trigger1 = Time = GetHitVar(ctrltime)
+value = 1
+
+[State 120, Hi to Lo]
+type = StateTypeSet
+triggerall = statetype = S
+trigger1 = !AILevel
+trigger1 = command = "holddown"
+trigger2 = AILevel
+trigger2 = (abs(P2Dist X)>120) || (P2MoveType=H) || (P2StateType=C)
+trigger2 = P2StateType!=A
+statetype = C
+physics = C
+
+[State 120, Lo to Hi]
+type = StateTypeSet
+triggerall = statetype = C
+trigger1 = !AILevel
+trigger1 = command!= "holddown"
+trigger2 = AILevel
+trigger2 = p2statetype = A
+trigger2 = abs(P2BodyDist X)=3
+statetype = S
+physics = S
+
+[State 151, 4]
+type = ChangeState
+trigger1 = HitOver
+value = 130
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Crouch guard hit (shaking)
+[Statedef 152]
+type    = C
+movetype= H
+physics = N
+velset = 0,0
+
+[State 152, 1]
+type = ChangeAnim
+trigger1 = 1
+value = 151
+
+[State 152, 3]
+type = ChangeState
+trigger1 = HitShakeOver
+value = 151 + 2*(StateType=C)
+
+[State 120, Hi to Lo]
+type = StateTypeSet
+triggerall = statetype = S
+trigger1 = !AILevel
+trigger1 = command = "holddown"
+trigger2 = AILevel
+trigger2 = (abs(P2Dist X)>120) || (P2MoveType=H) || (P2StateType=C)
+trigger2 = P2StateType!=A
+statetype = C
+physics = C
+
+[State 120, Lo to Hi]
+type = StateTypeSet
+triggerall = statetype = C
+trigger1 = !AILevel
+trigger1 = command!= "holddown"
+trigger2 = AILevel
+trigger2 = p2statetype = A
+statetype = S
+physics = S
+
+[State 152, 4]
+type = ForceFeedback
+trigger1 = time = 0
+waveform = square
+time = 4
+
+;---------------------------------------------------------------------------
+; Crouch guard hit (knocked back)
+[Statedef 153]
+type    = C
+movetype= H
+physics = C
+anim = 151
+
+[State 153, 1]
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+
+[State 153, 2]
+type = VelSet
+trigger1 = Time = GetHitVar(slidetime)
+trigger2 = HitOver
+x = 0
+
+[State 151, 3]
+type = CtrlSet
+trigger1 = Time = GetHitVar(ctrltime)
+value = 1
+
+[State 120, Hi to Lo]
+type = StateTypeSet
+triggerall = statetype = S
+trigger1 = !AILevel
+trigger1 = command = "holddown"
+trigger2 = AILevel
+trigger2 = (abs(P2Dist X)>120) || (P2MoveType=H) || (P2StateType=C)
+trigger2 = P2StateType!=A
+statetype = C
+physics = C
+
+[State 120, Lo to Hi]
+type = StateTypeSet
+triggerall = statetype = C
+trigger1 = !AILevel
+trigger1 = command!= "holddown"
+trigger2 = AILevel
+trigger2 = p2statetype = A
+statetype = S
+physics = S
+
+[State 153, 4]
+type = ChangeState
+trigger1 = HitOver
+value = 131
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Air guard hit (shaking)
+[Statedef 154]
+type    = A
+movetype= H
+physics = N
+velset = 0,0
+
+[State 154, 1]
+type = ChangeAnim
+trigger1 = 1
+value = 152
+
+[State 154, 2]
+type = ChangeState
+trigger1 = HitShakeOver
+value = 155;AGUARDHIT2
+
+[State 154, 3]
+type = ForceFeedback
+trigger1 = time = 0
+waveform = square
+time = 4
+
+;---------------------------------------------------------------------------
+; Air guard hit (knocked away)
+[Statedef 155]
+type    = A
+movetype= H
+physics = N
+anim = 152
+
+[State 155, 1]
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+y = 1
+
+[State 155, 2]
+type = VelAdd
+trigger1 = 1
+y = Const(movement.yaccel)
+
+[State 155, 3]
+type = CtrlSet
+trigger1 = Time = GetHitVar(ctrltime)
+value = 1
+
+[State 155, 4]
+type = VarSet
+trigger1 = 1
+sysvar(0) = (pos y >= 0) && (vel y > 0)
+
+[State 155, 5]
+type = VelSet
+trigger1 = sysvar(0)
+y = 0
+
+[State 155, 6]
+type = PosSet
+trigger1 = sysvar(0)
+y = 0
+
+[State 132, 6]
+type = ChangeState
+trigger1 = sysvar(0)
+trigger1 = cond(p2dist x<0,(command="holdfwd"),(command="holdback"))
+trigger1 = inguarddist
+value = 130
+
+[State 155, 7]
+type = ChangeState
+trigger1 = sysvar(0)
+value = 52
+
+;---------------------------------------------------------------------------
+; Air get-hit (falling)
+[Statedef 5050]
+type    = A
+movetype= H
+physics = N
+
+[State 5050, 1] ;Change anim when done with transition
+type = ChangeAnim
+trigger1 = AnimTime = 0
+trigger1 = Anim = 5035
+trigger2 = Time = 0     ;If no transition anim
+trigger2 = Anim != 5035
+trigger2 = (Anim != [5051, 5059]) && (Anim != [5061, 5069])
+trigger2 = Anim != 5090 ;Not if hit off ground anim
+value = 5050
+
+[State 5050, 2] ;Coming down anim
+type = ChangeAnim
+trigger1 = anim = [5050,5059]
+trigger1 = Vel Y >= ifelse(anim = 5050, Const720p(4), Const720p(-8))
+trigger1 = SelfAnimExist(anim+10)
+value = anim+10
+persistent = 0
+
+[State 5050, 3] ;Gravity
+type = VelAdd
+trigger1 = 1
+y = GetHitVar(yaccel)
+
+[State 5050, 4] ;Recover near ground
+type = ChangeState
+triggerall = Vel Y > 0
+triggerall = Pos Y >= Const(movement.air.gethit.groundrecover.ground.threshold)
+triggerall = alive
+triggerall = CanRecover
+trigger1 = Command = "recovery"
+value = 5200 ;Air get-hit (fall recovery on ground)
+
+[State 5050, 5]; Recover in mid air
+type = ChangeState
+triggerall = Vel Y > Const(movement.air.gethit.airrecover.threshold)
+triggerall = alive
+triggerall = CanRecover
+trigger1 = Command = "recovery"
+value = 5210 ;Air get-hit (fall recovery in air)
+
+[State 5050, 6]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= -vel y
+;trigger1 = Pos Y >= ifelse((anim = [5051,5059]) || (anim = [5061,5069]), 0, Const(movement.air.gethit.groundlevel))
+value = 5100 ;Downed get-hit (hit ground from fall)
+
+;---------------------------------------------------------------------------
+; Downed get-hit (hit ground from fall)
+[Statedef 5100]
+type    = L
+movetype= H
+physics = N
+
+[State 5100, 2004.04.14 behavior]
+type = null;VelSet
+trigger1 = Time = 0
+trigger1 = GetHitVar(fall.yvel) = 0
+trigger1 = vel x < -1
+x = -1
+
+[State 5100, EnvShake]
+type = FallEnvShake
+trigger1 = Time = 0
+
+[State 5100, Var] ;Save fall velocity
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = floor(vel y)
+
+[State 5100, 2] ;Hit ground anim (normal)
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = (anim != [5051,5059]) && (anim != [5061,5069])
+trigger2 = !SelfAnimExist(5100 + (anim % 10))
+value = 5100
+
+[State 5100, 3] ;Hit ground anim (for hit up)
+type = ChangeAnim
+trigger1 = time = 0
+trigger1 = (anim = [5051,5059]) || (anim = [5061,5069])
+trigger1 = SelfAnimExist(5100 + (anim % 10))
+value = 5100 + (anim % 10)
+
+[State 5100, 4]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 5100, 5]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 5100, 6] ;Reduce speed
+type = VelMul
+trigger1 = Time = 0
+x = 0.75
+
+[State 5100, 7]
+type = ChangeState
+trigger1 = Time = 0
+trigger1 = GetHitVar(fall.yvel) = 0
+value = 5110 ;Downed get-hit (lying down)
+
+[State 5100, 8]
+type = Explod
+trigger1 = Time = 1
+anim = F(60 + (sysvar(1) > Const720p(20)) + (sysvar(1) > Const720p(56)))
+pos = 0, 0
+postype = p1
+sprpriority = ifelse (sysvar(1) <= Const720p(56), -10, 10)
+
+[State 5100, 9]
+type = HitFallDamage
+trigger1 = Time = 3
+
+[State 5100, 10]
+type = PlaySnd
+trigger1 = Time = 1
+value = F7, (sysvar(1) > Const720p(20)) + (sysvar(1) > Const720p(56))
+
+[State 5100, 11]
+type = PosFreeze
+trigger1 = 1
+
+[State 5100, 12]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 5101 ;Downed get-hit (bounce off ground)
+
+[State 5100, 13]
+type = ForceFeedback
+trigger1 = Time = 0
+waveform = sinesquare
+ampl = 128,-3,-.2,.005
+time = 20
+
+;---------------------------------------------------------------------------
+; Downed get-hit (lying down)
+[Statedef 5110]
+type    = L
+movetype= H
+physics = N
+
+[State 5110, EnvShake]
+type = FallEnvShake
+trigger1 = Time = 0
+
+[State 5110, 1] ;For hit up/up-diag type (from state 5081)
+type = ChangeAnim
+persistent = 0
+trigger1 = SelfAnimExist(5110 + (anim % 10))
+trigger1 = anim = [5081,5089]
+value = 5110 + (anim % 10)
+
+[State 5110, 2] ;Hit ground anim (normal)
+type = ChangeAnim
+triggerall = time = 0
+triggerall = anim != [5110,5119] ;Not already changed anim
+trigger1 = anim != [5161,5169]
+trigger2 = !SelfAnimExist(5170 + (anim % 10))
+value = 5170
+
+[State 5110, 3] ;Hit ground anim (for hit up)
+type = ChangeAnim
+triggerall = time = 0
+triggerall = anim != [5110,5119] ;Not already changed anim
+trigger1 = anim = [5161,5169]
+trigger1 = SelfAnimExist(5170 + (anim % 10))
+value = 5170 + (anim % 10)
+
+[State 5110, 4]
+type = HitFallDamage
+trigger1 = Time = 0
+
+[State 5110, 5]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 5110, Var] ;Get fall velocity
+type = VarSet
+trigger1 = Time = 0
+trigger1 = GetHitVar(fall.yvel) != 0
+sysvar(1) = floor(vel y)
+
+[State 5110, 6]
+type = PlaySnd
+trigger1 = Time = 0
+trigger1 = !SysVar(0)
+value = F7, (sysvar(1) > Const720p(20)) + (sysvar(1) > Const720p(56))
+
+[State 5110, 7]
+type = Explod
+trigger1 = Time = 0
+trigger1 = !SysVar(0)
+anim = F(60 + (sysvar(1) > Const720p(20)) + (sysvar(1) > Const720p(56)))
+pos = 0, 0
+postype = p1
+sprpriority = ifelse (sysvar(1) <= Const720p(56), -10, 10)
+
+[State 5110, 8]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 5110, 9] ;For hit up type
+type = ChangeAnim
+persistent = 0
+triggerall = anim = [5171,5179]
+triggerall = SelfAnimExist(5110 + (anim % 10))
+trigger1 = AnimTime = 0
+trigger2 = SysVar(0) ;SysVar(0) = 1 avoids hit ground anim
+value = 5110 + (anim % 10)
+
+[State 5110, 10] ;For normal
+type = ChangeAnim
+persistent = 0
+triggerall = Anim != [5111,5119]
+trigger1 = AnimTime = 0
+trigger2 = SysVar(0) ;SysVar(0) = 1 avoids hit ground frame
+value = 5110
+
+[State 5110, 11] ;If just died
+type = ChangeState
+triggerall = !alive
+trigger1 = AnimTime = 0
+trigger2 = SysVar(0) ;SysVar(0) = 1 avoids hit ground frame
+trigger3 = Anim = [5110,5119]
+value = 5150
+
+[State 5110, 12]
+type = VarSet
+trigger1 = SysVar(0)
+trigger1 = Time = 0
+sysvar(0) = 0
+
+[State 5110, 13] ;Friction
+type = VelMul
+trigger1 = 1
+x = 0.85
+
+[State 5110, 14] ;Friction
+type = VelSet
+trigger1 = abs(Vel x) < Const(movement.down.friction.threshold)
+persistent = 0
+x = 0
+
+[State 5110, 15]
+type = ForceFeedback
+trigger1 = alive
+trigger1 = Time = 0
+time = 8
+ampl = 240
+waveform = sine
+
+[State 5110, 16]
+type = ForceFeedback
+trigger1 = !alive
+trigger1 = Time = 0
+ampl = 200, 7, -.467
+time = 30
+waveform = sine
+
+;---------------------------------------------------------------------------
+; Downed get-hit (getting up)
+[Statedef 5120]
+type    = L
+movetype= I
+physics = N
+
+[State 5120, 1a] ;Get up anim (normal)
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = anim != [5111,5119]
+trigger2 = !SelfAnimExist(5120 + (anim % 10))
+value = 5120
+
+[State 5120, 1b] ;Get up anim (for hit up/diag-up)
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = anim = [5111,5119]
+trigger1 = SelfAnimExist(5120 + (anim % 10))
+value = 5120 + (anim % 10)
+
+[State 5120, 2]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+
+[State 5120, 3]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 5120, 4]
+type = HitFallSet
+trigger1 = AnimTime = 0
+value = 1
+
+[State 5120, 5] ;Can't be thrown right after getting up
+type = NotHitBy
+trigger1 = AnimTime = 0
+value = , NT,ST,HT
+time = 12
+
+[State 5120, 6] ;Can't be hit right after getting up (short time)
+type = NotHitBy
+trigger1 = AnimTime = 0
+value2 = SCA
+time = 3
+
+[State 5120, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Downed get-hit (lying defeated)
+[Statedef 5150]
+type    = L
+movetype= H
+physics = N
+sprpriority = -3
+ctrl = 0
+
+[State 0, ChangeAnim]
+type = ChangeAnim
+trigger1 = name != "Peppino" && authorname != "somebody407" && selfanimexist(5888)
+value = 5888
+
+[State 5150, 1] ;Normal anim
+type = ChangeAnim
+triggerall = Time = 0
+triggerall = SelfAnimExist(5140)
+trigger1 = (anim != [5111,5119]) && (anim != [5171,5179])
+trigger2 = !SelfAnimExist(5140 + (anim % 10))
+value = 5140
+
+[State 5150, 3] ;Hit up type anim
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = (anim = [5111,5119]) || (anim = [5171,5179])
+trigger1 = SelfAnimExist(5140 + (anim % 10))
+value = 5140 + (anim % 10)
+
+[State 5150, 4] ;Match over anim
+type = ChangeAnim
+persistent = 0
+;trigger1 = Time = 0
+trigger1 = MatchOver = 1
+trigger1 = Anim = [5140,5149]
+trigger1 = SelfAnimExist(anim+10)
+value = anim+10
+
+[State 5150, 5] ;Switch to 5110 if liedead anim does not exist
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = Anim != [5140,5159]
+trigger1 = Anim != [5110,5119]
+value = 5110
+
+[State 0, ChangeAnim] ;Clone death
+type = ChangeAnim
+triggerall = enemy,name = "Peppino" || enemy,name = "Pizza Tower - Peppino"
+triggerall = !time
+triggerall = roundno >= 2
+trigger1 = aiLevel && !enemy,aiLevel
+trigger2 = (aiLevel && enemy,AiLevel) || (!aiLevel && !enemy,AiLevel)
+trigger2 = teamside = 2
+value = 5141
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = enemy,name = "Peppino" || enemy,name = "Pizza Tower - Peppino"
+triggerall = !time
+triggerall = roundno >= 2
+trigger1 = aiLevel && !enemy,aiLevel
+trigger2 = (aiLevel && enemy,AiLevel) || (!aiLevel && !enemy,AiLevel)
+trigger2 = teamside = 2
+value = S5151,0
+
+[State 5150, 6] ;Friction
+type = VelMul
+trigger1 = 1
+x = 0.85
+
+[State 5150, 7] ;Friction
+type = VelSet
+trigger1 = abs(Vel x) < Const(movement.down.friction.threshold)
+persistent = 0
+x = 0
+
+[State 5150, 8]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Air get-hit (fall recovery on ground)
+[Statedef 5201]
+type    = A
+movetype= H
+physics = A
+anim = 5200
+
+[State 5201, 1] ;Turn if not facing opponent
+type = Turn
+trigger1 = Time = 0
+trigger1 = p2dist X < Const720p(-20)
+
+[State 5201, 2]
+type = VelSet
+trigger1 = Time = 0
+x = Const(velocity.air.gethit.groundrecover.x)
+y = Const(velocity.air.gethit.groundrecover.y)
+
+[State 5201, 3]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 5201, 4]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 5201, 5] ;Blink white
+type = PalFX
+trigger1 = Time = 0
+time = 3
+add = 128,128,128 ;256,256,256
+
+[State 5201, 6]
+type = Explod
+trigger1 = Time = 0
+anim = F60
+postype = p1
+pos = 0, -floor(vel y)
+sprpriority = -10
