@@ -1,0 +1,134 @@
+;==================< INITIALIZE >========================================
+
+;Initialize Start Round
+[Statedef 5900]
+type = S
+
+[state 5900, Reset Variables]
+type = varrangeset
+trigger1 = !roundsexisted && matchno = 1
+value = 0
+[state 5900, Reset Variables]
+type = varrangeset
+trigger1 = !roundsexisted && matchno = 1
+fvalue = 0
+[State 5900, Reset Palette]
+type = Null
+trigger1 = !roundsexisted&&matchno=1;
+fvar(0) = palno
+[State 5900, Reset Palette]
+type = Null
+trigger1 = !roundsexisted && matchno = 1
+source = 1,1
+dest = 1,fvar(0)
+
+;___________________________________________________________________________
+
+;PALETTE SELECTOR & DRIVE SELECTOR
+[State 5900, Palette Selector + Drive Selector];
+type=Varset ;DON'T TOUCH-----------------------------------------------------------------------------
+trigger1=1 ;DON'T TOUCH-----------------------------------------------------------------------------
+v=56 ;DON'T TOUCH-----------------------------------------------------------------------------
+Value = 2
+;0 = No Match-start-selector
+;1 = Palette Selector only
+;2 = Palette Selector + Drive Selector
+;3 = Drive Selector only
+
+;DRIVE LOCKING
+[State 5900, Drive Locking];
+type=Varset ;DON'T TOUCH-----------------------------------------------------------------------------
+trigger1=1 ;DON'T TOUCH-----------------------------------------------------------------------------
+v=55 ;DON'T TOUCH-----------------------------------------------------------------------------
+Value = 0
+;0 = Unlock drive selector (DEFAULT)
+;1 = Lock drive selector
+
+;___________________________________________________________________________
+
+;CUSTOM COMBO / MAX MODE SELECT
+[State 5900, Custom Combo / Max Mode Select]
+type = VarSet ;DON'T TOUCH-----------------------------------------------------------------------------
+trigger1 = !roundsexisted&&matchno=1; ;DON'T TOUCH-----------------------------------------------------------------------------
+var(54) = 0
+ignoreHitPause = 1 ;DON'T TOUCH-----------------------------------------------------------------------------
+;0 = custom combo
+;1 = max mode
+;2 = rage mode
+
+;FOCUS ATTACK / POWER CHARGE SELECT
+[State 5900, Focus Attack / Power Charge Select]
+type = VarSet ;DON'T TOUCH-----------------------------------------------------------------------------
+trigger1 = 1 ;DON'T TOUCH-----------------------------------------------------------------------------
+var(40) = 1
+ignoreHitPause = 1 ;DON'T TOUCH-----------------------------------------------------------------------------
+;0 = power charge
+;1 = focus attack - DEFAULT
+;___________________________________________________________________________
+
+[State 5901, PotS or Infinite Hit-Sounds]
+type = varset ;DON'T TOUCH-----------------------------------------------------------------------------
+trigger1=1 ;DON'T TOUCH-----------------------------------------------------------------------------
+v=52 ;DON'T TOUCH-----------------------------------------------------------------------------
+Value = 0
+; Set as "0" if you want default/SFV hitsounds
+; Set as "1" if you want classic PotS hitsounds
+; Set as "2" if you want Infinite's hitsounds
+; Set as "3" if you want the hitsounds from the Capcom vs SNK series
+
+[State 5901, PotS or Infinite Hit-Sparks]
+type = varset ;DON'T TOUCH-----------------------------------------------------------------------------
+trigger1=1 ;DON'T TOUCH-----------------------------------------------------------------------------
+fv=29 ;DON'T TOUCH-----------------------------------------------------------------------------
+Value = -1
+; Set as "-1" if you want default/custom HitSparks
+; Set as "0" if you want classic, orange PotS HitSparks
+; Set as "1" if you want multi-colored PotS HitSparks (but Super Hitsparks are half-purple, half-blue)
+; Set as "2" if you want multi-colored PotS HitSparks (standard)
+; Set as "3" if you want the HitSparks of PotS' 2022 updated characters
+
+[State 5900, How many palettes?]
+type=Varset
+trigger1=1 ;DON'T TOUCH-----------------------------------------------------------------------------
+fv=27 ;DON'T TOUCH-----------------------------------------------------------------------------
+Value = 12
+; How many color palettes does the character have?
+
+;___________________________________________________________________________
+;                 DON'T CHANGE ANYTHING BELOW THIS LINE... I'LL KNOW.
+;___________________________________________________________________________
+[State 5900, Pal Selector on]
+type=helper
+triggerall=var(56)&&!numhelper(256)&&!AILevel&&numenemy;
+trigger1=!roundsexisted&&!(teammode=simul)&&!(enemy,teammode=simul)
+trigger2=(teammode=turns)
+trigger2=!roundsexisted&&(enemy,roundsexisted)
+id=256
+stateno=9256
+size.xScale=0.5
+size.yScale=0.5
+facing=facing
+ownpal=1
+
+[State 5900, No Drive Selector]
+type = VarSet
+triggerall = var(56) < 2 || AILevel
+trigger1 =!roundsexisted
+v = 54
+value = 0+random%3
+
+[State 5900, Turns Intro]
+type = ChangeState
+trigger1 = TeamMode = Turns
+trigger1 = !RoundsExisted && RoundNo >= 2
+value = 6900
+
+[State 5900, Intro Decider]
+type = ChangeState
+trigger1 = RoundNo = 1
+value = 190
+
+[State 5900, End]
+type = ChangeState
+trigger1 = 1
+value = 0

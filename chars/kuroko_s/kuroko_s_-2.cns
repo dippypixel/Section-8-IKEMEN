@@ -1,0 +1,181 @@
+[Statedef -2]
+
+[State -1, VarRandom]
+Type = VarRandom
+TriggerAll = Time = 0
+Trigger1 = StateNo = 5000
+Trigger2 = StateNo = 5010
+Trigger3 = StateNo = 5020
+Trigger4 = StateNo = 5070
+Trigger5 = StateNo = 5120
+
+V = 12
+
+Range = 0,5
+IgnoreHitPause = 1
+
+[State -2, 喰らい1]
+Type = PlaySnd
+TriggerAll = Time = 1
+Trigger1 = StateNo = 5000
+Trigger2 = StateNo = 5010
+Trigger3 = StateNo = 5020
+Trigger4 = StateNo = 5070
+Value = s2,var(12)
+Channel = 0
+volume=255
+
+
+;■　起き上がり音声　■■■■■■■■■■■■■■
+[State -2,起き上がり1]
+type = PlaySnd
+Trigger1 = StateNo = 5120
+Trigger1 =time =1
+Value = s3,var(12)
+Channel = 0
+Volume=255
+lowpriority=1
+
+;■コンボ補正（攻撃力Down）■■■■■■■■■■■■■■■■
+[State -3]
+type = varset
+trigger1 = ctrl=1
+var(48)=0
+IgnoreHitPause = 1
+
+[State -3]
+type = AttackMulSet
+trigger1 = var(48) <6
+value = 1.0
+IgnoreHitPause = 1
+
+[State -3]
+type = AttackMulSet
+trigger1 = var(48) >=6 && var(48) <11
+value = 0.9
+IgnoreHitPause = 1
+
+[State -3]
+type = AttackMulSet
+trigger1 = var(48) >=11 && var(48) <16
+value = 0.8
+IgnoreHitPause = 1
+
+[State -3]
+type = AttackMulSet
+trigger1 = var(48) >=16
+value = 0.7 
+IgnoreHitPause = 1
+
+;■■■■■■■■■■■■■■■■■
+[State -3, テレポゲージ増加]
+type = varadd
+trigger1 = GameTime % 5=1
+v = 30
+value = 1
+
+;■■■■■■■■■■■■■■■■■
+[State -3, テレポゲージ上限]
+type = varset
+trigger1 = var(30)>=75
+v = 30
+value = 75
+
+;■■■■■■■■■■■■■■■■■
+[State -3, テレポゲージ下限]
+type = varset
+trigger1 = var(30)<=0
+v = 30
+value = 0
+
+;■■■■■■■■■■■■■■■■■
+[State -1, テレポゲージ呼び出し]
+Type     = Helper
+Trigger1 = NumHelper(4100) = 0
+Stateno  = 4100
+ID       = 4100
+Pos      = 0,40
+PosType  = back
+OwnPal   = 1
+size.xscale=0.625
+size.yscale=0.625
+SuperMoveTime = 999999
+PauseMoveTime = 999999
+IgnoreHitPause = 1
+Persistent = 0
+
+
+;■■■■■■■■■■■■■■■■■
+[State -2, テレポゲージ表示]
+Type = null;Explod
+trigger1 = 1
+Anim = 7341
+ID = 7341
+Postype = Left
+Pos = 0,helper(4100),Pos y+185;helper(4100),Pos x,helper(4100),Pos y
+scale = 0.625,0.625
+Ownpal = 1
+SprPriority = 3
+bindtime = 1
+persistent=1
+IgnoreHitPause = 1
+SuperMoveTime = 9999999
+PauseMoveTime = 9999999
+facing = 1
+persistent =0
+
+;■根性値（防御力変化）■■■■■■■■■■■■■■■■
+[State -1, DefenceMulSet]
+Type = DefenceMulSet
+Trigger1 = Life <= 800
+Trigger1 = Life >= 601
+Value = 0.9
+IgnoreHitPause = 1
+
+[State -1, DefenceMulSet]
+Type = DefenceMulSet
+Trigger1 = Life <= 600
+Trigger1 = Life >= 401
+Value = 0.8
+IgnoreHitPause = 1
+
+[State -1, DefenceMulSet]
+Type = DefenceMulSet
+Trigger1 = Life <= 400
+Trigger1 = Life >= 201
+Value = 0.7
+IgnoreHitPause = 1
+
+[State -1, DefenceMulSet]
+Type = DefenceMulSet
+Trigger1 = Life <= 200
+Value = 0.6
+IgnoreHitPause = 1
+
+[State -1, DefenceMulSet]
+Type = DefenceMulSet
+Trigger1 = Life <= 100
+Value = 0.5
+IgnoreHitPause = 1
+
+;■　一度負けたかどうかの判定　■■■■■■■■■■■■■■■■
+;[State -1] 
+;type=varadd
+;trigger1 = var(50)=0
+;trigger1 = lose
+;var(50) = 1
+
+;■debug用■■■■■■■■■■■■
+[State -2, デバック]
+type = DisplayToClipboard
+trigger1 = 1
+text =  "var(11),%f\n"
+params = var(11)
+IgnoreHitPause = 1
+
+[State -2, 距離確認デバック]
+type = AppendToClipboard
+trigger1 = 1
+text =  "P2X:%f,P2Y:%f,Vx%f,Vy%f,Py%f \n"
+params = p2bodydist x, p2bodydist y,vel x,vel y,Pos y
+IgnoreHitPause = 1

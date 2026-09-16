@@ -1,0 +1,3281 @@
+; これはカンフーマンのＣＮＳファイルです。
+; コメントを参考にしてＣＮＳを理解してください
+
+; これはKFMの定数と状態のファイルです。
+; 絶対記入し、削除はしないでください。
+[Data]
+  ;体力ゲージの初期値
+life = 1300
+  ;攻撃力（これ以上に設定すると強くなる）
+attack = 100
+  ;防御力（これ以上に設定すると強くなる）
+defence = 100
+  ;コンボをくらっている時にあがる防御力
+fall.defence_up = 50
+  ;倒れてから起上がるまでのフレーム数
+liedown.time = 60
+  ;空中でどれだけコンボが繋がるか（高くすると無限コンボになるので注意）
+airjuggle = 15
+  ;hitdefで設定していない時の基本ヒットスパークナンバー
+sparkno = 2
+  ;設定してない時のガードナンバー
+guard.sparkno = 40
+  ;KOした時に声にエコーをかけるか（１でＯＮ）
+KO.echo = 0
+ volume = 255
+  IntPersistIndex = 60
+FloatPersistIndex = 40
+
+[Size]
+xscale = 1.5           ;水平方向の縮尺（通常１）
+yscale = 1.5           ;垂直方向の縮尺（通常１）
+ground.back = 15     ;キャラの幅(後方,地上)
+ground.front = 16    ;キャラの幅(前方,地上)
+air.back = 12        ;キャラの幅(後方,空中)
+air.front = 12       ;キャラの幅(前方,空中)
+height = 60          ;キャラの高さ
+attack.dist = 160    ;攻撃をした時相手がガード体制に入る最低距離
+proj.attack.dist = 90;攻撃をした時相手がガード体制に入る最低距離（飛び道具）
+proj.doscale = 0     ;上で設定した縮尺を飛び道具にも適用するか（１でＯＮ）   
+head.pos = 9, -90   ;頭の大体の座標
+mid.pos = 9, -60    ;体の中心の大体の座標
+shadowoffset = 0     ;影の垂直方向のオフセット
+draw.offset = 0,0    ;使用しない
+
+[Velocity]
+walk.fwd  = 2.4      ;前進の速度
+walk.back = -2.2     ;後退の速度
+run.fwd  = 4.6, 0    ;前ダッシュの速度（ホップする時はyを-にする）
+run.back = -4.5,-3.8 ;後ダッシュの速度（ホップする時はyを-にする）
+jump.neu = 0,-8.4    ;垂直ジャンプの速度
+jump.back = -2.55    ;後ジャンプの速度
+jump.fwd = 2.5       ;前ジャンプの速度
+runjump.back = -2.55,-8.1 ;後ダッシュしながらのジャンプ速度(オプション)
+runjump.fwd = 4,-8.1      ;前ダッシュしながらのジャンプ速度(オプション)
+airjump.neu = 0,-8.1      ;２段ジャンプ以降の垂直ジャンプの速度(オプション)
+airjump.back = -2.55      ;２段ジャンプ以降の後ジャンプの速度(オプション)
+airjump.fwd = 2.5         ;２段ジャンプ以降の前ジャンプの速度
+
+[Movement]
+airjump.num = 1      ;空中でジャンプする回数
+airjump.height = 35  ;空中でジャンプする最低限の高さ
+yaccel = .44         ;重力
+stand.friction = .85  ;立ち状態の摩擦係数
+crouch.friction = .82 ;屈み状態の摩擦係数
+
+;---------------------------------------------------------------------------
+; ステイトの解説
+; [Statedef STATENO]
+; type = ?      S/C/A/L  Ｓ：立ち/Ｃ：屈み/Ａ：空中/Ｌ：ダウン
+; movetype = ?  I/A/H    Ｉ：通常状態/Ａ：攻撃状態/Ｈ：ダメージをくらってる状態
+; physics = ?   S/C/A/N  Ｓ：立ち/Ｃ：屈み/Ａ：空中/Ｎ：無し
+; juggle = ?             その攻撃に使うジャグル数
+;
+
+;---------------------------------------------------------------------------
+; タイムオーバーで負けた時
+[Statedef 170]
+type = S
+ctrl = 0
+anim = 170
+velset = 0,0
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; 勝った動作１
+[Statedef 180]
+type = S
+
+[State 180, 1]
+type = ChangeState
+trigger1 = Time = 0
+value = 181
+
+;---------------------------------------------------------------------------
+; 勝った動作２
+[Statedef 181]
+type = S
+ctrl = 0
+anim = 181
+velset = 0,0
+
+[State 181, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; 開始前の動作
+[Statedef 191]
+type = S
+ctrl = 0
+anim = 190
+velset = 0,0
+
+[State 0, Helper];104,96
+type = Helper
+trigger1 = AnimElem = 7
+helpertype = Player
+name = "Hadou"
+ownpal = 1
+ID = 1900
+stateno = 1900
+pos = 0,0
+postype = p1
+size.xscale = 1.5
+size.yscale = 1.5
+ignorehitpause=1
+supermovetime = 2147483647
+pausemovetime = 2147483647
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 191, 4] 
+type = ChangeState
+trigger1 = var(5)
+value = 192
+;---------------------------------------------------------------------------
+; 開始前の動作
+[Statedef 192]
+type = S
+ctrl = 0
+anim = 192
+velset = 0,0
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 200, 1]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = 13,6
+
+[State 200, 1]
+type = PlaySnd
+trigger1 = AnimElem = 2
+value = 12,1
+
+[State 736:	EnvShake]
+type	= EnvShake
+trigger1 = AnimElem = 14
+time	= 10
+freq	= 140
+ampl	= -4
+phase	= 90
+
+[State 200, 1]
+type = PlaySnd
+trigger1 = AnimElem = 14
+value = 0,7
+
+[State 191, 4] 
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+;---------------------------------------------------------------------------
+[Statedef 1900];王冠
+type    = S
+movetype= A
+physics = S
+sprpriority = 999999
+poweradd= 0
+ctrl = 0
+movehitpersist = 1
+hitdefpersist = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = IsHelper
+trigger1 = anim != 191
+value = 191
+ignorehitpause = 1
+
+[State 200, 1]
+type = varadd
+trigger1 = 1
+var(4) = 2
+
+[State 8000]
+type = Posset
+trigger1 = IsHelper
+y = -240+var(4)
+ignorehitpause = 1
+
+[state ];画面外に出られるようになる
+type=screenbound
+trigger1=1
+value=0
+movecamera=0,0
+ignorehitpause=1
+
+[State 200, 1]
+type = ParentVarSet
+trigger1 = var(4) >= 240
+var(5) = 1
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = var(4) >= 240
+
+[State ]
+Type=selfstate
+Trigger1=IsHelper
+Value=5150
+Persistent=256
+IgnoreHitPause=1
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+; 挑発の動作
+[Statedef 195]
+type = S
+ctrl = 0
+anim = 195
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+[State 195, 1]
+type = CtrlSet
+trigger1 = Time = 40
+value = 1
+
+[State 195, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+;---------------------------------------------------------------------------
+[Statedef 666];Damage
+type = S
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 2
+value = 2
+ignorehitpause = 1
+
+[State a]
+type = varset
+trigger1 = Var(49)
+var(49) = 0
+ignorehitpause = 1
+
+[state ]
+type=turn
+triggerall=p2Bodydist x <= 0
+trigger1=AnimElem = 1
+trigger2=AnimElem = 8
+ignorehitpause=1
+
+[State 200, 音を鳴らす]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = 11,1
+
+[State 195, 2]
+type = Ctrlset
+trigger1 = AnimTime = 8
+value = 1
+
+[State 195, 2]
+type = Ctrlset
+trigger1 = AnimTime = 1
+value = 0
+;---------------------------------------------------------------------------
+[Statedef 555];Crown
+type = S
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 6
+value = 6
+ignorehitpause = 1
+
+[State a]
+type = varset
+trigger1 = Var(46)
+var(46) = 0
+ignorehitpause = 1
+
+[state ]
+type=turn
+triggerall=p2Bodydist x <= 0
+trigger1=AnimElem = 1
+trigger2=AnimElem = 8
+ignorehitpause=1
+
+[State 200, 音を鳴らす]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = 13,6
+
+[State 195, 2]
+type = Ctrlset
+trigger1 = AnimTime = 8
+value = 1
+
+[State 195, 2]
+type = Ctrlset
+trigger1 = AnimTime = 1
+value = 0
+
+;---------------------------------------------------------------------------
+[Statedef 777];Milk
+type = S
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 3000
+value = 3000
+ignorehitpause = 1
+
+[State 0, Helper];104,96
+type = Helper
+trigger1 = AnimElem = 1
+helpertype = Player
+name = "Hadou"
+ownpal = 1
+ID = 30000
+stateno = 30000
+pos = Floor(60 * const(size.xscale)),Floor(-42 * const(size.yscale))
+postype = p1
+size.xscale = 1.5
+size.yscale = 1.5
+ignorehitpause=1
+supermovetime = 2147483647
+pausemovetime = 2147483647
+
+[State a]
+type = varadd
+trigger1 = AnimElem = 1
+var(10) = 1
+ignorehitpause = 1
+
+[State 200, 音を鳴らす]
+type = varset
+trigger1 = var(9)
+sysvar(3) = 0
+
+[State a]
+type = varset
+trigger1 = Var(9)
+var(9) = 0
+ignorehitpause = 1
+
+[State 195, 2]
+type = Ctrlset
+trigger1 = AnimElem = 2
+value = 1
+
+[State 195, 2]
+type = Ctrlset
+trigger1 = AnimElem = 1
+value = 0
+;---------------------------------------------------------------------------
+
+[Statedef 200]
+type     = S 
+movetype = A                 ;キャラの行動内容を指定 I=何もしない　A=攻撃している　H=攻撃を食らっている
+physics  = S                 ;キャラの物理的な体勢
+juggle   = 8                 ;攻撃を当てた時に溜まるジャグルポイントの設定
+velset   = 0,0               ;移動初速度の設定（このステートでは0,0なので移動せず止まります）
+ctrl     = 0                 ;コントロールの可否（0=キー操作不可・1=キー操作可能）
+sprpriority = 2              ;画像表示優先度　数値が多いと手前に、少ないと奥に優先されます
+movehitpersist = 1
+hitdefpersist = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 200
+value = 200
+ignorehitpause = 1
+
+[state ]
+type=turn
+trigger1=p2Bodydist x <= 0
+trigger1=AnimElem = 1
+ignorehitpause=1
+
+[State 200, 1]
+type = Varadd
+trigger1 = var(26)
+trigger1 = AnimElem = 1
+var(56) = 9900
+ignorehitpause=1
+
+[State 200, 1]
+type = Varadd
+trigger1 = !var(26)
+trigger1 = AnimElem = 1
+var(56) = 9900
+ignorehitpause=1
+
+[State 200, 1]
+type = Poweradd
+trigger1 = var(26)
+trigger1 = AnimElem = 1
+value = 9900
+ignorehitpause=1
+
+[State 2000, 6]
+type = Projectile
+trigger1 = AnimElem = 4
+trigger2 = AnimElem = 10
+trigger3 = AnimElem = 16
+trigger4 = AnimElem = 22
+projanim = 201
+projremove = 0
+projremovetime = 600
+ProjHeightBound = -240,240
+projpriority = 1
+projsprpriority = 5
+projshadow = 0,0,0
+getpower = 100
+offset = Floor(46 * const(size.xscale)),Floor(-25 * const(size.yscale))
+attr = S, SP
+animtype = Hard
+velocity = 1+random%15/10,-1+random%30/10
+damage    = 6+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.006))
+hitflag = MAFPDLH
+guardflag = 
+hitsound = 0,0
+sparkno = -1
+guardsound = -1
+pausetime = 0,4
+ground.type = High
+ground.hittime = 21
+ground.slidetime = 21
+ground.velocity = -6,0
+air.juggle = 8
+air.velocity = -6,0
+fall = 1
+air.fall = 1
+
+[State 2000, 6]
+type = Projectile
+trigger1 = AnimElem = 4
+trigger2 = AnimElem = 10
+trigger3 = AnimElem = 16
+trigger4 = AnimElem = 22
+projanim = 201
+projremove = 0
+projremovetime = 600
+projpriority = 1
+projsprpriority = 5
+projshadow = 0,0,0
+ProjHeightBound = -240,240
+getpower = 100
+offset = Floor(46 * const(size.xscale)),Floor(-25 * const(size.yscale))
+attr = S, SP
+animtype = Hard
+velocity = 1+random%15/10,-1+random%30/10
+damage    = 6+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.006))
+hitflag = MAFPDLH
+guardflag = 
+hitsound = 0,0
+sparkno = -1
+guardsound = -1
+pausetime = 0,4
+ground.type = High
+ground.hittime = 21
+ground.slidetime = 21
+ground.velocity = -6,0
+air.juggle = 8
+air.velocity = -6,0
+fall = 1
+air.fall = 1
+
+[State 2000, 6]
+type = Projectile
+trigger1 = AnimElem = 4
+trigger2 = AnimElem = 10
+trigger3 = AnimElem = 16
+trigger4 = AnimElem = 22
+projanim = 201
+projremove = 0
+ProjHeightBound = -240,240
+projremovetime = 600
+projpriority = 1
+projsprpriority = 5
+projshadow = 0,0,0
+getpower = 100
+offset = Floor(46 * const(size.xscale)),Floor(-25 * const(size.yscale))
+attr = S, SP
+animtype = Hard
+velocity = 1+random%15/10,-1+random%30/10
+damage    = 6+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.006))
+hitflag = MAFPDLH
+guardflag = 
+hitsound = 0,0
+sparkno = -1
+guardsound = -1
+pausetime = 0,4
+ground.type = High
+ground.hittime = 21
+ground.slidetime = 21
+ground.velocity = -6,0
+air.juggle = 8
+air.velocity = -6,0
+fall = 1
+air.fall = 1
+
+[State 2000, 6]
+type = Projectile
+trigger1 = AnimElem = 4
+trigger2 = AnimElem = 10
+trigger3 = AnimElem = 16
+trigger4 = AnimElem = 22
+projanim = 201
+ProjHeightBound = -240,240
+projremove = 0
+projremovetime = 600
+projpriority = 1
+projsprpriority = 5
+projshadow = 0,0,0
+getpower = 100
+offset = Floor(46 * const(size.xscale)),Floor(-25 * const(size.yscale))
+attr = S, SP
+animtype = Hard
+velocity = 1+random%15/10,-1+random%30/10
+damage    = 6+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.006))
+hitflag = MAFPDLH
+guardflag = 
+hitsound = 0,0
+sparkno = -1
+guardsound = -1
+pausetime = 0,4
+ground.type = High
+ground.hittime = 21
+ground.slidetime = 21
+ground.velocity = -6,0
+air.juggle = 8
+air.velocity = -6,0
+fall = 1
+air.fall = 1
+
+[State 200, 音を鳴らす]
+type = MovehitReset
+trigger1 = AnimElem = 1
+
+[State 200, 1]
+type = Poweradd
+trigger1 = !var(26)
+trigger1 = AnimElem = 1
+value = 9900
+ignorehitpause=1
+
+[State 200, 音を鳴らす]
+type = Ctrlset
+trigger1 = AnimElem = 1
+value = 0
+
+[State 200, 音を鳴らす]
+type = PlaySnd
+trigger1 = AnimElem = 4
+trigger2 = AnimElem = 10
+trigger3 = AnimElem = 16
+trigger4 = AnimElem = 22
+value = 13,0
+
+[State 200, 音を鳴らす]
+type = PlaySnd
+trigger1 = AnimElem = 4
+trigger2 = AnimElem = 10
+trigger3 = AnimElem = 16
+trigger4 = AnimElem = 22
+value = 13,1
+
+[State 200, ステート変更]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 0
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+; ここから下に新しいステートを書くと分かりやすくていいと思います
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+[StateDef 27000]
+Type = S
+VelSet = 0,0
+Sprpriority = 2
+
+[State a]
+type = assertspecial
+trigger1 = 1
+flag = invisible
+ignorehitpause = 1
+
+[State 0, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[State a]
+type = turn
+trigger1 = facing != root,facing
+ignorehitpause = 1
+
+[State a]
+type = posset
+trigger1 = 1
+x = root,pos x
+y = root,pos y
+ignorehitpause = 1
+
+[State a]
+type = changeanim
+trigger1 = 1
+value = root,anim
+elem = root,animelemno(0)
+ignorehitpause = 1
+
+[State a]
+type = HitOverride
+trigger1 = 1
+attr = SCA,AA,AP,AT
+stateno = 27001
+time = 1
+ignorehitpause = 1
+
+[StateDef 27001]
+Type = S
+VelSet = 0,0
+Sprpriority = 2
+
+[State 0, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+supermovetime = 999999999
+pausemovetime = 999999999
+
+[State a]
+type = turn
+trigger1 = facing != root,facing
+ignorehitpause = 1
+
+[State a]
+type = assertspecial
+trigger1 = 1
+flag = invisible
+ignorehitpause = 1
+
+[State a]
+type = posset
+trigger1 = 1
+x = root,pos x
+y = root,pos y
+ignorehitpause = 1
+
+[State a]
+type = changeanim
+trigger1 = 1
+value = root,anim
+elem = root,animelemno(0)
+ignorehitpause = 1
+
+[State a]
+type = HitOverride
+trigger1 = 1
+attr = SCA,AA,AP,AT
+stateno = 27001
+time = 1
+ignorehitpause = 1
+
+[State a]
+type = parentvarset
+trigger1 = time = 0
+var(49) = GetHitVar(damage)
+ignorehitpause = 1
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = !time
+value = SCA
+time = 60
+
+[State a]
+type = ChangeState
+trigger1 = time = 1
+value = 27000
+ctrl = 0
+ignorehitpause = 1
+supermovetime = 999999999
+pausemovetime = 999999999
+;---------------------------------------------------------------------------
+
+;---------------------------------------------------------------------------
+[Statedef 5152];1回目死亡演出
+type    = S
+movetype= I
+physics = N
+sprpriority = 4
+poweradd= 0
+ctrl = 0
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 5000
+value = 5000
+ignorehitpause = 1
+
+[State 200, 音を鳴らす]
+type = Posset
+trigger1 = 1
+y = 0
+
+[State 0, Helper];104,96
+type = Helper
+trigger1 = AnimElem = 2
+helpertype = Player
+name = "Hadou"
+ownpal = 1
+ID = 5560
+stateno = 5560
+pos = Floor(1 * const(size.xscale)),Floor(-71 * const(size.yscale))
+postype = p1
+size.xscale = 1.5
+size.yscale = 1.5
+ignorehitpause=1
+supermovetime = 2147483647
+pausemovetime = 2147483647
+
+[State 0, Helper];104,96
+type = Helper
+trigger1 = AnimElem = 10
+helpertype = Player
+name = "Hadou"
+ownpal = 1
+ID = 5660
+stateno = 5660
+pos = Floor(0 * const(size.xscale)),Floor(-38 * const(size.yscale))
+postype = p1
+size.xscale = 1.5
+size.yscale = 1.5
+ignorehitpause=1
+supermovetime = 2147483647
+pausemovetime = 2147483647
+
+[State 200, 音を鳴らす]
+type = Varset
+trigger1 =AnimElem = 1
+var(18) = 0
+
+[state 190]
+type = stopsnd
+trigger1 = gametime%10 = 1
+channel = 9
+ignorehitpause=1
+supermovetime = 2147483647
+pausemovetime = 2147483647
+
+[State 200, 音を鳴らす]
+type = Ctrlset
+trigger1 = AnimElem = 1
+value = 0
+
+[State 200, 音を鳴らす]
+type = Varadd
+trigger1 = 1
+var(18) = 1
+
+[State 181, 特殊効果]
+type = AssertSpecial
+trigger1 = var(18) <= 280
+flag = roundnotover
+
+[State 200, 音を鳴らす]
+type = PlaySnd
+trigger1 = AnimElem = 2
+value = 13,7
+
+[State 200, 音を鳴らす]
+type = PlaySnd
+trigger1 = AnimElem = 3
+value = 12,2
+
+;---------------------------------------------------------------------------
+[Statedef 5153];待機
+type    = S
+movetype= I
+physics = N
+sprpriority = 4
+poweradd= 0
+ctrl = 0
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 5010
+value = 5010
+ignorehitpause = 1
+
+[State 200, 音を鳴らす]
+type = Posset
+trigger1 = 1
+y = 0
+
+[State 200, 音を鳴らす]
+type = Ctrlset
+trigger1 = AnimElem = 1
+value = 0
+
+[State ]
+Type=selfstate
+Trigger1=!IsHelper
+Value=5150
+Persistent=256
+IgnoreHitPause=1
+;---------------------------------------------------------------------------
+[Statedef 5560]
+type    = S
+movetype= A
+physics = S
+sprpriority = 999999
+poweradd= 0
+ctrl = 0
+movehitpersist = 1
+hitdefpersist = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = IsHelper
+trigger1 = anim != 5005
+value = 5005
+ignorehitpause = 1
+
+[State 1000, 音を鳴らす]
+type = Velset
+trigger1 = 1
+x = -1.25
+
+[State 1000, 音を鳴らす]
+type = Varset
+trigger1 = AnimElem = 2
+var(7) = 1
+
+[State 1000, 音を鳴らす]
+type = Veladd
+trigger1 = var(7)
+y = .28
+
+[state ];画面外に出られるようになる
+type=screenbound
+trigger1=1
+value=0
+movecamera=0,0
+ignorehitpause=1
+
+[State 0, Helper];104,96
+type = Helper
+trigger1 = (Vel y > 0) && (Pos y >= 0)
+helpertype = Player
+name = "Hadou"
+ownpal = 1
+ID = 5561
+stateno = 5561
+pos = 0,0
+postype = p1
+size.xscale = 1.5
+size.yscale = 1.5
+ignorehitpause=1
+supermovetime = 2147483647
+pausemovetime = 2147483647
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = (Vel y > 0) && (Pos y >= 0)
+
+[State ]
+Type=selfstate
+Trigger1=IsHelper
+Value=5150
+Persistent=256
+IgnoreHitPause=1
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+[Statedef 5561]
+type    = S
+movetype= A
+physics = S
+sprpriority = 5
+poweradd= 0
+ctrl = 0
+velset = 0,0
+movehitpersist = 1
+hitdefpersist = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = IsHelper
+trigger1 = anim != 5006
+value = 5006
+ignorehitpause = 1
+
+[State 1000, 音を鳴らす]
+type = Velset
+trigger1 = 1
+x = -0.75
+
+[state ];画面外に出られるようになる
+type=screenbound
+trigger1=1
+value=0
+movecamera=0,0
+ignorehitpause=1
+
+[State 1000, 音を鳴らす]
+type =Posset
+trigger1 = 1
+y = 0
+
+[State ]
+Type=selfstate
+Trigger1=IsHelper
+Value=5150
+Persistent=256
+IgnoreHitPause=1
+;---------------------------------------------------------------------------
+[Statedef 5660]
+type    = S
+movetype= A
+physics = S
+sprpriority = 999999
+poweradd= 0
+ctrl = 0
+movehitpersist = 1
+hitdefpersist = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = IsHelper
+trigger1 = anim != 5001
+value = 5001
+ignorehitpause = 1
+
+[State 1000, 音を鳴らす]
+type = Veladd
+trigger1 = 1
+y = .28
+
+[state ];画面外に出られるようになる
+type=screenbound
+trigger1=1
+value=0
+movecamera=0,0
+ignorehitpause=1
+
+[State 0, Helper];104,96
+type = Helper
+trigger1 = (Vel y > 0) && (Pos y >= 0)
+helpertype = Player
+name = "Hadou"
+ownpal = 1
+ID = 5661
+stateno = 5661
+pos = 0,0
+postype = p1
+size.xscale = 1.5
+size.yscale = 1.5
+ignorehitpause=1
+supermovetime = 2147483647
+pausemovetime = 2147483647
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = (Vel y > 0) && (Pos y >= 0)
+
+[State ]
+Type=selfstate
+Trigger1=IsHelper
+Value=5150
+Persistent=256
+IgnoreHitPause=1
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+[Statedef 5661]
+type    = S
+movetype= A
+physics = S
+sprpriority = 5
+poweradd= 0
+ctrl = 0
+velset = 0,0
+movehitpersist = 1
+hitdefpersist = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = IsHelper
+trigger1 = anim != 5002
+value = 5002
+ignorehitpause = 1
+
+[State 1000, 音を鳴らす]
+type =Posset
+trigger1 = 1
+y = 0
+
+[State 1000, 音を鳴らす]
+type = Velset
+trigger1 = 1
+x = -1
+
+[State 240, 4]
+type = AngleDraw
+trigger1 = 1
+
+[State 240, 4]
+type = AngleAdd
+trigger1= 1
+value =7
+
+[state ];画面外に出られるようになる
+type=screenbound
+trigger1=1
+value=0
+movecamera=0,0
+ignorehitpause=1
+
+[State ]
+Type=selfstate
+Trigger1=IsHelper
+Value=5150
+Persistent=256
+IgnoreHitPause=1
+;---------------------------------------------------------------------------
+[Statedef 210]
+type = S
+physics = S
+ctrl = 0
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 210
+value = 210
+ignorehitpause = 1
+
+[State 360, 0]
+type = ChangeState
+trigger1 = animTime = 0
+value = 211
+ctrl = 0
+
+[Statedef 211];空中
+type = A
+movetype = A
+physics = N
+juggle  = 5
+sprpriority = 1
+movehitpersist = 1
+hitdefpersist = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 211
+value = 211
+ignorehitpause = 1
+
+[state 190]
+type = playsnd
+trigger1 = animelem = 1
+value = 13,4
+
+
+[State 200, 音を鳴らす]
+type = MovehitReset
+trigger1 = AnimElem = 4
+
+[State 210, 2]
+type = HitDef
+trigger1 = !movehit
+attr = A, NA
+animtype  = hard
+damage    = 8+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.008))
+hitflag = MAFDLHP
+guardflag = 
+guard.sparkno = S901
+pausetime = 0,0
+guard.pausetime = 14,26
+sparkno = -1
+sparkxy = -10,Floor(-85 * const(size.yscale))
+hitsound   = S0,0
+guardsound = S0,28
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 25
+ground.velocity = 0,-6
+air.velocity = 0,-6
+fall = 1
+fall.recover = 0
+
+[State 200, 音を鳴らす]
+type = Ctrlset
+trigger1 = AnimElem = 1
+value = 0
+
+[state 195]
+type = velset
+trigger1 = AnimElem = 1
+x = 2+random%8
+y = -9
+
+[state 195]
+type = veladd
+trigger1 = 1
+y = .32
+
+[State 821, 2]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y > 0
+value = 212
+
+[Statedef 212];着地
+type = S
+movetype = I
+physics = S
+velset = 0,0
+ctrl = 0
+sprpriority = 1
+
+[state 190]
+type = varset
+trigger1 = 1
+var(8) = 0
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 212
+value = 212
+ignorehitpause = 1
+
+[State 736:	EnvShake]
+type	= EnvShake
+trigger1 = AnimElem = 1
+time	= 10
+freq	= 140
+ampl	= -4
+phase	= 90
+
+[State 210, 2]
+type = HitDef
+trigger1 = !movehit
+attr = A, NA
+animtype  = hard
+damage    = 8+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.008))
+hitflag = MAFDLHP
+guardflag = 
+guard.sparkno = S901
+pausetime = 0,0
+guard.pausetime = 14,26
+sparkno = -1
+sparkxy = -10,Floor(-85 * const(size.yscale))
+hitsound   = S0,0
+guardsound = S0,28
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 25
+ground.velocity = 0,-6
+air.velocity = 0,-6
+fall = 1
+fall.recover = 0
+
+[state 190]
+type = playsnd
+trigger1 = AnimElem = 1
+value = S0,7
+
+[state 195]
+type = posset
+trigger1 = 1
+y = 0
+
+[State 107, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 213
+ctrl = 0
+
+[Statedef 213];空中
+type = A
+movetype = A
+physics = N
+juggle  = 5
+sprpriority = 1
+movehitpersist = 1
+hitdefpersist = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 213
+value = 213
+ignorehitpause = 1
+
+[state 190]
+type = playsnd
+trigger1 = animelem = 1
+value = 13,4
+
+
+[State 200, 音を鳴らす]
+type = MovehitReset
+trigger1 = AnimElem = 1
+
+[State 210, 2]
+type = HitDef
+trigger1 = !movehit
+attr = A, NA
+animtype  = hard
+damage    = 8+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.008))
+hitflag = MAFDLHP
+guardflag = 
+guard.sparkno = S901
+pausetime = 0,0
+guard.pausetime = 14,26
+sparkno = -1
+sparkxy = -10,Floor(-85 * const(size.yscale))
+hitsound   = S0,0
+guardsound = S0,28
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 25
+ground.velocity = 0,-6
+air.velocity = 0,-6
+fall = 1
+fall.recover = 0
+
+[State 200, 音を鳴らす]
+type = Ctrlset
+trigger1 = AnimElem = 1
+value = 0
+
+[state 195]
+type = velset
+trigger1 = AnimElem = 1
+x = -4+random%12
+y = -9
+
+[state 195]
+type = veladd
+trigger1 = 1
+y = .32
+
+[State 821, 2]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y > 0
+value = 214
+
+[Statedef 214];着地
+type = S
+movetype = I
+physics = S
+velset = 0,0
+ctrl = 0
+sprpriority = 1
+
+[state 190]
+type = varset
+trigger1 = 1
+var(8) = 0
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 214
+value = 214
+ignorehitpause = 1
+
+[State 736:	EnvShake]
+type	= EnvShake
+trigger1 = AnimElem = 1
+time	= 10
+freq	= 140
+ampl	= -4
+phase	= 90
+
+[State 210, 2]
+type = HitDef
+trigger1 = !movehit
+attr = A, NA
+animtype  = hard
+damage    = 8+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.008))
+hitflag = MAFDLHP
+guardflag = 
+guard.sparkno = S901
+pausetime = 0,0
+guard.pausetime = 14,26
+sparkno = -1
+sparkxy = -10,Floor(-85 * const(size.yscale))
+hitsound   = S0,0
+guardsound = S0,28
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 25
+ground.velocity = 0,-6
+air.velocity = 0,-6
+fall = 1
+fall.recover = 0
+
+[state 190]
+type = playsnd
+trigger1 = AnimElem = 1
+value = S0,7
+
+[state 195]
+type = posset
+trigger1 = 1
+y = 0
+
+[State 107, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 215
+ctrl = 0
+
+[Statedef 215];空中
+type = A
+movetype = A
+physics = N
+juggle  = 5
+sprpriority = 1
+movehitpersist = 1
+hitdefpersist = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 215
+value = 215
+ignorehitpause = 1
+
+[state 190]
+type = playsnd
+trigger1 = animelem = 1
+value = 13,4
+
+
+[State 200, 音を鳴らす]
+type = MovehitReset
+trigger1 = AnimElem = 1
+
+[State 210, 2]
+type = HitDef
+trigger1 = !movehit
+attr = A, NA
+animtype  = hard
+damage    = 8+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.008))
+hitflag = MAFDLHP
+guardflag = 
+guard.sparkno = S901
+pausetime = 0,0
+guard.pausetime = 14,26
+sparkno = -1
+sparkxy = -10,Floor(-85 * const(size.yscale))
+hitsound   = S0,0
+guardsound = S0,28
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 25
+ground.velocity = 0,-6
+air.velocity = 0,-6
+fall = 1
+fall.recover = 0
+
+[State 200, 音を鳴らす]
+type = Ctrlset
+trigger1 = AnimElem = 1
+value = 0
+
+[state 195]
+type = velset
+trigger1 = AnimElem = 1
+x = -4+random%12
+y = -9
+
+[state 195]
+type = veladd
+trigger1 = 1
+y = .32
+
+[State 821, 2]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y > 0
+value = 216
+
+[Statedef 216];着地
+type = S
+movetype = I
+physics = S
+velset = 0,0
+ctrl = 0
+sprpriority = 1
+
+[state 190]
+type = varset
+trigger1 = 1
+var(8) = 0
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 216
+value = 216
+ignorehitpause = 1
+
+[State 736:	EnvShake]
+type	= EnvShake
+trigger1 = AnimElem = 1
+time	= 10
+freq	= 140
+ampl	= -4
+phase	= 90
+
+[State 210, 2]
+type = HitDef
+trigger1 = !movehit
+attr = A, NA
+animtype  = hard
+damage    = 8+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.008))
+hitflag = MAFDLHP
+guardflag = 
+guard.sparkno = S901
+pausetime = 0,0
+guard.pausetime = 14,26
+sparkno = -1
+sparkxy = -10,Floor(-85 * const(size.yscale))
+hitsound   = S0,0
+guardsound = S0,28
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 25
+ground.velocity = 0,-6
+air.velocity = 0,-6
+fall = 1
+fall.recover = 0
+
+[state 190]
+type = playsnd
+trigger1 = AnimElem = 1
+value = S0,7
+
+[state 195]
+type = posset
+trigger1 = 1
+y = 0
+
+[State 107, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 217
+ctrl = 0
+
+[Statedef 217];空中
+type = A
+movetype = A
+physics = N
+juggle  = 5
+sprpriority = 1
+movehitpersist = 1
+hitdefpersist = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 217
+value = 217
+ignorehitpause = 1
+
+[state 190]
+type = playsnd
+trigger1 = animelem = 1
+value = 13,4
+
+
+[State 200, 音を鳴らす]
+type = MovehitReset
+trigger1 = AnimElem = 1
+
+[State 210, 2]
+type = HitDef
+trigger1 = !movehit
+attr = A, NA
+animtype  = hard
+damage    = 8+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.008))
+hitflag = MAFDLHP
+guardflag = 
+guard.sparkno = S901
+pausetime = 0,0
+guard.pausetime = 14,26
+sparkno = -1
+sparkxy = -10,Floor(-85 * const(size.yscale))
+hitsound   = S0,0
+guardsound = S0,28
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 25
+ground.velocity = 0,-6
+air.velocity = 0,-6
+fall = 1
+fall.recover = 0
+
+[State 200, 音を鳴らす]
+type = Ctrlset
+trigger1 = AnimElem = 1
+value = 0
+
+[state 195]
+type = velset
+trigger1 = AnimElem = 1
+x = -14
+y = -8
+
+[state 195]
+type = veladd
+trigger1 = 1
+y = .72
+
+[State 821, 2]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y > 0
+value = 218
+
+[Statedef 218];着地
+type = S
+movetype = I
+physics = S
+velset = 0,0
+ctrl = 0
+sprpriority = 1
+
+[state 190]
+type = varset
+trigger1 = 1
+var(8) = 0
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 218
+value = 218
+ignorehitpause = 1
+
+[State 736:	EnvShake]
+type	= EnvShake
+trigger1 = AnimElem = 1
+time	= 10
+freq	= 140
+ampl	= -4
+phase	= 90
+
+[State 210, 2]
+type = HitDef
+trigger1 = !movehit
+attr = A, NA
+animtype  = hard
+damage    = 8+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.008))
+hitflag = MAFDLHP
+guardflag = 
+guard.sparkno = S901
+pausetime = 0,0
+guard.pausetime = 14,26
+sparkno = -1
+sparkxy = -10,Floor(-85 * const(size.yscale))
+hitsound   = S0,0
+guardsound = S0,28
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 25
+ground.velocity = 0,-6
+air.velocity = 0,-6
+fall = 1
+fall.recover = 0
+
+[state 190]
+type = playsnd
+trigger1 = AnimElem = 1
+value = S0,7
+
+[state 195]
+type = posset
+trigger1 = 1
+y = 0
+
+[State 107, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+;---------------------------------------------------------------------------
+[Statedef 220]
+type = S
+physics = S
+ctrl = 0
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 220
+value = 220
+ignorehitpause = 1
+
+[State 360, 0]
+type = varset
+trigger1 = 1
+var(8) = 0
+
+[State 360, 0]
+type = ChangeState
+trigger1 = animTime = 0
+value = 221
+ctrl = 0
+
+[Statedef 221];空中
+juggle  = 5
+sprpriority = 1
+movehitpersist = 1
+hitdefpersist = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 221
+value = 221
+ignorehitpause = 1
+
+[State 360, 0]
+type = varset
+trigger1 = AnimElem = 2
+var(8) = 1
+
+[State 360, 0]
+type = varset
+trigger1 = AnimElem = 6
+var(8) = 2
+
+[state 190]
+type = playsnd
+trigger1 = animelem = 1
+value = 13,4
+
+[state 190]
+type = playsnd
+trigger1 = animelem = 2
+value = 12,0
+
+
+[State 200, 音を鳴らす]
+type = MovehitReset
+trigger1 = AnimElem = 4
+
+[State 210, 2]
+type = HitDef
+trigger1 = !movehit
+attr = A, NA
+animtype  = hard
+damage    = 8+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.008))
+hitflag = MAFDLHP
+guardflag = 
+guard.sparkno = S901
+pausetime = 0,0
+guard.pausetime = 14,26
+sparkno = -1
+sparkxy = -10,Floor(-85 * const(size.yscale))
+hitsound   = S0,0
+guardsound = S0,28
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 25
+ground.velocity = 0,-6
+air.velocity = 0,-6
+fall = 1
+fall.recover = 0
+
+[State 200, 音を鳴らす]
+type = Ctrlset
+trigger1 = AnimElem = 1
+value = 0
+
+[state 195]
+type = velset
+trigger1 = !var(8)
+trigger1 = AnimElem = 1
+x = 2+random%8
+y = -9
+
+[state 195]
+type = veladd
+trigger1 = !var(8)
+y = .32
+
+[State ]
+type=statetypeset
+trigger1 = var(8) = 1
+trigger1 = !IsHelper
+statetype=S
+movetype=A
+physics=N
+ignorehitpause=1
+
+[State ]
+type=statetypeset
+trigger1 = var(8) != 1
+trigger1 = !IsHelper
+statetype=A
+movetype=A
+physics=N
+ignorehitpause=1
+
+[state 195]
+type = velset
+trigger1 = var(8) = 1
+x = 0
+y = 0
+
+[state 195]
+type = velset
+trigger1 = var(8) >= 2
+x = 0
+y = 14
+
+[State 100]
+Type = Afterimage
+Trigger1 = AnimElem = 6
+Trans = Add
+Time = 20
+PalContrast = 122,122,122
+
+[State 821, 2]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y > 0
+value = 222
+
+[Statedef 222];着地
+type = S
+movetype = I
+physics = S
+velset = 0,0
+ctrl = 0
+sprpriority = 1
+
+[state 190]
+type = varset
+trigger1 = 1
+var(8) = 0
+
+
+[State 736:	EnvShake]
+type	= EnvShake
+trigger1 = AnimElem = 1
+time	= 10
+freq	= 140
+ampl	= -4
+phase	= 90
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 222
+value = 222
+ignorehitpause = 1
+
+[State 210, 2]
+type = HitDef
+trigger1 = !movehit
+attr = A, NA
+animtype  = hard
+damage    = 8+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.008))
+hitflag = MAFDLHP
+guardflag = 
+guard.sparkno = S901
+pausetime = 0,0
+guard.pausetime = 14,26
+sparkno = -1
+sparkxy = -10,Floor(-85 * const(size.yscale))
+hitsound   = S0,0
+guardsound = S0,28
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 25
+ground.velocity = 0,-6
+air.velocity = 0,-6
+fall = 1
+fall.recover = 0
+
+[state 190]
+type = playsnd
+trigger1 = AnimElem = 1
+value = S0,7
+
+[state 195]
+type = posset
+trigger1 = 1
+y = 0
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelem = 1
+helpertype = Player
+name = "Star"
+ID = 22000
+size.xscale = 1
+size.yscale = 1
+stateno = 22000
+pos = Floor(0 * const(size.xscale)),Floor(0 * const(size.yscale))
+ownpal = 1
+postype = p1
+ignorehitpause = 1
+
+[State 736:	EnvShake]
+type	= EnvShake
+trigger1 = AnimElem = 1
+time	= 10
+freq	= 140
+ampl	= -4
+phase	= 90
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelem = 1
+helpertype = Player
+name = "Star"
+ID = 22001
+stateno = 22000
+size.xscale = 1
+size.yscale = 1
+pos = Floor(0 * const(size.xscale)),Floor(0 * const(size.yscale))
+ownpal = 1
+postype = p1
+ignorehitpause = 1
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelem = 1
+helpertype = Player
+name = "Star"
+ID = 22002
+stateno = 22000
+size.xscale = 1
+size.yscale = 1
+pos = Floor(0 * const(size.xscale)),Floor(0 * const(size.yscale))
+ownpal = 1
+postype = p1
+ignorehitpause = 1
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelem = 1
+helpertype = Player
+name = "Star"
+ID = 22003
+stateno = 22000
+size.xscale = 1
+size.yscale = 1
+pos = Floor(0 * const(size.xscale)),Floor(0 * const(size.yscale))
+ownpal = 1
+postype = p1
+ignorehitpause = 1
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelem = 1
+helpertype = Player
+name = "Star"
+ID = 22004
+stateno = 22000
+size.xscale = 1
+size.yscale = 1
+pos = Floor(0 * const(size.xscale)),Floor(0 * const(size.yscale))
+ownpal = 1
+postype = p1
+ignorehitpause = 1
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelem = 1
+helpertype = Player
+name = "Star"
+ID = 22005
+stateno = 22000
+size.xscale = 1
+size.yscale = 1
+pos = Floor(0 * const(size.xscale)),Floor(0 * const(size.yscale))
+ownpal = 1
+postype = p1
+ignorehitpause = 1
+
+[State 107, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 223
+ctrl = 0
+
+[Statedef 223];空中
+juggle  = 5
+sprpriority = 1
+movehitpersist = 1
+hitdefpersist = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 223
+value = 223
+ignorehitpause = 1
+
+[State 360, 0]
+type = varset
+trigger1 = AnimElem = 2
+var(8) = 1
+
+[State 360, 0]
+type = varset
+trigger1 = AnimElem = 6
+var(8) = 2
+
+[state 190]
+type = playsnd
+trigger1 = animelem = 1
+value = 13,4
+
+[state 190]
+type = playsnd
+trigger1 = animelem = 2
+value = 12,0
+
+
+[State 200, 音を鳴らす]
+type = MovehitReset
+trigger1 = AnimElem = 4
+
+[State 210, 2]
+type = HitDef
+trigger1 = !movehit
+attr = A, NA
+animtype  = hard
+damage    = 8+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.008))
+hitflag = MAFDLHP
+guardflag = 
+guard.sparkno = S901
+pausetime = 0,0
+guard.pausetime = 14,26
+sparkno = -1
+sparkxy = -10,Floor(-85 * const(size.yscale))
+hitsound   = S0,0
+guardsound = S0,28
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 25
+ground.velocity = 0,-6
+air.velocity = 0,-6
+fall = 1
+fall.recover = 0
+
+[State 200, 音を鳴らす]
+type = Ctrlset
+trigger1 = AnimElem = 1
+value = 0
+
+[state 195]
+type = velset
+trigger1 = !var(8)
+trigger1 = AnimElem = 1
+x = 2+random%8
+y = -9
+
+[state 195]
+type = veladd
+trigger1 = !var(8)
+y = .32
+
+[State ]
+type=statetypeset
+trigger1 = var(8) = 1
+trigger1 = !IsHelper
+statetype=S
+movetype=A
+physics=N
+ignorehitpause=1
+
+[State ]
+type=statetypeset
+trigger1 = var(8) != 1
+trigger1 = !IsHelper
+statetype=A
+movetype=A
+physics=N
+ignorehitpause=1
+
+[state 195]
+type = velset
+trigger1 = var(8) = 1
+x = 0
+y = 0
+
+[state 195]
+type = velset
+trigger1 = var(8) >= 2
+x = 0
+y = 14
+
+[State 100]
+Type = Afterimage
+Trigger1 = AnimElem = 6
+Trans = Add
+Time = 20
+PalContrast = 122,122,122
+
+[State 821, 2]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y > 0
+value = 224
+
+[Statedef 224];着地
+type = S
+movetype = I
+physics = S
+velset = 0,0
+ctrl = 0
+sprpriority = 1
+
+[state 190]
+type = varset
+trigger1 = 1
+var(8) = 0
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 224
+value = 224
+ignorehitpause = 1
+
+
+[State 736:	EnvShake]
+type	= EnvShake
+trigger1 = AnimElem = 1
+time	= 10
+freq	= 140
+ampl	= -4
+phase	= 90
+
+[State 210, 2]
+type = HitDef
+trigger1 = !movehit
+attr = A, NA
+animtype  = hard
+damage    = 8+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.008))
+hitflag = MAFDLHP
+guardflag = 
+guard.sparkno = S901
+pausetime = 0,0
+guard.pausetime = 14,26
+sparkno = -1
+sparkxy = -10,Floor(-85 * const(size.yscale))
+hitsound   = S0,0
+guardsound = S0,28
+ground.type = High
+ground.slidetime = 12
+ground.hittime  = 25
+ground.velocity = 0,-6
+air.velocity = 0,-6
+fall = 1
+fall.recover = 0
+
+[state 190]
+type = playsnd
+trigger1 = AnimElem = 1
+value = S0,7
+
+[state 195]
+type = posset
+trigger1 = 1
+y = 0
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelem = 1
+helpertype = Player
+name = "Star"
+ID = 22000
+stateno = 22000
+size.xscale = 1
+size.yscale = 1
+pos = Floor(0 * const(size.xscale)),Floor(0 * const(size.yscale))
+ownpal = 1
+postype = p1
+ignorehitpause = 1
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelem = 1
+helpertype = Player
+name = "Star"
+ID = 22001
+stateno = 22000
+size.xscale = 1
+size.yscale = 1
+pos = Floor(0 * const(size.xscale)),Floor(0 * const(size.yscale))
+ownpal = 1
+postype = p1
+ignorehitpause = 1
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelem = 1
+helpertype = Player
+name = "Star"
+ID = 22002
+stateno = 22000
+size.xscale = 1
+size.yscale = 1
+pos = Floor(0 * const(size.xscale)),Floor(0 * const(size.yscale))
+ownpal = 1
+postype = p1
+ignorehitpause = 1
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelem = 1
+helpertype = Player
+name = "Star"
+ID = 22003
+size.xscale = 1
+size.yscale = 1
+stateno = 22000
+pos = Floor(0 * const(size.xscale)),Floor(0 * const(size.yscale))
+ownpal = 1
+postype = p1
+ignorehitpause = 1
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelem = 1
+helpertype = Player
+name = "Star"
+ID = 22004
+stateno = 22000
+size.xscale = 1
+size.yscale = 1
+pos = Floor(0 * const(size.xscale)),Floor(0 * const(size.yscale))
+ownpal = 1
+postype = p1
+ignorehitpause = 1
+
+[State 0, Helper]
+type = Helper
+trigger1 = animelem = 1
+helpertype = Player
+name = "Star"
+ID = 22005
+stateno = 22000
+size.xscale = 1
+size.yscale = 1
+pos = Floor(0 * const(size.xscale)),Floor(0 * const(size.yscale))
+ownpal = 1
+postype = p1
+ignorehitpause = 1
+
+[State 107, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 217
+ctrl = 0
+
+;---------------------------------------------------------------------------
+[Statedef 22000]
+type    = S
+movetype= A
+physics = S
+sprpriority = 5
+poweradd= 0
+ctrl = 0
+movehitpersist = 1
+hitdefpersist = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = IsHelper
+trigger1 = anim != 229
+value = 229
+ignorehitpause = 1
+
+[State 400, 1]
+type = Varadd
+trigger1 = 1
+var(7) = 1
+
+[State 400, 1]
+type = Velset
+triggerall = ANimElem = 1
+trigger1 = Ishelper(22000)
+trigger2 = Ishelper(22001)
+trigger3 = Ishelper(22002)
+y = -4
+
+[State 400, 1]
+type = Velset
+triggerall = ANimElem = 1
+trigger1 = Ishelper(22003)
+trigger2 = Ishelper(22004)
+trigger3 = Ishelper(22005)
+y = -5
+
+[State 400, 1]
+type = Velset
+trigger1 = Ishelper(22000)
+x = 3
+
+[State 400, 1]
+type = Velset
+trigger1 = Ishelper(22001)
+x = 2
+
+[State 400, 1]
+type = Velset
+trigger1 = Ishelper(22002)
+x = 1
+
+[State 400, 1]
+type = Velset
+trigger1 = Ishelper(22005)
+x = -3
+
+[State 400, 1]
+type = Velset
+trigger1 = Ishelper(22004)
+x = -2
+
+[State 400, 1]
+type = Velset
+trigger1 = Ishelper(22003)
+x = -1
+
+[State 400, 1]
+type = Veladd
+trigger1 = 1
+y = .12
+
+[State 200, 1]
+type = HitDef
+trigger1 = !movehit
+attr = , NA                     ;立ち状態で、通常の攻撃(ｓは立ち、ｎは通常、aは攻撃を表す)
+damage = 8+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.008)), 0                   ;ダメージ量（左が当たった時、右はガードした時）
+animtype = Hard                ;当てた時の相手のポーズ（light/midium/hard/back）から選択
+guardflag =                    ;ガードできる状態（ｍaは全ての状態でガード可能）
+hitflag = MAFDPLH                    ;当てる事のできる条件
+priority = 3, Hit                ;攻撃の優先権（0弱い　4通常　7強い
+pausetime = 0, 11                 ;攻撃が当たった時の硬直時間（左が自分、右が相手）
+sparkno = -1                      ;ヒットエフェクトのスプライトステート（無ければ0）
+sparkxy = -10, -21               ;ヒットエフェクトを表示する場所（相手の座標で）
+hitsound = -1                  ;ヒットした時の音（ｓ*,*にすると自分の音を使う）
+guardsound = 6, 0                ;ガードした時の音（同上）
+ground.type = High               ;相手のくらった場所（High：頭、体, Low：足, Trip：足払い）
+ground.slidetime = 5             ;相手が後にすべる時間
+ground.hittime  = 12             ;コンボが繋がる時間（高くしすぎない事）
+ground.velocity = -8             ;地上で攻撃をくらった場合の相手の移動状況（ｘとｙで小数点可）
+airguard.velocity = 0,0     ;空中で攻撃をくらった場合の相手の移動状況（ｘとｙで小数点可）
+air.type = High                  ;空中で相手がくらった場所（上と同じ）
+air.velocity = 0,0           ;空中で攻撃をくらった場合の相手の移動状況（ｘとｙで小数点可）
+air.hittime = 12                 ;空中でコンボが繋がる時間
+
+[state ]
+type=screenbound
+trigger1=1
+value=0
+movecamera=0,0
+ignorehitpause=1
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = AnimTime = 0
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+[Statedef 230]
+type = S
+physics = S
+ctrl = 0
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 230
+value = 230
+ignorehitpause = 1
+
+[state 190]
+type = playsnd
+trigger1 = animelem = 1
+value = 13,0
+
+[state 190]
+type = varset
+trigger1 = 1
+var(7) = 0
+
+[state 190]
+type = varset
+trigger1 = 1
+var(8) = 0
+
+[State 360, 0]
+type = ChangeState
+trigger1 = animTime = 0
+value = 231
+ctrl = 0
+
+[Statedef 231];空中
+type = A
+movetype = A
+physics = N
+juggle  = 5
+sprpriority = 1
+movehitpersist = 1
+hitdefpersist = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 231
+value = 231
+ignorehitpause = 1
+
+[State 2000, 6]
+type = Projectile
+trigger1 = var(8)
+trigger1 = gametime%3 = 1
+projanim = 201
+projremove = 0
+projremovetime = 600
+ProjHeightBound = -240,240
+projpriority = 1
+projsprpriority = 5
+projshadow = 0,0,0
+getpower = 100
+offset = Floor(0 * const(size.xscale)),Floor(-11 * const(size.yscale))
+attr = S, SP
+animtype = Hard
+velocity = -1+random%4,1+random%2
+damage    = 6+ceil(((enemy,const(data.defence)*0.01)*enemy,lifemax*0.006))
+hitflag = MAFPDLH
+guardflag = 
+hitsound = 0,0
+sparkno = -1
+guardsound = -1
+pausetime = 0,4
+ground.type = High
+ground.hittime = 21
+ground.slidetime = 21
+ground.velocity = -6,0
+air.juggle = 8
+air.velocity = -6,0
+fall = 1
+air.fall = 1
+
+[state 190]
+type = varadd
+trigger1 = 1
+var(7) = 1
+
+[state 190]
+type = varset
+trigger1 = var(7) >= 31
+var(7) = 0
+
+[state 190]
+type = varset
+trigger1 = var(7) >= 16
+var(8) = 1
+
+[state 190]
+type = playsnd
+trigger1 = animelem = 1
+value = 13,1
+
+
+[state ];画面外に出られるようになる
+type=screenbound
+trigger1=1
+value=0
+movecamera=0,0
+ignorehitpause=1
+
+[State 200, 音を鳴らす]
+type = Ctrlset
+trigger1 = AnimElem = 1
+value = 0
+
+[state 195]
+type = velset
+trigger1 = 1
+x = 2
+
+[state 195]
+type = velset
+trigger1 = var(7) <= 15
+trigger2 = var(7) >= 25
+y = -3
+
+[state 195]
+type = velset
+trigger1 = var(7) = [16,24]
+y = 1
+
+[State 821, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 232
+
+[Statedef 232];空中
+type = A
+movetype = A
+physics = N
+juggle  = 5
+sprpriority = 1
+movehitpersist = 1
+hitdefpersist = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 232
+value = 232
+ignorehitpause = 1
+
+[State 200, 音を鳴らす]
+type = MovehitReset
+trigger1 = AnimElem = 4
+
+[State 200, 音を鳴らす]
+type = Ctrlset
+trigger1 = AnimElem = 1
+value = 0
+
+
+[state ];画面外に出られるようになる
+type=screenbound
+trigger1=1
+value=0
+movecamera=0,0
+ignorehitpause=1
+
+[state 190]
+type = varset
+trigger1 = 1
+var(7) = 0
+
+[state 190]
+type = varset
+trigger1 = 1
+var(8) = 0
+
+[state 195]
+type = Posset
+trigger1 = facing = 1
+trigger1 = AnimElem = 1
+x = -360
+y = -90
+
+[state 195]
+type = Posset
+trigger1 = facing = -1
+trigger1 = AnimElem = 1
+x = 360
+y = -90
+
+[state 195]
+type = velset
+trigger1 = facing = facing
+x = 14
+
+[state 195]
+type = velset
+trigger1 = facing != facing
+x = 14
+
+[state 195]
+type = veladd
+trigger1 = 1
+y = .76
+
+[State 821, 2]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y > 0
+value = 233
+
+[Statedef 233];着地
+type = S
+movetype = I
+physics = S
+velset = 0,0
+ctrl = 0
+sprpriority = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = name = "K Round"
+trigger1 = anim != 233
+value = 233
+ignorehitpause = 1
+
+[state 190]
+type = varset
+trigger1 = 1
+var(7) = 0
+
+[state 190]
+type = varset
+trigger1 = 1
+var(8) = 0
+
+[State 736:	EnvShake]
+type	= EnvShake
+trigger1 = AnimElem = 1
+time	= 10
+freq	= 140
+ampl	= -4
+phase	= 90
+
+
+[state 190]
+type = playsnd
+trigger1 = AnimElem = 1
+value = S0,7
+
+[state 195]
+type = posset
+trigger1 = 1
+y = 0
+
+[State 107, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 0
+---------------------------------------------------------------------------
+[Statedef 30000];
+type = S
+movetype = A
+physics = S
+ctrl = 0
+sprpriority = 777777777
+movehitpersist = 1
+hitdefpersist = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = IsHelper
+trigger1 = anim != 3003
+value = 3003
+ignorehitpause = 1
+
+[state 190]
+type = playsnd
+trigger1 = animelem = 1
+value = 13,1
+
+[State 77, trans]
+type=trans
+trigger1= 1
+trans=add
+ignorehitpause=1
+
+[State 77, trans]
+type=angledraw
+trigger1= 1
+scale= 2.5-fvar(24),2.5-fvar(24)
+
+[State 4206,Playsnd]
+type= Varadd
+trigger1 = fvar(24) <= 1
+fvar(24) = 0.01
+
+[state 195]
+type = varadd
+trigger1 = 1
+var(7) = 1
+
+[state ];画面外に出られるようになる
+type=screenbound
+trigger1=1
+value=0
+movecamera=0,0
+ignorehitpause=1
+
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = IsHelper
+flag = noshadow
+
+[State 0, PlayerPush]
+type = Lifeset
+trigger1 = 1
+value = Lifemax
+ignorehitpause = 1
+
+[State 0, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[State 77, bind]
+type=bindtoroot
+trigger1=1
+pos= Floor(60 * const(size.xscale)),Floor(-42 * const(size.yscale))
+
+[state ];画面外に出られるようになる
+type=screenbound
+trigger1=1
+value=0
+movecamera=0,0
+ignorehitpause=1
+
+[State 0, Helper]
+type = Helper
+trigger1 = Animtime = 0
+helpertype = Player
+name = "Hadou"
+ID = 30001
+stateno = 30001
+pos = 0,0
+ownpal = 1
+postype = p1
+ignorehitpause = 1
+
+[State 1206, このヘルパーを消す]
+type = DestroySelf
+trigger1 = AnimTime = 0
+[State ]
+Type=selfstate
+Trigger1=IsHelper
+Value=5150
+Persistent=256
+IgnoreHitPause=1
+;---------
+[statedef 30001]
+type    = S
+movetype= A
+physics = S
+sprpriority = -3
+poweradd= 0
+ctrl = 0
+velset = 0,0
+
+[State アニメ変更]
+type = Changeanim
+triggerall = Ishelper
+trigger1 = anim != 3002
+value = 3002
+ignorehitpause = 1
+
+[State 200, 1]
+type = varset
+trigger1 = 1
+var(8) = Floor(60 * const(size.xscale))
+ignorehitpause=1
+
+[State 200, 1]
+type = varadd
+trigger1 = 1
+var(7) = Floor(3 * const(size.xscale))
+ignorehitpause=1
+
+[State 77, bind]
+type=bindtoroot
+trigger1=1
+pos= Floor(60 * const(size.xscale))-var(7),Floor(-42 * const(size.yscale))
+
+[state ];画面外に出られるようになる
+type=screenbound
+trigger1=1
+value=0
+movecamera=0,0
+ignorehitpause=1
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+
+[State 200, 1]
+type = ParentVarAdd
+trigger1 = var(8)-var(7) <= 0
+var(9) = 1
+ignorehitpause=1
+
+[state 190]
+type = playsnd
+trigger1 = var(8)-var(7) <= 0
+value = 13,5
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = var(8)-var(7) <= 0
+
+[State ]
+Type=selfstate
+Trigger1=IsHelper
+Value=5150
+Persistent=256
+IgnoreHitPause=1
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+[Statedef 55555]
+type = S
+movetype = H
+ctrl = 0
+sprpriority = -5
+
+[State アニメ変更]
+type = Changeanim
+triggerall = Root,anim = 0
+triggerall = IsHelper
+trigger1 = anim != 3
+value = 3
+ignorehitpause = 1
+
+[State アニメ変更]
+type = Changeanim
+triggerall = Root,anim != 0
+triggerall = IsHelper
+trigger1 = anim != 4
+value = 4
+ignorehitpause = 1
+
+[State a]
+type = parentvaradd
+trigger1 = GetHitVar(damage)
+var(46) = 19+random%7
+ignorehitpause = 1
+
+[State 77, trans]
+type=trans
+trigger1= 1
+trans=add
+ignorehitpause=1
+
+[state ];画面外に出られるようになる
+type=screenbound
+trigger1=1
+value=0
+movecamera=0,0
+ignorehitpause=1
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = IsHelper
+flag = noshadow
+
+[State 0, PlayerPush]
+type = Lifeset
+trigger1 = 1
+value = Lifemax
+ignorehitpause = 1
+
+[State 0, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[state ];画面外に出られるようになる
+type=screenbound
+trigger1=1
+value=0
+movecamera=0,0
+ignorehitpause=1
+
+[State a]
+type = HitOverride
+trigger1 = 1
+attr = SCA,AA,AP,AT
+stateno = 45100
+time = 1
+ignorehitpause = 1
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = root,anim != 0
+trigger1 = IsHelper
+
+[State ]
+Type=selfstate
+Trigger1=IsHelper
+Value=5150
+Persistent=256
+IgnoreHitPause=1
+
+;---------------------------------------------------------------------------
+; ここは-2のステートを書いてください、ヘルパー関係です
+;---------------------------------------------------------------------------
+
+[Statedef -2]
+
+[State -2];簡易時止め解凍用
+type = Helper
+triggerall = !IsHelper
+trigger1 = !numhelper(55)
+trigger1 = anim = 0
+name = "Crown"
+ID = 55
+stateno = 55555
+Persistent = 0
+postype = p1
+pos = 0,0
+keyctrl = 0
+ownpal = 1
+helpertype = player
+supermovetime = 9999999
+pausemovetime = 9999999
+
+[State 575775]
+Type=varset
+trigger1 = !IsHelper
+var(47) = 100
+ignorehitpause=1
+
+[State 575775]
+Type=varadd
+trigger1 = var(46) >= var(47)
+sysvar(3)=9999999
+ignorehitpause=1
+
+[State 200, 1]
+type = VarAdd
+trigger1 = var(9)
+fvar(9) = 0.25
+ignorehitpause=1
+
+[State 200, 1]
+type = VarAdd
+trigger1 = Root,var(9)
+trigger1 = IsHelper
+fvar(9) = 0.25
+ignorehitpause=1
+
+[State -2]
+type = attackmulset
+trigger1 = 1
+value = 1+fvar(9)
+ignorehitpause = 1
+supermovetime = 999999999
+pausemovetime = 999999999
+
+[State ];曲を流すかどうか
+type = varset
+trigger1 = 1
+var(35) = 1 ;1でON、0でOFF
+ignorehitpause = 1
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = !IsHelper
+value = SCA
+time = 3134144
+ignorehitpause = 1
+supermovetime = 999999999
+pausemovetime = 999999999
+
+[State 575757]
+Type=lifeset
+trigger1= 1
+value=lifemax-sysvar(3)
+ignorehitpause=1
+
+[State 575775]
+Type=Varadd
+trigger1=Palno=1
+trigger1=var(49)
+sysvar(3)=var(49)
+ignorehitpause=1
+
+[State a]
+type = varset
+trigger1 = Var(49) >= 1450
+trigger2 = Var(49) <= -1
+var(49) = 0
+ignorehitpause = 1
+
+[state a];アーマー用ヘルパー
+type = Helper
+trigger1 = numhelper(1892) = 0
+id = 1892
+name = "Armor"
+sprpriority = -3
+pos =0,0
+postype = p1
+stateno = 27000
+helpertype = player
+pausemovetime = 0
+bindtime = -1
+keyctrl = 0 
+ownpal = 1
+
+[State a];音楽
+type = PlaySnd
+trigger1 = RoundState = 2
+trigger1 = var(35)
+trigger1 = !IsHelper
+value = 9999,0
+channel = 9
+lowpriority = 1
+loop = 1
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = !var(35)
+flag = nostandguard
+flag2 = nocrouchguard
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = var(35)
+flag = nomusic
+flag2 = nostandguard
+flag3 = nocrouchguard
+
+[State -3, Landing Sound]
+type = varset
+triggerall = 1
+trigger1 = lose
+var(6) = 1
+
+[State -2, gametime式ステ抜け]
+type = Selfstate
+triggerall = ishelper(55555)
+trigger1 = 1
+value = 55555
+ignorehitpause = 1
+
+[State -2, gametime式ステ抜け]
+type = Selfstate
+triggerall = ishelper(1900)
+trigger1 = 1
+value = 1900
+ignorehitpause = 1
+
+[State -2, gametime式ステ抜け]
+type = Selfstate
+triggerall = ishelper(30000)
+trigger1 = 1
+value = 30000
+ignorehitpause = 1
+
+[State -2, gametime式ステ抜け]
+type = Selfstate
+triggerall = ishelper(5560)
+trigger1 = 1
+value = 5560
+ignorehitpause = 1
+
+[State -2, gametime式ステ抜け]
+type = Selfstate
+trigger1 = ishelper(22000)
+trigger2 = ishelper(22001)
+trigger3 = ishelper(22002)
+trigger4 = ishelper(22003)
+trigger5 = ishelper(22004)
+trigger6 = ishelper(22005)
+value = 22000
+ignorehitpause = 1
+
+[State -2, gametime式ステ抜け]
+type = Selfstate
+triggerall = ishelper(5561)
+trigger1 = 1
+value = 5561
+ignorehitpause = 1
+
+[State -2, gametime式ステ抜け]
+type = Selfstate
+triggerall = ishelper(5660)
+trigger1 = 1
+value = 5660
+ignorehitpause = 1
+
+[State -2, gametime式ステ抜け]
+type = Selfstate
+triggerall = ishelper(5661)
+trigger1 = 1
+value = 5661
+ignorehitpause = 1
+
+[State -2, gametime式ステ抜け]
+type = Selfstate
+triggerall = ishelper(1892)
+trigger1 = sysfvar(0) !=gametime+123456789
+trigger2 = var(53) !=gametime+gametime%10
+trigger3 = sysfvar(2) !=gametime + gametime%256 + gametime%65536 + gametime%2
+trigger4 = sysfvar(3) !=53*gametime+52+gametime%5
+trigger5 = movereversed
+value = 27000
+ctrl = 0
+ignorehitpause = 1
+
+[State 200, 1]
+type = VarSet
+trigger1 = !ishelper
+fvar(5) = (20-random%40)/10
+
+[State 200, 1]
+type = VarSet
+trigger1 = !ishelper
+fvar(4) = random%50/100
+
+
+[state 5150]
+type = Selfstate
+trigger1 = name= "K Round"
+trigger1 = ROundState <= 3
+trigger1 = !IsHelper
+trigger1 = !alive
+value = 5153
+ignorehitpause = 1
+SuperMoveTime = 99999999999999
+PauseMoveTime = 99999999999999
+
+[state 5150]
+type = Selfstate
+trigger1 = name= "K Round"
+trigger1 = ROundState = 4
+trigger1 = !IsHelper
+trigger1 = loseko
+value = 5152
+ignorehitpause = 1
+SuperMoveTime = 99999999999999
+PauseMoveTime = 99999999999999
+
+[State 575757]
+Type=selfstate
+trigger1=!IsHelper
+trigger1=anim=200
+value = 200
+ignorehitpause=1
+pausemovetime=2147483647
+supermovetime=2147483647
+
+[State 575757]
+Type=selfstate
+trigger1=!IsHelper
+trigger1=anim=210
+value = 210
+ignorehitpause=1
+pausemovetime=2147483647
+supermovetime=2147483647
+
+[State 575757]
+Type=selfstate
+trigger1=!IsHelper
+trigger1=anim=211
+value = 211
+ignorehitpause=1
+pausemovetime=2147483647
+supermovetime=2147483647
+
+[State 575757]
+Type=selfstate
+trigger1=!IsHelper
+trigger1=anim=212
+value = 212
+ignorehitpause=1
+pausemovetime=2147483647
+supermovetime=2147483647
+
+[State 575757]
+Type=selfstate
+trigger1=!IsHelper
+trigger1=anim=213
+value = 213
+ignorehitpause=1
+pausemovetime=2147483647
+supermovetime=2147483647
+
+[State 575757]
+Type=selfstate
+trigger1=!IsHelper
+trigger1=anim=214
+value = 214
+ignorehitpause=1
+pausemovetime=2147483647
+supermovetime=2147483647
+
+[State 575757]
+Type=selfstate
+trigger1=!IsHelper
+trigger1=anim=215
+value = 215
+ignorehitpause=1
+pausemovetime=2147483647
+supermovetime=2147483647
+
+[State 575757]
+Type=selfstate
+trigger1=!IsHelper
+trigger1=anim=216
+value = 216
+ignorehitpause=1
+pausemovetime=2147483647
+supermovetime=2147483647
+
+[State 575757]
+Type=selfstate
+trigger1=!IsHelper
+trigger1=anim=217
+value = 217
+ignorehitpause=1
+pausemovetime=2147483647
+supermovetime=2147483647
+
+[State 575757]
+Type=selfstate
+trigger1=!IsHelper
+trigger1=anim=218
+value = 218
+ignorehitpause=1
+pausemovetime=2147483647
+supermovetime=2147483647
+
+[State 575757]
+Type=selfstate
+trigger1=!IsHelper
+trigger1=anim=220
+value = 220
+ignorehitpause=1
+pausemovetime=2147483647
+supermovetime=2147483647
+
+[State 575757]
+Type=selfstate
+trigger1=!IsHelper
+trigger1=anim=221
+value = 221
+ignorehitpause=1
+pausemovetime=2147483647
+supermovetime=2147483647
+
+[State 575757]
+Type=selfstate
+trigger1=!IsHelper
+trigger1=anim=222
+value = 222
+ignorehitpause=1
+pausemovetime=2147483647
+supermovetime=2147483647
+
+[State 575757]
+Type=selfstate
+trigger1=!IsHelper
+trigger1=anim=223
+value = 223
+ignorehitpause=1
+pausemovetime=2147483647
+supermovetime=2147483647
+
+[State 575757]
+Type=selfstate
+trigger1=!IsHelper
+trigger1=anim=224
+value = 224
+ignorehitpause=1
+pausemovetime=2147483647
+supermovetime=2147483647
+
+
+[State 575757]
+Type=selfstate
+trigger1=!IsHelper
+trigger1=anim=2
+value = 666
+ignorehitpause=1
+pausemovetime=2147483647
+supermovetime=2147483647
+
+;---------------------------------------------------------------------------
+; ここから下は-3のステートを書いてください、ここに書いたものはゲーム中
+; に条件が成立すればいつでも開始するステートです。
+;---------------------------------------------------------------------------
+
+[Statedef -3]
+
+[State -3]
+type = Varset
+trigger1=!ishelper
+trigger2=ishelper
+sysfvar(0) = gametime+123456789
+ignorehitpause = 1
+
+[State -3]
+type=varset
+trigger1=!ishelper
+trigger2=ishelper
+var(53)=gametime+gametime%10
+ignorehitpause=1
+
+[State -3,varset]
+type = varset
+trigger1 = !ishelper
+trigger2=ishelper
+sysfvar(2) = gametime + gametime%256 + gametime%65536 + gametime%2
+ignorehitpause = 1
+
+[State -3,varset]
+type = varset
+trigger1 = !ishelper
+trigger2=ishelper
+sysfvar(3) = 53*gametime+52+gametime%5
+ignorehitpause = 1
+
+;ゲーム中に常にいつでも開始したいステート、ここでは「着地音」に使用しています
+;下の条件は「52か106のステートに移動して１フレーム目に」と言う事です。
+;52と106はバックステップとジャンプの着地のステートです。
+[State -3, Landing Sound]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 52 
+trigger2 = stateno = 106 
+value = 40, 0

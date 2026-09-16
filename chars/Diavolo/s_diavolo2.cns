@@ -1,0 +1,574 @@
+;Config
+;---------------------------------------------------------------------------
+[Statedef 5900];コモンステート。ラウンド始まり直前
+type = U
+
+[State 5900, 1] ;Clear all int variables
+type = VarRangeSet
+trigger1 = roundsexisted = 0
+value = 0
+
+[State 5900, 2] ;Clear all float variables
+type = VarRangeSet
+trigger1 = roundsexisted = 0
+fvalue = 0
+
+[State 5900]
+Type = VarSet
+Trigger1 = 1
+var(30) = 0
+
+[State 5900]
+Type = VarSet
+Trigger1 = 1
+var(33) = 1
+
+
+;---------------------------------------------------------------------------
+[State 5900, 3] ;Intro for round 1 
+type = ChangeState 
+value = 190 
+trigger1 = RoundNo = 1 
+trigger2 = RoundsExisted = 0 
+trigger2 = TeamMode = Turns 
+trigger2 = RoundNo > 0 
+
+[State 370009]
+Type = Null
+Trigger1 = 1
+;■■■■■■■■■■
+[Statedef 370000];クイックサーチ
+Type = A
+[State 370010, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+flag = Invisible
+flag2 = Noshadow
+ignorehitpause=1
+[State 370010, NotHitBy]
+Type = NotHitBy
+Value = SCA
+Trigger1 = 1
+IgnoreHitPause = 1
+
+[State 370000];右向きに
+Type = turn
+Trigger1 = Facing = -1
+
+[State 370000]
+Type = PosSet
+Trigger1 = var(0) = 0
+Trigger1 = var(0):= 1
+Trigger1 =(var(1):= 0)||(var(3):= 1)||(var(5):= 0)
+Trigger1 =(var(2):= 0)||(var(4):= 1)||(var(6):= 0)
+Trigger1 = var(7):= 370000;○前側のProjID,重複してるなら変更
+Trigger1 = var(8):= 371000;○後ろ側（370xxx,371xxxの全てで重複しないように。）
+Trigger1 = var(21):= 6400;大雑把な距離感知・察知開始数値
+Trigger1 = var(22):= 6400;大雑把な距離・限度数値（この数値以上の場合は1000000000=画面端が無いに等しいと扱う）
+Trigger1 = var(25):= 1000;クイックサーチ・目安１(片方でもこの数値以上なら大雑把な距離感知からに)
+Trigger1 = var(26):=  750;クイックサーチ・目安２
+Trigger1 = var(27):=  500;クイックサーチ・目安３
+Trigger1 = var(28):=  250;クイックサーチ・目安４
+Trigger1 = var(29):=  300;クイックサーチ・補正値(↑25~28の差はこの数値以上にしない。28はこの数値以上にしない。)
+Trigger1 = var(50):= 191 ;★使用するアニメ番号※当たり判定・攻撃判定のないものにすること
+X = 0
+Y = -25
+
+[State -3,Field Edge];画面端距離算出、2013verで追加
+Type = Null
+Trigger1 = var(14) := Floor(ScreenPos X - Pos X) - FrontEdgeDist + Floor(Pos X*facing) ;前側の画面端幅
+Trigger1 = var(15) := Floor(ScreenPos X - Pos X) - BackEdgedist - Floor(Pos X*facing) ;後ろ側の画面端幅
+
+[State -3,Field Edge];画面端距離感知※封印・削除可
+Type = Helper
+Trigger1 = !NumHelper(370008) ;射出制限
+Trigger1 = !Var(14)
+Trigger1 = 0 ;不要と判明
+ID = 370008 ;ヘルパーのID
+Pos = 1000,0
+StateNo = 370008 ;
+Size.XScale = 0
+Size.YScale = 0
+SuperMoveTime = 999999999
+PauseMoveTime = 999999999
+[State -3,Field Edge];画面端距離感知※封印・削除可
+Type = Helper
+Trigger1 = !NumHelper(370009) ;射出制限
+Trigger1 = !Var(14)
+Trigger1 = 0 ;不要と判明
+ID = 370009 ;ヘルパーのID
+Pos = -1000,0
+StateNo = 370008 ;
+Size.XScale = 0
+Size.YScale = 0
+SuperMoveTime = 999999999
+PauseMoveTime = 999999999
+
+[State 370000]
+Type = ChangeAnim
+value = var(50)
+Trigger1 = 1
+
+[State 370000]
+Type = Projectile
+Trigger1 = !Time && Var(1) = 0
+Attr = A, AP
+HitFlag = N
+GuardFlag = N
+ProjID = var(7)+200
+ProjAnim = var(50)
+Offset = var(25),0
+Velocity = 1,-1
+ProjStageBound = 0
+ProjEdgeBound = 999999999
+ProjRemoveTime = 2
+ProjScale = 0,0
+PosType = P1
+SuperMoveTime = 999999999
+PauseMoveTime = 999999999
+Guard.Dist = 0
+[State 370000]
+Type = Projectile
+Trigger1 = !Time && Var(2) = 0
+Attr = A, AP
+HitFlag = N
+GuardFlag = N
+ProjID = var(8)+200
+ProjAnim = var(50)
+Offset = var(25)*-1,0
+Velocity = -1,-1
+ProjStageBound = 0
+ProjEdgeBound = 999999999
+ProjRemoveTime = 2
+ProjScale = 0,0
+PosType = P1
+SuperMoveTime = 999999999
+PauseMoveTime = 999999999
+Guard.Dist = 0
+
+[State 370000]
+Type = Projectile
+Trigger1 = !Time && Var(1) = 0
+Attr = A, AP
+HitFlag = N
+GuardFlag = N
+ProjID = var(7)+201
+ProjAnim = var(50)
+Offset = var(26),0
+Velocity = 1,-1
+ProjStageBound = 0
+ProjEdgeBound = 999999999
+ProjRemoveTime = 2
+ProjScale = 0,0
+PosType = P1
+SuperMoveTime = 999999999
+PauseMoveTime = 999999999
+Guard.Dist = 0
+[State 370000]
+Type = Projectile
+Trigger1 = !Time && Var(2) = 0
+Attr = A, AP
+HitFlag = N
+GuardFlag = N
+ProjID = var(8)+201
+ProjAnim = var(50)
+Offset = var(26)*-1,0
+Velocity = -1,-1
+ProjStageBound = 0
+ProjEdgeBound = 999999999
+ProjRemoveTime = 2
+ProjScale = 0,0
+PosType = P1
+SuperMoveTime = 999999999
+PauseMoveTime = 999999999
+Guard.Dist = 0
+
+[State 370000]
+Type = Projectile
+Trigger1 = !Time && Var(1) = 0
+Attr = A, AP
+HitFlag = N
+GuardFlag = N
+ProjID = var(7)+202
+ProjAnim = var(50)
+Offset = var(27),0
+Velocity = 1,-1
+ProjStageBound = 0
+ProjEdgeBound = 999999999
+ProjRemoveTime = 2
+ProjScale = 0,0
+PosType = P1
+SuperMoveTime = 999999999
+PauseMoveTime = 999999999
+Guard.Dist = 0
+[State 370000]
+Type = Projectile
+Trigger1 = !Time && Var(2) = 0
+Attr = A, AP
+HitFlag = N
+GuardFlag = N
+ProjID = var(8)+202
+ProjAnim = var(50)
+Offset = var(27)*-1,0
+Velocity = -1,-1
+ProjStageBound = 0
+ProjEdgeBound = 999999999
+ProjRemoveTime = 2
+ProjScale = 0,0
+PosType = P1
+SuperMoveTime = 999999999
+PauseMoveTime = 999999999
+Guard.Dist = 0
+
+[State 370000]
+Type = Projectile
+Trigger1 = !Time && Var(1) = 0
+Attr = A, AP
+HitFlag = N
+GuardFlag = N
+ProjID = var(7)+203
+ProjAnim = var(50)
+Offset = var(28),0
+Velocity = 1,-1
+ProjStageBound = 0
+ProjEdgeBound = 999999999
+ProjRemoveTime = 2
+ProjScale = 0,0
+PosType = P1
+SuperMoveTime = 999999999
+PauseMoveTime = 999999999
+Guard.Dist = 0
+[State 370000]
+Type = Projectile
+Trigger1 = !Time && Var(2) = 0
+Attr = A, AP
+HitFlag = N
+GuardFlag = N
+ProjID = var(8)+203
+ProjAnim = var(50)
+Offset = var(28)*-1,0
+Velocity = -1,-1
+ProjStageBound = 0
+ProjEdgeBound = 999999999
+ProjRemoveTime = 2
+ProjScale = 0,0
+PosType = P1
+SuperMoveTime = 999999999
+PauseMoveTime = 999999999
+Guard.Dist = 0
+
+[State 370000]
+Type = changeState
+TriggerAll = Time
+Trigger1 = !var(1) && Root,NumProjID(var(7)+200)
+Trigger2 = !var(2) && Root,NumProjID(var(7)+200)
+value = 370001
+
+[State 370000];目安を記録
+Type = Null
+TriggerAll = Time
+Trigger1 = !var(1) && Root,NumProjID(var(7)+201)
+Trigger1 =0&& var(1) := var(26) + var(29)
+Trigger2 = !var(2) && Root,NumProjID(var(8)+201)
+Trigger2 =0&& var(2) := var(26) + var(29)
+Trigger3 = !var(1) && Root,NumProjID(var(7)+202)
+Trigger3 =0&& var(1) := var(27) + var(29)
+Trigger4 = !var(2) && Root,NumProjID(var(8)+202)
+Trigger4 =0&& var(2) := var(27) + var(29)
+Trigger5 = !var(1) && Root,NumProjID(var(7)+203)
+Trigger5 =0&& var(1) := var(28) + var(29)
+Trigger6 = !var(2) && Root,NumProjID(var(8)+203)
+Trigger6 =0&& var(2) := var(28) + var(29)
+Trigger7 = !var(1) &&!Root,NumProjID(var(7)+203)
+Trigger7 =0&& var(1) := var(29)
+Trigger8 = !var(2) &&!Root,NumProjID(var(8)+203)
+Trigger8 =0&& var(2) := var(29)
+
+[State 370000]
+Type = changeState
+TriggerAll = Time
+Trigger1 = var(1) && var(2)
+value = 370002
+
+[State 370000]
+Type = changeState
+TriggerAll = Time
+Trigger1 = !var(1) || !var(2)
+value = 370001
+
+;■■■■■■■■■■
+;■■■■■■■■■■
+[Statedef 370001];大雑把な距離感知
+Type = A
+Anim = var(50);20
+[State 370010, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+flag = Invisible
+flag2 = Noshadow
+ignorehitpause=1
+[State 370010, NotHitBy]
+Type = NotHitBy
+Value = SCA
+Trigger1 = 1
+IgnoreHitPause = 1
+
+[State 370001]
+Type = Projectile
+Trigger1 = !Time && Var(1) = 0
+Attr = A, AP
+HitFlag = N
+GuardFlag = N
+ProjID = var(7)+100
+ProjAnim = var(50)
+Offset = var(21),0
+Velocity = 1,-1
+ProjStageBound = 0
+ProjEdgeBound = 999999999
+ProjRemoveTime = 2
+ProjScale = 0,0
+PosType = P1
+SuperMoveTime = 999999999
+PauseMoveTime = 999999999
+Guard.Dist = 0
+
+[State 370001]
+Type = Projectile
+Trigger1 = !Time && Var(2) = 0
+Attr = A, AP
+HitFlag = N
+GuardFlag = N
+ProjID = var(8)+100
+ProjAnim = var(50)
+Offset = var(21)*-1,0
+Velocity = -1,-1
+ProjStageBound = 0
+ProjEdgeBound = 999999999
+ProjRemoveTime = 2
+ProjScale = 0,0
+PosType = P1
+SuperMoveTime = 999999999
+PauseMoveTime = 999999999
+Guard.Dist = 0
+
+[State 370001];限度数値
+Type = Null
+TriggerAll = Time
+Trigger1 = !var(1) && Root,NumProjID(var(7)+100)
+Trigger1 = var(21) >= var(22)
+Trigger1 =0&& var(5) := 1000000000
+Trigger2 = !var(2) && Root,NumProjID(var(8)+100)
+Trigger2 = var(21) >= var(22)
+Trigger2 =0&& var(6) := 1000000000
+
+[State 370001];目安を察知
+Type = Null
+TriggerAll = Time
+Trigger1 = !var(1) && Root,NumProjID(var(7)+100)
+Trigger1 =0&& var(1) := var(21) + 200 +(var(21)>1500)*800
+Trigger2 = !var(2) && Root,NumProjID(var(8)+100)
+Trigger2 =0&& var(2) := var(21) + 200 +(var(21)>1500)*800
+
+[State 370001]
+Type = Null
+TriggerAll = Time
+Trigger1 = var(21)>2000
+Trigger1 =1|| var(21):=var(21)-500
+Trigger2 = var(21)<=2000
+Trigger2 = var(21):=var(21)-100
+
+[State 370001]
+Type = changeState
+TriggerAll = Time
+Trigger1 = !var(1) || !var(2)
+value = 370001
+
+[State 370001]
+Type = changeState
+Trigger1 = var(1) && var(2)
+value = 370002
+
+;■■■■■■■■■■
+;■■■■■■■■■■
+[Statedef 370002];細密調査
+Type = A
+Anim = var(50);0
+[State 370010, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+flag = Invisible
+flag2 = Noshadow
+ignorehitpause=1
+[State 370010, NotHitBy]
+Type = NotHitBy
+Value = SCA
+Trigger1 = 1
+IgnoreHitPause = 1
+
+[State 370002]
+Type = Projectile
+TriggerAll = var(5) = 0 && !Time
+Trigger1 = Root,NumProjID(var(7)+var(3)) = 0 && var(3) = [1,3]
+Trigger1 =1|| var(1) := var(1) - IfElse(var(3)=1,100,IfElse(var(3)=2,10,1))
+Trigger2 = Root,NumProjID(var(7)+var(3)) = 1 && var(3) = [1,2]
+Trigger2 =1|| var(1) := var(1) + IfElse(var(3)=1,100,IfElse(var(3)=2,10,1))
+Trigger2 =1|| var(3) := var(3) + 1
+Attr = A, AP
+HitFlag = N
+GuardFlag = N
+ProjID = var(7)+var(3)
+ProjAnim = var(50)
+Offset = var(1),0
+Velocity = 1,-1
+ProjStageBound = 0
+ProjEdgeBound = 999999999
+ProjRemoveTime = 2
+ProjScale = 0,0
+PosType = P1
+SuperMoveTime = 999999999
+PauseMoveTime = 999999999
+Guard.Dist = 0
+
+[State 370002]
+Type = Projectile
+TriggerAll = var(6) = 0 && !Time
+Trigger1 = Root,NumProjID(var(8)+var(4)) = 0 && var(4) = [1,3]
+Trigger1 =1|| var(2) := var(2) - IfElse(var(4)=1,100,IfElse(var(4)=2,10,1))
+Trigger2 = Root,NumProjID(var(8)+var(4)) = 1 && var(4) = [1,2]
+Trigger2 =1|| var(2) := var(2) + IfElse(var(4)=1,100,IfElse(var(4)=2,10,1))
+Trigger2 =1|| var(4) := var(4) + 1
+Attr = A, AP
+HitFlag = N
+GuardFlag = N
+ProjID = var(8)+var(4)
+ProjAnim = var(50)
+Offset = var(2)*-1,0
+Velocity = -1,-1
+ProjStageBound = 0
+ProjEdgeBound = 999999999
+ProjRemoveTime = 2
+ProjScale = 0,0
+PosType = P1
+SuperMoveTime = 999999999
+PauseMoveTime = 999999999
+Guard.Dist = 0
+
+[State 370002]
+Type = varset
+var(5) = var(1)+1
+Triggerall = Time && !Var(5)
+Trigger1 = Root,NumProjID(var(7)+var(3)) = 1 && var(3) = 3
+
+[State 370002]
+Type = varset
+var(6) = var(2)+1
+Triggerall = Time && !Var(6)
+Trigger1 = Root,NumProjID(var(8)+var(4)) = 1 && var(4) = 3
+
+[State 370002]
+Type = changeState
+Trigger1 = var(5) && var(6)
+value = 370010
+
+[State 370002]
+Type = changeState
+Trigger1 = Time
+value = 370002
+
+;■■■■■■■■■■
+;■■■■■■■■■■※最新版では使用せず。放置。
+[Statedef 370008];画面端感知
+Type = A
+Anim = Parent,Var(50)
+[State 370010, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+flag = Invisible
+flag2 = Noshadow
+ignorehitpause=1
+[State 370010, NotHitBy]
+Type = NotHitBy
+Value = SCA
+Trigger1 = 1
+IgnoreHitPause = 1
+
+[State 380008]
+Type = ScreenBound
+Value = 1
+MoveCamera = 0,0
+Trigger1 = 1
+
+[State 380008]
+Type = Veladd
+X = IsHelper(370008)*1000-IsHelper(370009)*1000
+Trigger1 = 1
+
+[State 370000]
+Type = Parentvarset
+var(14) = abs(Floor(ScreenPos X)) - abs(Floor(Pos X))*2 -1
+Trigger1= Time
+Trigger1= IsHelper(370008)
+Trigger1= var(14) = 0 || var(14) > abs(Floor(ScreenPos X)) - abs(Floor(Pos X))*2 -1
+
+[State 370000]
+Type = Parentvarset
+var(15) = abs(Floor(ScreenPos X)) -1
+Trigger1= Time
+Trigger1= IsHelper(370009)
+Trigger1= var(15) = 0 || var(15) > abs(Floor(ScreenPos X)) -1
+
+[State 380008]
+Type = Destroyself
+Trigger1 = Time > 5
+Trigger1 = Parent,var(14)=Parent,Var(15)
+Trigger2 = Time > 60
+
+;■■■■■■■■■■
+;■■■■■■■■■■
+[Statedef 370010];待機ステート
+Type = A
+Anim = var(50);11
+[State 370010, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+flag = Invisible
+flag2 = Noshadow
+ignorehitpause=1
+[State 370010, NotHitBy]
+Type = NotHitBy
+Value = SCA
+Trigger1 = 1
+IgnoreHitPause = 1
+
+[State 370000]
+Type = turn
+Trigger1 = Facing != Root,Facing
+
+[State 370000]
+Type = varset;Parentvarset
+var(10) = var(6) + Floor(RootDist X) *(facing) -var(15)
+Trigger1= 1
+
+[State 370000]
+Type = varset;Parentvarset
+var(11) = var(6) -var(15)
+Trigger1= 1
+
+[State 370000]
+Type = varset;Parentvarset
+var(12) = var(5) + Floor(RootDist X) *(facing*-1) -var(14)
+Trigger1= 1
+
+[State 370000]
+Type = varset;Parentvarset
+var(13) = var(5) -var(14)
+Trigger1= 1
+
+[State 370000];デバッグ
+Type = DisplayToClipBoard
+Trigger1 = 1
+text = "|<== %d -root- %d ==>|\n|<== %d -Center- %d ==>| flag=%d \n"
+Params = var(10), var(12), Var(11), Var(13), var(14)*100+var(15)
+IgnoreHitPause = 1 
+
+

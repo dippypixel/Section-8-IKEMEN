@@ -1,0 +1,1594 @@
+; サンプルキャラクター『カンフーマン』のコンスタンツとステートのファイルです。
+;===========================================================================
+; コンスタンツ（定数）
+;===========================================================================
+;---------------------------------------------------------------------------
+; ここがキャラの心臓部とも言うべき場所。
+; １キャラ単位のライフや大きさなど、標準のステータスを予め決めておく部分。
+; このコーナー自体省略出来ません。
+;---------------------------------------------------------------------------
+; 基本データ
+;---------------------------------------------------------------------------
+[Data]
+	life              = 987    ;ライフ（体力ゲージ）最大値
+	power             = 13000  ;パワーゲージ最大値（オプション・デフォルトは3000=Lv.3）
+	attack            = 87     ;攻撃力（デフォルトは１００％）
+	defence           = 87     ;防御力（デフォルトは１００％）
+	fall.defence_up   = 50     ;横に倒れている時に一時的に加える防御力（％）
+	liedown.time      = 60     ;横に倒れている時間（フレーム）
+	airjuggle         = 15     ;ジャグルポイント限界値（「小ネタ.txt」参照）
+	sparkno           = 2      ;デフォルトのヒットスパーク（fightfxから）
+	guard.sparkno     = 40     ;デフォルトのガードスパーク（fightfxから）
+	KO.echo           = 0      ;ＫＯ時の音声（11,0）にエコーを掛けるか否か（0=掛けない,1=掛ける）
+	volume            = 255    ;キャラの標準の音量（最小-255・最大255）
+	IntPersistIndex   = 0      ;次のラウンドへ持ち越せる「Var」のアドレスの範囲を決める（※１）
+	FloatPersistIndex = 0     ;次のラウンドへ持ち越せる「FVar」のアドレスの範囲を決める（※１）
+
+;---------------------------------------------------------------------------
+; サイズ
+;---------------------------------------------------------------------------
+[Size]
+	xscale           = 1       ;キャラの横の大きさ（絶対値・float）
+	yscale           = 1       ;キャラの縦の大きさ（絶対値・float）
+	ground.back      = 15      ;地上にいる時の「後方の物理的な幅」
+	ground.front     = 16      ;地上にいる時の「前方の物理的な幅」
+	air.back         = 12      ;空中にいる時の「後方の物理的な幅」
+	air.front        = 12      ;空中にいる時の「前方の物理的な幅」
+	height           = 60      ;キャラの物理的な高さ（高いほど相手は飛び越しにくくなる）
+	attack.dist      = 160     ;相手がガード態勢に入る最低の距離
+	proj.attack.dist = 90      ;自分の「Projectile」に対して相手がガード態勢に入る最低の距離
+	proj.doscale     = 0       ;xscaleとyscaleを「Projectile」にも影響させるか否か（0=させない・1=させる）
+	head.pos         = -5,-90  ;キャラの標準の頭の座標（Bind系で適用される）
+	mid.pos          = -5,-60  ;キャラの標準の体中心の座標（Bind系で適用される）
+	shadowoffset     = 0       ;影のＹ軸方向の位置座標
+	draw.offset      = 0,0     ;キャラの表示座標（Ｘ軸,Ｙ軸
+
+;---------------------------------------------------------------------------
+; 移動速度
+;---------------------------------------------------------------------------
+[Velocity]
+walk.fwd     = 0.75         ;前進速度（Ｘ軸・[Statedef 20]に適用される）
+walk.back    = -1.4        ;後退速度（Ｘ軸・[Statedef 20]に適用される）
+run.fwd      = 4.6,0       ;前方に走る速度（Ｘ軸,Ｙ軸・[Statedef 100]に適用される）
+run.back     = -5.5,-2.8   ;後方に走る速度（Ｘ軸,Ｙ軸・[Statedef 105]に適用される）
+
+	jump.neu     = 0,-10.85     ;垂直ジャンプの速度（Ｘ軸,Ｙ軸・[Statedef 40]に適用される）
+	jump.back    = -4          ;後方ジャンプの速度（Ｘ軸・[Statedef 40]に適用される）
+	jump.fwd     = 3.85         ;前方ジャンプの速度（Ｘ軸・[Statedef 40]に適用される）
+	
+	runjump.back = -2.55,-8.1  ;後方に走ってからのジャンプ速度（Ｘ軸,Ｙ軸・[Statedef 40]に適用される）
+	runjump.fwd  = 5,-6.1      ;前方に走ってからのジャンプ速度（Ｘ軸,Ｙ軸・[Statedef 40]に適用される）
+
+	airjump.neu  = 0,-12.1      ;空中垂直ジャンプ速度（Ｘ軸,Ｙ軸・[Statedef 45]に適用される）
+	airjump.back = -4.55       ;空中後方ジャンプ速度（Ｘ軸・[Statedef 45]に適用される）
+	airjump.fwd  = 3.5         ;空中前方ジャンプ速度（Ｘ軸・[Statedef 45]に適用される）
+
+;---------------------------------------------------------------------------
+; 運動関係
+;---------------------------------------------------------------------------
+[Movement]
+airjump.num     = 0        ;空中ジャンプが出来る回数
+airjump.height  = 35       ;空中ジャンプが出来る最低の高度（Ｙ軸）
+yaccel          = .45      ;Ｙ軸加速度（重力）
+stand.friction  = .85      ;立っている時の摩擦係数（ステートのPhysicsが「S」の時）
+crouch.friction = .82      ;しゃがんでいる時の摩擦係数（ステートのPhysicsが「C」の時）
+
+;===========================================================================
+; ステート
+;===========================================================================
+;---------------------------------------------------------------------------
+; ここからはキャラのそれぞれの行動（ステート）を設定する。
+; 番号（ステートナンバー）に気を付ければ良いだけで、
+; 行動の決め方もステートの数も作りたいキャラによって自由。
+;
+; 本来ステートは別のファイルとして扱っているものだけど、
+; このようにコンスタンツファイルと一緒にまとめる事も可能。
+;
+; ステートの基本的な設定はおまけフォルダの「テンプレート.txt」を参照。
+;===========================================================================
+; 基本行動
+;===========================================================================
+;---------------------------------------------------------------------------
+;タイムオーバー（負けた時）
+[Statedef 170]
+type = S
+ctrl = 0
+anim = 170
+velset = 0,0
+
+[State 170, 無敵]
+type = NotHitBy
+trigger1 = 1 ;トリガーを何も書かず「1」にする事により、『無条件で常に実行させる命令』になる。
+value = SCA
+time = 1
+
+[State 170, ボイス]
+type = PlaySnd
+trigger1 = time = 60
+value = 180, random % 2
+channel = 0
+
+;==============================================================================
+; 勝利ポーズ
+;==============================================================================
+;---------------------------------------------------------------------------
+;勝利ポーズ分岐
+;---------------------------------------------------------------------------
+[Statedef 180]
+type = S
+
+[State 180, 負完全勝利]
+type = ChangeState
+trigger1 = PrevStateNo = 5150
+trigger1 = var(42) = 1
+trigger1 = Time = 0
+value = 186
+
+[State 180, エクスカリバー勝利]
+type = ChangeState
+trigger1 = PrevStateNo = 5150
+trigger1 = var(42) = 3 || var(42) = 5
+trigger1 = Time = 0
+value = 187
+
+[State 180, エクスカリバー勝利]
+type = ChangeState
+trigger1 = PrevStateNo != 5150
+trigger1 = var(42) = 4
+trigger1 = Time = 0
+value = 188
+
+[State 180, エクスカリバー勝利]
+type = ChangeState
+trigger1 = PrevStateNo = 5150
+trigger1 = var(42) = 7
+trigger1 = Time = 0
+value = 189
+
+[State 180, 汎用勝利]
+type = ChangeState
+trigger1 = Time = 0
+value = 181
+
+;---------------------------------------------------------------------------
+;汎用勝利
+;---------------------------------------------------------------------------
+[Statedef 181]
+type = S
+ctrl = 0
+anim = 181
+velset = 0,0
+
+[State 181, 無敵]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 181, セリフ分岐]
+type = Varset
+trigger1 = Time = 0
+var(0) = random % 5
+
+[State 181, ボイス]
+type = PlaySnd
+trigger1 = time = 0
+value = 180, var(0)
+channel = 0
+
+[State 181, 口パク停止]
+type = changeanim
+trigger1 = var(0) != 4
+trigger1 = time > 100
+value = 181
+elem = 3
+
+[State 181,口パク停止]
+type = changeanim
+trigger1 = var(0) = 4
+trigger1 = time > 315
+value = 181
+elem = 3
+
+[State 181, ラウンド待機]
+type = AssertSpecial
+trigger1 = var(0) = 4
+trigger1 = time < 360
+flag = roundnotover
+
+
+;---------------------------------------------------------------------------
+;負完全勝利
+;---------------------------------------------------------------------------
+[Statedef 186]
+type = S
+ctrl = 0
+anim = 2920
+velset = 0,0
+
+[State 186, 無敵]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 186, ラウンド待機]
+type = AssertSpecial
+trigger1 = time < 340
+flag = roundnotover
+
+
+[State 186, ボイス]
+type = PlaySnd
+trigger1 = time = 0
+value = 2900, 3
+channel = 0
+
+[State 186, ]
+type = changeanim
+trigger1 = anim = 2920
+trigger1 = time > 110
+value = 2920
+elem = 1
+
+[State 186, ]
+type = changeanim
+trigger1 = time = 140
+value = 2921
+
+[State 186, ボイス]
+type = PlaySnd
+trigger1 = time = 150
+value = 2900, 2
+channel = 0
+
+[State 186, ]
+type = changeanim
+trigger1 = anim = 2921
+trigger1 = time > 270
+value = 2921
+elem = 3
+		
+;---------------------------------------------------------------------------
+;エクスカリバー勝利
+;---------------------------------------------------------------------------
+[Statedef 187]
+type = S
+ctrl = 0
+;anim = 2805
+velset = 0,0
+
+[State 187, 無敵]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 186, ]
+type = changeanim
+trigger1 = time = 0
+value = 2805
+elem = ifelse(var(42) = 3,1,5)
+
+[State 187, ラウンド待機]
+type = AssertSpecial
+trigger1 = time < 200
+flag = roundnotover
+
+[State 187, ボイス]
+type = PlaySnd
+trigger1 = animelemtime(5) = 30
+value = 180, 5
+channel = 0
+
+;---------------------------------------------------------------------------
+;エクスカリバー勝利
+;---------------------------------------------------------------------------
+[Statedef 188]
+type = S
+ctrl = 0
+;anim = 2805
+velset = 0,0
+
+[State 187, 無敵]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 186, ]
+type = changeanim
+trigger1 = time = 0
+value = 2805
+elem = 3
+
+[State 187, ラウンド待機]
+type = AssertSpecial
+trigger1 = time < 200
+flag = roundnotover
+
+[State 187, ボイス]
+type = PlaySnd
+trigger1 = animelemtime(5) = 30
+value = 180, 5
+channel = 0
+
+;---------------------------------------------------------------------------
+;裸エプロンブチギレ勝利
+;---------------------------------------------------------------------------
+[Statedef 189]
+type = S
+ctrl = 0
+;anim = 2216
+velset = 0,0
+
+[State 186, ]
+type = changeanim
+trigger1 = time = 0
+value = 2216
+elem = 2
+
+[State 187, 無敵]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 187, ラウンド待機]
+type = AssertSpecial
+trigger1 = time < 200
+flag = roundnotover
+
+[State 187, ボイス]
+type = PlaySnd
+trigger1 = animelemtime(3) = 0
+value = 2200, 1
+channel = 0
+volume = 255
+
+;==============================================================================
+; イントロ
+;==============================================================================
+;---------------------------------------------------------------------------
+; イントロ分岐
+;---------------------------------------------------------------------------
+[Statedef 191,イントロ分岐]
+	Type=S
+
+[State 190, 1]
+type = AssertSpecial
+trigger1 = 1
+flag = intro
+
+	[State 191,特殊イントロ分岐]
+		Type=ChangeState
+		;上条当麻
+		Trigger1=P2Name="Kamijo toma" && (var(10) := 0 || 1)
+		;一方通行
+		Trigger2=P2Name="Accelerator" && var(10) := 1
+		;碇シンジ
+		Trigger3=P2Name="super_shinji_san" && var(10) := 2
+		;モノクマ
+		Trigger4=P2Name="MONOKUMA" && var(10) := 3
+		;クロ
+		Trigger5=P2Name="kuro" && var(10) := 4
+		;VS痴女
+		Trigger6=(P2Name="saber_Extra"||P2Name="caster_Extra"||P2Name="Sefu-Sefu-Len"||P2Name="another blood"||P2Name="another_blood") && var(10) := 5
+		;使徒
+		Trigger7=P2Name="aznyael" && var(10) := 6
+		;トランプ		
+		Trigger8=(P2Name="Ren" || P2Name="Saku" || P2Name="Oswald" || P2Name="Rozwel" || P2Name="Joker_AKOF"|| P2Name="Gambit" || P2Name="Marvel vs Capcom - Eternity of Heroes: Gambit" || P2Name="GAMBIT by CAMRAT" || P2Name="Masta Gambit") && var(10) := 7
+		;這いよる混沌
+		Trigger9=(P2Name="haiyoru_konton" || P2Name="Nyarlathotep" || P2Name="nyar" || P2Name="Nyaruko") && var(10) := 8
+		;過負荷
+		Trigger10=(P2Name="Matou Sakura" || P2Name="Saber_Alter")&& var(10) := 9	
+		;主人公（笑）
+		Trigger11=P2Name="Asagiri_Asagi" && var(10) := 10	
+		;カリスマ
+		Trigger12=(P2Name="gilgamesh" || P2Name="Dio" || P2Name="Shadow DIO" || P2Name="final dio" || P2Name="Shadow_Final_DIO") && var(10) := 11	
+		;ループ
+		Trigger13=(P2Name="Akemi-Homura") && var(10) := 12
+			
+
+		value=192
+
+	[State 191,汎用イントロ分岐]
+		Type=ChangeState
+		triggerall = roundsexisted = 0
+		Trigger1 = var(10) := Random%3 || 1
+		value=199
+
+	[State 191,ターンバトル初回時以外イントロ終了]
+		Type=ChangeState
+		trigger1 = roundsexisted != 0
+		value=0
+
+;---------------------------------------------------------------------------
+; 特殊イントロ
+;---------------------------------------------------------------------------
+[Statedef 192,特殊イントロ]
+	Type=S
+	Ctrl=0
+	velset=0,0
+	sprpriority = 3
+
+	[State 190, 1]
+		type = AssertSpecial
+		trigger1 = 1
+		flag = intro
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		Trigger1=RoundState=0
+		Trigger1=var(10)=0
+		value=194
+		persistent = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		Trigger1=RoundState=0
+		Trigger1=var(10)=1
+		value=191
+		elem = 3
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		Trigger1=RoundState=0
+		Trigger1=var(10)=2
+		value=195
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		Trigger1=RoundState=0
+		Trigger1=var(10)=3
+		value=195
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		Trigger1=RoundState=0
+		Trigger1=var(10)=4
+		value=195
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		Trigger1=RoundState=0
+		Trigger1=var(10)=5
+		value=195
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		Trigger1=RoundState=0
+		Trigger1=var(10)=6
+		value=195
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		Trigger1=RoundState=0
+		Trigger1=var(10)=7
+		value=195
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		Trigger1=RoundState=0
+		Trigger1=var(10)=8
+		value=194
+		elem = 4
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		Trigger1=RoundState=0
+		Trigger1=var(10)=9
+		value=195
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		Trigger1=RoundState=0
+		Trigger1=var(10)=10
+		value=199
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		Trigger1=RoundState=0
+		Trigger1=var(10)=11
+		value=195
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		Trigger1=RoundState=0
+		Trigger1=var(10)=11
+		value=195
+
+;---------------------------------------------------------------------------
+;VS上条当麻
+;---------------------------------------------------------------------------
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		Trigger1=Anim=194
+		Trigger1=var(10)=0	
+		Trigger1=AnimElemTime(3)=0
+		value=2900,1
+		volume=255
+		channel=1
+		persistent = 0
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		Trigger1=Anim=194
+		Trigger1=var(10)=0	
+		Trigger1=Time=80
+		value=191,0
+		volume=255
+		channel=1
+		persistent = 0
+
+
+	[State 2900,黒]
+		type = Explod
+		Trigger1=Anim=194
+		Trigger1=var(10)=0	
+		Trigger1=Time=120
+		anim = 11665
+		ID = 11664
+		pos = 150,110
+		postype = back
+		bindtime = -1
+		random = 0, 0
+		supermovetime = 9999
+		pausemovetime = 9999
+		scale = 2,2
+		sprpriority = -5
+		ownpal = 1
+		RemoveTime=128
+		facing = -1
+		persistent=0
+		ontop = 1
+
+	[State 2900, バシュン音]
+		type = PlaySnd
+		Trigger1=Anim=194
+		Trigger1=var(10)=0	
+		Trigger1=Time=120
+		value = 105, 16
+		channel = -1
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		Trigger1=Anim=194
+		Trigger1=var(10)=0	
+		Trigger1=Time>150
+		value=194
+		elem = 4
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		Trigger1=Anim=194
+		Trigger1=var(10)=0	
+		Trigger1=Time=300
+		value=701
+		persistent = 0
+
+	[State 195,end]
+		Type=ChangeState
+		Trigger1=Anim=701
+		Trigger1=var(10)=0
+		Trigger1=animtime=0
+		value=0
+;---------------------------------------------------------------------------
+;VS一方通行
+;---------------------------------------------------------------------------
+[State 190, 『僕は悪くない』]
+type = PlaySnd
+Trigger1=var(10)=1
+trigger1 = Anim = 191
+trigger1 = Animelemtime(6) = 0
+value = 190, 0
+channel = 1
+
+
+[State 190, 『僕は悪くない』]
+type = stopSnd
+Trigger1=var(10)=1
+trigger1 = time = 80
+channel = 1
+
+[State 190, 『僕は悪くない』]
+type = varSet
+Trigger1=var(10)=1
+trigger1 = time = 80
+var(20) = life
+
+[State 190, 『僕は悪くない』]
+type = LifeSet
+Trigger1=var(10)=1
+trigger1 = time = 80
+value = 1
+
+[State 191, 特殊効果]
+type = AssertSpecial
+Trigger1=var(10)=1
+trigger1 = Anim = 191
+trigger1 = time > 75
+flag = NoShadow
+flag2 = Invisible
+
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		Trigger1=Anim=191
+		Trigger1=var(10)=1	
+		Trigger1=Time=450
+		value=2900,1
+		volume=255
+		channel=1
+		persistent = 0
+
+	[State 190, 『僕は悪くない』]
+		type = LifeSet
+		TriggerAll=var(10)=1
+		Trigger1=Anim=191
+		Trigger1=Time=500
+		value = var(20)
+
+	[State 5070,SE]
+		Type=playSnd
+		TriggerAll=var(10)=1
+		Trigger1=Anim=191
+		Trigger1=Time=500
+		value=110,6
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll=var(10)=1
+		Trigger1=Anim=191
+		Trigger1=Time=500
+		trigger2 = anim = 181
+		trigger2 = AnimElemTime(3) >= 0
+		trigger2 = AnimElemTime(4) < 0
+		value=181
+		elem = 3
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll=var(10)=1
+		TriggerAll=Anim=181
+		Trigger1=Time=550
+		Trigger2=Time>820
+		value=181
+		elem = 4
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		Trigger1=Anim=181
+		Trigger1=var(10)=1	
+		Trigger1=Time=550
+		value=191,1
+		volume=255
+		channel=1
+		persistent = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll=var(10)=1
+		TriggerAll=Anim=181
+		Trigger1=Time=900
+		value=702
+
+	[State 195,アニメ変更]
+		Type=ChangeState
+		TriggerAll=var(10)=1
+		TriggerAll=Anim=702
+		Trigger1=AnimTime=0
+		value=0
+
+;---------------------------------------------------------------------------
+;VS碇シンジ
+;---------------------------------------------------------------------------
+	[State 191,Anim];アニメ変更
+		type = Varset
+		Trigger1 = var(10) =2
+		trigger1 = Time = 0
+		var(20) = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll=var(10)=2
+		Trigger1=var(20)=0
+		Trigger2=anim=195
+		Trigger2=var(20)>100
+		Trigger2=var(20)<190		
+		value=195
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll=var(10)=2
+		trigger1 = P2StateNo = 0
+		trigger2 = time > 400		
+		var(20) = 1
+		persistent = 0
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		Trigger1=var(10)=2	
+		Trigger1=var(20)
+		value=191,2
+		volume=255
+		channel=1
+		persistent = 0
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		Trigger1=var(10)=2
+		Trigger1=var(20)
+		var(20) = 1
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		Trigger1=var(10)=2
+		Trigger1=var(20)=310
+		value=710
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		Trigger1=var(10)=2
+		Trigger1=var(20)>480
+		Trigger1=anim = 710
+		value=710
+		elem = 4
+		
+	[State 191,End]
+		Type=Changeanim
+		Trigger1=var(10)=2
+		Trigger1=var(20)=510
+		value=702
+
+	[State 191,End]
+		Type=ChangeState
+		Trigger1=var(10)=2
+		Trigger1=anim=702
+		Trigger1=animTime=0
+		value=0
+
+;---------------------------------------------------------------------------
+;VSモノクマ
+;---------------------------------------------------------------------------
+	[State 191,Anim];アニメ変更
+		type = Varset
+		TriggerAll = var(10) = 3
+		trigger1 = Time = 0
+		var(20) = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll = var(10) = 3
+		Trigger1=var(20)=0
+		Trigger2=anim=195
+		Trigger2=var(20)>100
+		Trigger2=var(20)<190		
+		value=195
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 3
+		trigger1 = P2StateNo = 0
+		trigger2 = time > 400		
+		var(20) = 1
+		persistent = 0
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		TriggerAll = var(10) = 3	
+		Trigger1=var(20)
+		value=191,3
+		volume=255
+		channel=1
+		persistent = 0
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 3
+		Trigger1=var(20)
+		var(20) = 1
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		TriggerAll = var(10) = 3
+		Trigger1=var(20)=110
+		value=710
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		TriggerAll = var(10) = 3
+		Trigger1=var(20)>190
+		Trigger1=anim = 710
+		value=710
+		elem = 4
+		
+	[State 191,End]
+		Type=Changeanim
+		TriggerAll = var(10) = 3
+		Trigger1=var(20)=250
+		value=702
+
+	[State 191,End]
+		Type=ChangeState
+		TriggerAll = var(10) = 3
+		Trigger1=anim=702
+		Trigger1=animTime=0
+		value=0
+
+;---------------------------------------------------------------------------
+;VSクロ
+;---------------------------------------------------------------------------
+	[State 191,Anim];アニメ変更
+		type = Varset
+		TriggerAll = var(10) = 4
+		trigger1 = Time = 0
+		var(20) = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll = var(10) = 4
+		Trigger1=var(20)=0
+		Trigger2 = anim = 195
+		Trigger2=var(20)		
+		value=195
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 4
+		trigger1 = P2StateNo = 0
+		trigger2 = time > 400		
+		var(20) = 1
+		persistent = 0
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 4
+		Trigger1=var(20)
+		var(20) = 1
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		TriggerAll = var(10) = 4	
+		Trigger1=anim = 196
+		Trigger1=animelemtime(5) = 10		
+		value=191,4
+		volume=255
+		channel=1
+		persistent = 0
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		TriggerAll = var(10) = 4
+		Trigger1=var(20)=50
+		value=196
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		TriggerAll = var(10) = 4
+		Trigger1=var(20)>190
+		Trigger1=anim = 196
+		value=196
+		elem = 5
+		
+	[State 191,End]
+		Type=Changeanim
+		TriggerAll = var(10) = 4
+		Trigger1=var(20)=210
+		value=701
+
+	[State 191,End]
+		Type=ChangeState
+		TriggerAll = var(10) = 4
+		Trigger1=anim=701
+		Trigger1=animTime=0
+		value=0
+
+;---------------------------------------------------------------------------
+;VS痴女
+;---------------------------------------------------------------------------
+	[State 191,Anim];アニメ変更
+		type = Varset
+		TriggerAll = var(10) = 5
+		trigger1 = Time = 0
+		var(20) = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll = var(10) = 5
+		Trigger1=var(20)=0
+		value=195
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 5
+		trigger1 = P2StateNo = 0
+		trigger2 = time > 400		
+		var(20) = 1
+		persistent = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll = var(10) = 5
+		Trigger1=var(20)=1
+		value=700
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		TriggerAll = var(10) = 5	
+		Trigger1=var(20)
+		value=191,5
+		volume=255
+		channel=1
+		persistent = 0
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 5
+		Trigger1=var(20)
+		var(20) = 1
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		TriggerAll = var(10) = 5
+		TriggerAll=anim = 700
+		Trigger1=var(20)>210
+		Trigger1=var(20)<250
+		Trigger2=var(20)>410
+		value=700
+		elem = 3
+		
+	[State 191,End]
+		Type=Changeanim
+		TriggerAll = var(10) = 5
+		Trigger1=var(20)=450
+		value=701
+
+	[State 191,End]
+		Type=ChangeState
+		TriggerAll = var(10) = 5
+		Trigger1=anim=701
+		Trigger1=animTime=0
+		value=0
+;---------------------------------------------------------------------------
+;VS使徒
+;---------------------------------------------------------------------------
+	[State 191,Anim];アニメ変更
+		type = Varset
+		TriggerAll = var(10) = 6
+		trigger1 = Time = 0
+		var(20) = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll = var(10) = 6
+		Trigger1=var(20)=0
+		value=195
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 6
+		trigger1 = P2StateNo = 0
+		trigger2 = time > 400		
+		var(20) = 1
+		persistent = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll = var(10) = 6
+		Trigger1=var(20)=90
+		value=710
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		TriggerAll = var(10) = 6	
+		Trigger1=var(20)=10
+		value=191,6
+		volume=255
+		channel=1
+		persistent = 0
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 6
+		Trigger1=var(20)
+		var(20) = 1
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		TriggerAll = var(10) = 6
+		TriggerAll=anim = 710
+		Trigger1=var(20)>190
+		value=710
+		elem = 4
+		
+	[State 191,End]
+		Type=Changeanim
+		TriggerAll = var(10) = 6
+		Trigger1=var(20)=220
+		value=701
+
+	[State 191,End]
+		Type=ChangeState
+		TriggerAll = var(10) = 6
+		Trigger1=anim=701
+		Trigger1=animTime=0
+		value=0
+;---------------------------------------------------------------------------
+;VSトランプ
+;---------------------------------------------------------------------------
+	[State 191,Anim];アニメ変更
+		type = Varset
+		TriggerAll = var(10) = 7
+		trigger1 = Time = 0
+		var(20) = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll = var(10) = 7
+		Trigger1=var(20)=0
+		value=195
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 7
+		trigger1 = time > 60	
+;		trigger1 = P2StateNo = 0
+;		trigger2 = time > 400		
+		var(20) = 1
+		persistent = 0
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		TriggerAll = var(10) = 7	
+		Trigger1=var(20)=1
+		value=191,7
+		volume=255
+		channel=1
+		persistent = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll = var(10) = 7
+		Trigger1=var(20)=60
+		value=196
+
+	[State 5070,SE]
+		Type=playSnd
+		TriggerAll = var(10) = 7
+		Trigger1=var(20)=80
+		value=110,6
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 7
+		Trigger1=var(20)
+		var(20) = 1
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		TriggerAll = var(10) = 7
+		TriggerAll=anim = 196
+		Trigger1=var(20)>200
+		value=196
+		elem = 5
+		
+	[State 191,End]
+		Type=Changeanim
+		TriggerAll = var(10) = 7
+		Trigger1=var(20)=230
+		value=701
+
+	[State 191,End]
+		Type=ChangeState
+		TriggerAll = var(10) = 7
+		Trigger1=anim=701
+		Trigger1=animTime=0
+		value=0
+;---------------------------------------------------------------------------
+;VS這いよる混沌
+;---------------------------------------------------------------------------
+	[State 191,Anim];アニメ変更
+		type = Varset
+		TriggerAll = var(10) = 8
+		trigger1 = Time = 0
+		var(20) = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll = var(10) = 8
+		Trigger1=var(20)=0
+		value=194
+		elem = 4
+		
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 8
+		trigger1 = P2StateNo = 0
+		trigger2 = time > 400		
+		var(20) = 1
+		persistent = 0
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		TriggerAll = var(10) = 8	
+		Trigger1=var(20)=1
+		value=191,8
+		volume=255
+		channel=1
+		persistent = 0
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 8
+		Trigger1=var(20)
+		var(20) = 1
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		TriggerAll = var(10) = 8
+		TriggerAll=anim = 194
+		Trigger1=var(20)>220
+		value=194
+		elem = 4
+		
+	[State 191,End]
+		Type=Changeanim
+		TriggerAll = var(10) = 8
+		Trigger1=var(20)=250
+		value=701
+
+	[State 191,End]
+		Type=ChangeState
+		TriggerAll = var(10) = 8
+		Trigger1=anim=701
+		Trigger1=animTime=0
+		value=0
+;---------------------------------------------------------------------------
+;VS過負荷
+;---------------------------------------------------------------------------
+	[State 191,Anim];アニメ変更
+		type = Varset
+		TriggerAll = var(10) = 9
+		trigger1 = Time = 0
+		var(20) = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll = var(10) = 9
+		Trigger1=var(20)=0
+		value=195
+		
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 9
+		trigger1 = P2StateNo = 0
+		trigger2 = time > 400		
+		var(20) = 1
+		persistent = 0
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 9
+		Trigger1=var(20)
+		var(20) = 1
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		TriggerAll = var(10) = 9	
+		Trigger1=var(20)=20
+		value=11,7
+		volume=255
+		channel=1
+		persistent = 0
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		TriggerAll = var(10) = 9
+		Trigger1=var(20)=80
+		value=715
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		TriggerAll = var(10) = 9	
+		Trigger1=var(20)=100
+		value=191,9
+		volume=255
+		channel=1
+		persistent = 0
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		TriggerAll = var(10) = 9
+		TriggerAll=anim = 715
+		Trigger1=var(20)>260
+		value=715
+		elem = 3
+		
+	[State 191,End]
+		Type=Changeanim
+		TriggerAll = var(10) = 9
+		Trigger1=var(20)=310
+		value=703
+
+	[State 191,End]
+		Type=ChangeState
+		TriggerAll = var(10) = 9
+		Trigger1=anim=703
+		Trigger1=animTime=0
+		value=0
+;---------------------------------------------------------------------------
+;VS主人公（笑）
+;---------------------------------------------------------------------------
+	[State 191,Anim];アニメ変更
+		type = Varset
+		TriggerAll = var(10) = 10
+		trigger1 = Time = 0
+		var(20) = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll = var(10) = 10
+		Trigger1=var(20)=0
+		value=199
+		
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 10
+		Trigger1=RoundState!=0		
+		var(20) = 1
+		persistent = 0
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 10
+		Trigger1=var(20)
+		var(20) = 1
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		TriggerAll = var(10) = 10	
+		Trigger1=var(20)
+		value=191,10
+		volume=255
+		channel=1
+		persistent = 0
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		TriggerAll = var(10) = 10
+		TriggerAll=anim = 199
+		Trigger1=var(20)>160
+		value=199
+		
+	[State 191,End]
+		Type=Changeanim
+		TriggerAll = var(10) = 10
+		Trigger1=var(20)=180
+		value=701
+
+	[State 191,End]
+		Type=ChangeState
+		TriggerAll = var(10) = 10
+		Trigger1=anim=701
+		Trigger1=animTime=0
+		value=0
+
+;---------------------------------------------------------------------------
+;VSカリスマ
+;---------------------------------------------------------------------------
+	[State 191,Anim];アニメ変更
+		type = Varset
+		TriggerAll = var(10) = 11
+		trigger1 = Time = 0
+		var(20) = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll = var(10) = 11
+		Trigger1=var(20)<40
+		value=195
+		
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 11
+		trigger1 = P2StateNo = 0
+		trigger2 = time > 400		
+		var(20) = 1
+		persistent = 0
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 11
+		Trigger1=var(20)
+		var(20) = 1
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		TriggerAll = var(10) = 11	
+		Trigger1=var(20)=40
+		value=191,11
+		volume=255
+		channel=1
+		persistent = 0
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		TriggerAll = var(10) = 11
+		Trigger1=var(20)=220
+		value=710
+
+		
+	[State 191,End]
+		Type=Changeanim
+		TriggerAll = var(10) = 11
+		Trigger1=var(20)=680
+		value=702
+
+	[State 191,End]
+		Type=ChangeState
+		TriggerAll = var(10) = 11
+		Trigger1=anim=702
+		Trigger1=animTime=0
+		value=0
+
+;---------------------------------------------------------------------------
+;VSループ
+;---------------------------------------------------------------------------
+	[State 191,Anim];アニメ変更
+		type = Varset
+		TriggerAll = var(10) = 12
+		trigger1 = Time = 0
+		var(20) = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		TriggerAll = var(10) = 12
+		Trigger1=var(20)<40
+		value=195
+		
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 12
+		trigger1 = P2StateNo = 0
+		trigger2 = time > 400		
+		var(20) = 1
+		persistent = 0
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		TriggerAll = var(10) = 12
+		Trigger1=var(20)
+		var(20) = 1
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		TriggerAll = var(10) = 12	
+		Trigger1=var(20)=40
+		value=191,12
+		volume=255
+		channel=1
+		persistent = 0
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		TriggerAll = var(10) = 12
+		Trigger1=var(20)=40
+		value=710
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		TriggerAll = var(10) = 12
+		Trigger1=anim=710
+		Trigger1=var(20)>180
+		value=710
+		elem = 4
+		
+	[State 191,End]
+		Type=Changeanim
+		TriggerAll = var(10) = 12
+		Trigger1=var(20)=220
+		value=702
+
+	[State 191,End]
+		Type=ChangeState
+		TriggerAll = var(10) = 12
+		Trigger1=anim=702
+		Trigger1=animTime=0
+		value=0
+
+;---------------------------------------------------------------------------
+;汎用イントロ
+;---------------------------------------------------------------------------
+[Statedef 199]
+type = S
+ctrl = 0
+anim = 191
+velset = 0,0
+
+[State 191, アニメ変更];バトル画面に切り替わった瞬間のフェードインの時、アニメを固定している
+type = ChangeAnim
+trigger1 = RoundState = 0
+value = ifelse(var(10)=2,195,191+var(10))
+
+[State 191, 特殊効果];試合が開始するまではこのコントローラを使おう（※２）
+type = AssertSpecial
+trigger1 = 1
+flag = Intro ;イントロの状態
+
+[State 191, 特殊効果]
+type = AssertSpecial
+trigger1 = Anim = 191
+trigger1 = AnimElemTime(1) >= 6
+trigger1 = AnimElemTime(2) < 0
+flag = NoShadow
+flag2 = NoBG
+flag3 = Invisible
+
+[State 191, 特殊効果]
+type = AssertSpecial
+trigger1 = Anim = 191
+trigger1 = AnimElemTime(3) >= 0
+trigger1 = AnimElemTime(3) < 6
+flag = NoShadow
+flag2 = NoBG
+flag3 = Invisible
+
+[State 190, 『僕は悪くない』]
+type = PlaySnd
+trigger1 = !var(20)
+trigger1 = Anim = 191
+trigger1 = Animelemtime(6) = 0
+value = 190, 0
+
+[State 190, 球磨川君を見るときは]
+type = PlaySnd
+trigger1 = Anim = 192
+trigger1 = Animelemtime(1) = 12
+value = 190, 1
+
+[State 191, アニメ変更]
+type = ChangeAnim
+trigger1 = Anim = 192
+trigger1 = time = 330
+value = 193
+
+[State 1201, 螺子]
+type = Explod
+trigger1 = Anim = 193
+trigger1 = AnimElemtime(1) = 20
+anim = 1211
+ID = 1211
+pos = -15, -50
+postype = p1
+bindtime = -1
+random = 0, 0
+vel = 0, 0
+accel = 0, 0
+removetime = -1
+supermovetime = 0
+pausemovetime = 0
+sprpriority = -1
+ownpal = 1
+removeongethit = 1
+
+[State 1201, 螺子消し]
+type = RemoveExplod
+trigger1 = Anim = 193
+trigger1 = AnimElemtime(2) = 2
+trigger2 = AnimElemtime(13) = 0
+ID = 1211
+
+[State 1201, 螺子]
+type = Explod
+trigger1 = Anim = 193
+trigger1 = AnimElemtime(2) = 2
+anim = 1216
+id = 1211
+pos = -15, 0
+postype = p1
+bindtime = 1
+random = 0, 0
+vel = 0, 0
+accel = 0, 0
+removetime = -1
+supermovetime = 0
+pausemovetime = 0
+sprpriority = -1
+ownpal = 1
+removeongethit = 1
+
+
+[State 1201, 螺子]
+type = Explod
+trigger1 = Anim = 193
+trigger1 = AnimElemtime(13) = 0
+anim = 1217
+pos = -15, 0
+postype = p1
+bindtime = 1
+random = 0, 0
+vel = 0, 0
+accel = 0, 0
+removetime = -2
+supermovetime = 0
+pausemovetime = 0
+sprpriority = -1
+ownpal = 1
+removeongethit = 1
+
+[State 190, 球磨川君を見るときは]
+type = PlaySnd
+trigger1 = Anim = 193
+trigger1 = AnimElemTime(2) = 2
+value = 110, 0
+
+[State 1201, 画面振動]
+type = EnvShake
+trigger1 = Anim = 193
+trigger1 = AnimElemTime(2) = 0
+time = 8
+ampl = 20
+freq = -17
+
+
+	[State 191,Anim];アニメ変更
+		type = Varset
+		trigger1 = Anim = 195
+		trigger1 = Time = 0
+		var(20) = 0
+
+	[State 195,アニメ変更]
+		Type=ChangeAnim
+		trigger1 = Anim = 195
+		Trigger1=var(20)<40
+		value=195
+		
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		triggerAll = Anim = 195
+		trigger1 = P2StateNo = 0
+		trigger2 = time > 400
+		trigger3 = TeamMode = turns && Roundno != 1
+		var(20) = 1
+		persistent = 0
+
+	[State 193,Anim];アニメ変更
+		type = Varadd
+		triggerAll = Anim = 195
+		Trigger1=var(20)
+		var(20) = 1
+
+	[State 195,ボイス]
+		Type=PlaySnd
+		triggerAll = Anim = 195
+		Trigger1=var(20)=40
+		value=190,2
+		volume=255
+		channel=1
+		persistent = 0
+
+	[State 191,Anim];アニメ変更
+		Type=ChangeAnim
+		triggerAll = Anim = 195
+		Trigger1=var(20)=190
+		value=191
+		elem = 4
+
+	[State 191,End]
+		Type=ChangeState
+		Trigger1=var(20)
+		Trigger1=anim=191
+		Trigger1=animTime=0
+		value=0
+
+
+[State 191, ステート変更];アニメーションが終われば「通常立ち」のステートに変更する
+type = ChangeState
+triggerall = AnimTime = 0
+trigger1 = Anim = 191
+trigger2 = Anim = 193
+value = 0
+
+

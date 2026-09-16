@@ -1,0 +1,341 @@
+;---------------------------------------------------------------------------
+; Jump Start
+[Statedef 40]
+type    = S
+physics = S
+anim = 40
+ctrl = 0
+sprpriority = 1
+
+[State 40, 1]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 40, PlaySnd]
+type = PlaySnd
+trigger1 = time = 1
+value = S1000,20
+channel = 0
+
+[State 40, PlaySnd]
+type = PlaySnd
+triggerall = command = "holdfwd" || command = "holdback"
+trigger1 = time = 1
+value = S1000,3
+channel = 0
+
+[State 40, 2]
+type = VarSet
+trigger1 = command = "holdfwd"
+sysvar(1) = 1
+
+[State 40, 3]
+type = VarSet
+trigger1 = command = "holdback"
+sysvar(1) = -1
+
+[State 40, 4]
+type = VelSet
+trigger1 = AnimTime = 0
+x = ifelse(sysvar(1)=0, const(velocity.jump.neu.x), ifelse(sysvar(1)=1, const(velocity.jump.fwd.x), const(velocity.jump.back.x)))
+y = const(velocity.jump.y)
+
+[State 40, 5]
+type = VelSet
+trigger1 = AnimTime = 0
+trigger1 = prevstateno = 100 ;RUN_FWD
+trigger1 = sysvar(1) = 1
+x = const(velocity.runjump.fwd.x)
+
+[State 40, 6]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 50
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Leap foward
+[Statedef 100]
+type    = A
+physics = N
+anim = 100
+sprpriority = 1
+ctrl = 0
+
+[State 100, CtrlSet]
+type = CtrlSet
+trigger1 = Time = 3
+value = 1
+
+[State 100, 1]
+type = VelSet
+trigger1 = Animelem = 2
+x = 3.6
+y = -2.8
+
+[State 100, PlaySnd]
+type = PlaySnd
+trigger1 = Animelem = 1
+value = S1000,0
+channel = 0 
+
+[State 100, Gravity]
+type = Gravity
+trigger1 = Time > 7
+
+[State 100, 2]
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+
+[State 100, 3]
+type = AssertSpecial
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 100, 4]
+type = ChangeState
+triggerall = Time > 12
+trigger1 = Vel y > 0 && Pos y >= 0
+value = 52
+
+;-----------------------------------------------------------------
+;Dodge Foward
+[Statedef 800]
+type     = S
+movetype = I
+physics  = S
+velset   = 0,0
+anim     = 700
+ctrl     = 0
+
+[State 800, PlaySnd]
+type = PlaySnd
+trigger1 = Time = 1
+value = S1000,8
+channel= 0
+
+[State 800, AfterImage]
+type = AfterImage
+trigger1 = !time
+time = 25
+length = 20
+palinvertall = 0
+palcolor = 255
+paladd = 50,50,150
+timegap = 1
+framegap = 5
+trans = add1
+
+[State 800, hitby]
+type = hitby
+Trigger1 = 1
+value = SCA,AT
+
+[State 800, VelSet]
+type = VelSet
+trigger1 = AnimElemTime(2) >= 0
+x = 7.7
+
+[State 800, VelSet]
+type = VelSet
+trigger1 = AnimElem = 7, >= 0
+x = 0
+
+[State 800, PlayerPush]
+type = PlayerPush
+trigger1 = AnimElemTime(2) > 0
+value = 0
+
+[State 800, ChangeState]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;------------------------------------------------------------------
+;Dodge Back
+[Statedef 810]
+type     = S
+movetype = I
+physics  = S
+velset   = 0,0
+anim     = 705
+ctrl     = 0
+
+[State 810, PlaySnd]
+type = PlaySnd
+trigger1 = Time = 1
+value = S1000,8
+channel= 0
+
+[State 810, AfterImage]
+type = AfterImage
+trigger1 = !time
+time = 20
+length = 20
+palinvertall = 0
+palcolor = 255
+paladd = 0,0,0
+timegap = 1
+framegap = 5
+trans = add1
+
+[State 810, hitby]
+type = hitby
+Trigger1 = 1
+value = SCA,AT
+
+[State 810, VelSet]
+type = VelSet
+trigger1 = AnimElemTime(2) > 0
+x = -6.8
+
+[State 810, VelSet]
+type = VelSet
+trigger1 = AnimElem = 7, >= 0
+x = 0
+
+[State 810, PlayerPush]
+type = PlayerPush
+trigger1 = AnimElemTime(7) > 0
+value = 0
+
+[State 810, ChangeState]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Downed get-hit (getting up)
+[Statedef 5120]
+type    = L
+movetype= I
+physics = N
+
+[State 5120, 1a] ;Get up anim (normal)
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = anim != [5111,5119]
+trigger2 = !SelfAnimExist(5120 + (anim % 10))
+value = 5120
+
+[State 5120, 1b] ;Get up anim (for hit up/diag-up)
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = anim = [5111,5119]
+trigger1 = SelfAnimExist(5120 + (anim % 10))
+value = 5120 + (anim % 10)
+
+[State 181, Sound]
+type = PlaySnd
+trigger1 = Time = 0
+value = 490, (random%11)
+channel = 0
+volume = 255
+
+[State 5120, 2]
+type = VelSet
+trigger1 = Time = 0
+x = 0
+
+[State 5120, 3]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 5120, 4]
+type = HitFallSet
+trigger1 = AnimTime = 0
+value = 1
+
+[State 5120, 5] ;Can't be thrown right after getting up
+type = NotHitBy
+trigger1 = AnimTime = 0
+value = , NT,ST,HT
+time = 12
+
+[State 5120, 6] ;Can't be hit right after getting up (short time)
+type = NotHitBy
+trigger1 = AnimTime = 0
+value2 = SCA
+time = 3
+
+[State 5120, 4] ; transit to special lose state
+type = ChangeState
+triggerall = roundno >= 2
+trigger1 = lose
+trigger1 = roundstate >= 4
+value = 171
+
+[State 5120, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; HIT_LIEDEAD
+[Statedef 5150]
+type    = L
+movetype= H
+physics = N
+sprpriority = -3
+
+[State 5150, 1] ;Normal anim
+type = ChangeAnim
+triggerall = Time = 0
+triggerall = SelfAnimExist(5140)
+trigger1 = (anim != [5111,5119]) && (anim != [5171,5179])
+trigger2 = !SelfAnimExist(5140 + (anim % 10))
+value = 5140
+
+[State 5150, 3] ;Hit up type anim
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = (anim = [5111,5119]) || (anim = [5171,5179])
+trigger1 = SelfAnimExist(5140 + (anim % 10))
+value = 5140 + (anim % 10)
+
+[State 5150, 4] ;Match over anim
+type = ChangeAnim
+persistent = 0
+;trigger1 = Time = 0
+trigger1 = MatchOver = 1
+trigger1 = Anim = [5140,5149]
+trigger1 = SelfAnimExist(anim+10)
+value = anim+10
+
+[State 5150, 5] ;Switch to 5110 if liedead anim does not exist
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = Anim != [5140,5159]
+trigger1 = Anim != [5110,5119]
+value = 5110
+
+[State 5150, 6] ;Friction
+type = VelMul
+trigger1 = 1
+x = 0.85
+
+[State 5150, 7] ;Friction
+type = VelSet
+trigger1 = Vel x < .05
+persistent = 0
+x = 0
+
+[State 5150, 4] ; transit to special lose state
+type = ChangeState
+triggerall = roundno >= 2
+trigger1 = lose
+trigger1 = roundstate >= 4
+value = 171
+
+[State 5150, 8]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1

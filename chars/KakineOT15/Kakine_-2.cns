@@ -1,0 +1,501 @@
+;===========================================================================
+; 常時監視ステート（－２）
+;===========================================================================
+
+[Statedef -2]
+
+;-----------------------------------
+;ここは「パワー溜め」のステートで発生させた「Explod」のエフェクト画像を
+;特定の条件が有効になれば消す、という処理をしています。
+
+[State -2, エフェクトを消す];パワー溜めステート用
+type = RemoveExplod
+triggerall = NumExplod(130) > 0
+                          ;↑はＩＤナンバー「130」のExplodの画面中の数が0よりも多い、
+                          ;つまり１枚以上表示されている時
+trigger1 = StateNo != 700 ;ステートが７００（パワー溜め）以外の時
+trigger2 = MoveType != I  ;MoveTypeが「I（何もしてない）」以外の時
+ID = 130                  ;消すExplodの特定のＩＤナンバーを指定
+
+
+
+;-----------------------------------
+[State -2, クリップボード]
+type = DisplayToClipboard
+trigger1 = 1
+text = "Cancel=%d, Throw=%d, Button=%d, Body-Distance X=%d,Y=%d \n"
+params = var(1),var(2),var(5),floor(P2BodyDist X),floor(P2BodyDist Y)
+
+[State -2, クリップボード（追加専用）]
+type = AppendToClipboard
+trigger1 = 1
+text = "Position X=%d,Y=%d, Velocity X=%f,Y=%f, Hit=%d \n"
+params = floor(Pos X),floor(Pos Y),(Vel X),(Vel Y),(MoveHit)
+
+;===========================================================================
+
+[State -2];バーストアイコンy軸
+	type = Varset
+	trigger1 = Numhelper(30000) = 0
+	var(33) = 0;デフォルトは0 +方向で下に
+
+[State -2];バーストアイコンx軸
+	type = Varset
+	trigger1 = Numhelper(30000) = 0
+	var(34) = 0;デフォルトは0 -方向で中央に
+
+;===========================================================================
+;特殊システム
+;===========================================================================
+;DamageDampening Reset
+[State -2]
+	type = Varset
+	trigger1 = enemy,movetype != H
+	trigger2 = enemy,stateno = [120,155]
+	fv = 0
+	value = 1
+	ignorehitpause = 1
+
+
+[State -2];補正
+	type = Varset
+	trigger1 = enemy,movetype != H
+	trigger2 = enemy,stateno = [120,155]
+	fv = 10
+	value = 1
+	ignorehitpause = 1
+
+;Cornerpush reset
+[State -2];ヒットバック
+	type = Varset
+	trigger1 = enemy,movetype != H
+	trigger2 = enemy,stateno = [120,155]
+	fvar(11)=0
+	ignorehitpause = 1
+
+;Gives 1000 at the start of the battle
+[State -2,初期ゲージ設定]
+	Type= PowerSet
+	trigger1 = roundsexisted = 0 && roundstate = 0 && roundno = 1;
+	value = 1000 ; 0?6000で設定可能 1000単位で1本 デフォルトは1000
+;---------------------------------------------------------------------------
+;ダークマターゲージ
+;---------------------------------------------------------------------------
+[State -2];ダークマターゲージ上限
+Type= Varset
+Trigger1= var(50) >1000
+var(50)=1000
+
+[State -2];ダークマターゲージ下限
+Type= Varset
+Trigger1= var(50) < 0
+var(50)=0
+
+[State -2];ダークマターゲージ上限
+Type= Varset
+Trigger1= var(51) >1000
+var(51)=1000
+
+[State -2];ダークマターゲージ下限
+Type= Varset
+Trigger1= var(51) < 0
+var(51)=0
+
+[State -2];ダークマターゲージ使用不能
+Type= Varset
+Trigger1= var(17) = 1
+var(50)=0
+
+;[State -2];ダークマターゲージ使用不能
+;Type= Varset
+;Trigger1= var(17) = 1
+;var(51)=0
+
+[State -2];ゲージ呼び出し
+type = Helper
+triggerAll = !var(18)
+trigger1 = time = 1
+trigger1 = Numhelper(9998) = 0
+stateno = 9998
+ID = 9998
+pos = 0,0
+postype = left
+helpertype = normal
+name = "gauge"
+keyctrl = 0
+ownpal = 1
+pausemovetime = 9999
+supermovetime = 9999
+
+;Round Start DM
+[State -2,初期ゲージ設定]
+	Type= VarSet
+	trigger1 = roundsexisted = 0 && roundstate = 0 ;&& roundno = 1;
+	var(51) = 500 
+
+[State -2];DM Gauge add
+Type= VarAdd
+triggerall = roundstate = 2
+triggerall=time%4=1
+Trigger1= var(51) <=1000
+var(51)= 1
+
+[State -2];ゲージ呼び出し
+type = Helper
+triggerAll = !var(18)
+trigger1 = time = 1
+trigger1 = Numhelper(9999) = 0
+stateno = 9999
+ID = 9999
+pos = 0,0
+postype = left
+helpertype = normal
+name = "gauge"
+keyctrl = 0
+ownpal = 1
+pausemovetime = 9999
+supermovetime = 9999
+
+;[State -2];ゲージ回復
+;Type= VarAdd
+;TriggerAll= var(50) =[0,1001]
+;trigger1 = 1
+;var(50)=1
+
+;[State -2];ゲージ減少
+;Type= VarAdd
+;TriggerAll= var(50) =[0,1001]
+;trigger1 = GetHitVar(damage)
+;var(50)=-25
+
+
+[State -2];Jump Var Reset
+Type= VarSet
+trigger1=statetype!=A
+var(23)=0
+
+[State -2];Jump Var Add
+Type= VarAdd
+trigger1=anim=40
+trigger1=animtime=1
+v=23
+value=1
+
+
+;==============================================================================
+;ダークマター防御一打目
+;==============================================================================
+
+[State -2,ガード]
+Type     = VarSet
+Trigger1 = Ctrl && StateNo%2 && StateNo = [151,155]
+Trigger2 = PrevStateNo%2 = 0 && PrevStateNo = [150,154]
+Trigger2 = StateNo%2 = 0 && StateNo = [150,154]
+V        = 6
+Value    = 0
+Ignorehitpause = 1
+
+[State -2,ライフ反転]
+Type     = VarSet
+Trigger1 = MoveType != H
+V        = 6
+Value    = -Life
+Ignorehitpause = 1
+
+;[State -2,一打目ダメージ軽減]
+;Type     = LifeAdd
+;Trigger1 = MoveType = H
+;Trigger1 = Life && Alive
+;Trigger1 = Life < Var(6)
+;Value = Floor((Var(6)-Life)*FVar(6))
+;Ignorehitpause = 1
+;Absolute = 1
+
+[State -2,一打終了]
+Type     = VarSet
+Trigger1 = MoveType = H
+Trigger1 = Life <= Var(6) && Var(6)
+V        = 6
+Value    = 0
+Ignorehitpause = 1
+
+[State -2,ライフ]
+Type     = VarSet
+Trigger1 = MoveType = H
+Trigger1 = Var(6) < 0 && Var(6) > -1-LifeMax
+V        = 6
+Value    = -Var(6)
+Ignorehitpause = 1
+
+;[State -2, DefenceMulSet]
+;type = DefenceMulSet
+;trigger1 = var(17)=0
+;value = 1.66
+;ignorehitpause = 
+;persistent = 1
+
+;[State -2, DefenceMulSet]
+;type = DefenceMulSet
+;trigger1 = var(17)=1
+;value = 2.33
+;ignorehitpause = 
+;persistent = 1
+
+[State -2, DefenceMulSet]
+Type = DefenceMulSet
+Trigger1 = Life <= 300
+Value = 0.7
+IgnoreHitPause = 1
+
+[State -2, DefenceMulSet]
+Type = DefenceMulSet
+Trigger1 = Life <= 150
+Value = 0.5
+IgnoreHitPause = 1
+
+;==============================================================================
+
+
+
+[State -3, Get Hit Sounds]
+type = PlaySnd
+triggerall = alive && time = 1
+trigger1 = (stateno = 5000 || stateno = 5010 || stateno = 5020 || stateno = 5070 || stateno = 5080)
+trigger1 = enemynear,hitdefattr = SCA,NA,SA,HA
+value = S5000,0+(random%2)
+volume = 255
+channel = 0
+
+;==============================================================================
+;ゲージチャージ
+;==============================================================================
+
+[State 702, ゲージ回復]
+type = PowerAdd
+trigger1 = var(51) >= 950
+trigger1 = GameTime % 80 = 0
+value = 45
+
+[State 702, ゲージ回復]
+type = PowerAdd
+trigger1 = var(51) >= 800 && var(51) <= 899
+trigger1 = GameTime % 80 = 0
+value = 40
+
+[State 702, ゲージ回復]
+type = PowerAdd
+trigger1 = var(51) >= 700 && var(51) <= 799
+trigger1 = GameTime % 80 = 0
+value = 35
+
+[State 702, ゲージ回復]
+type = PowerAdd
+trigger1 = var(51) >= 600 && var(51) <= 699
+trigger1 = GameTime % 80 = 0
+value = 30
+
+[State 702, ゲージ回復]
+type = PowerAdd
+trigger1 = var(51) >= 500 && var(51) <= 599
+trigger1 = GameTime % 80 = 0
+value = 25
+
+[State 702, ゲージ回復]
+type = PowerAdd
+trigger1 = var(51) >= 400 && var(51) <= 499
+trigger1 = GameTime % 80 = 0
+value = 20
+
+[State 702, ゲージ回復]
+type = PowerAdd
+trigger1 = var(51) >= 300 && var(51) <= 399
+trigger1 = GameTime % 80 = 0
+value = 15
+
+[State 702, ゲージ回復]
+type = PowerAdd
+trigger1 = var(51) >= 200 && var(51) <= 299
+trigger1 = GameTime % 80 = 0
+value = 10
+
+[State 702, ゲージ回復]
+type = PowerAdd
+trigger1 = var(51) >= 100 && var(51) <= 199
+trigger1 = GameTime % 80 = 0
+value = 5
+
+;==============================================================================
+;サキスパ用
+;==============================================================================
+
+[State -2];
+type = Varset
+trigger1 = StateNo = 6300 && AnimElemtime(5) = 0;
+trigger2 = StateNo = 6350 && AnimElemtime(5) = 0;	
+var(14) = 1
+
+[State -2];タイマー呼び出し
+type = Helper
+triggerAll = Numhelper(30001) = 0
+trigger1 = time = 1
+stateno = 30001
+ID = 30001
+pos = 0,0
+postype = left
+helpertype = normal
+name = "timers"
+keyctrl = 0
+ownpal = 1
+pausemovetime = 1
+supermovetime = 1
+
+;リザレクション処理
+;==============================================================================
+;■NOKO Set for revive
+[State -2]
+type = null;assertspecial
+triggerall   = var(51)>999
+triggerall = power >=1000
+trigger1 = NumEnemy = 1 && !NumPartner
+trigger1 = Enemy(0),life > 0 || Enemy(0),alive = 0
+trigger2 = NumEnemy = 2 && !NumPartner
+trigger2 = EnemyNear(0),life > 0 || EnemyNear(0),alive = 0
+trigger2 = EnemyNear(1),life > 0 || EnemyNear(1),alive = 0
+trigger3 = NumEnemy = 1 && NumPartner
+trigger3 = EnemyNear(0),life > 0 || EnemyNear(0),alive = 0
+trigger3 = Partner,life > 0 || Partner,alive = 0
+trigger4 = NumEnemy = 2 && NumPartner
+trigger4 = EnemyNear(0),life > 0 || EnemyNear(0),alive = 0
+trigger4 = EnemyNear(1),life > 0 || EnemyNear(1),alive = 0
+trigger4 = Partner,life > 0 || Partner,alive = 0
+flag = noko
+IgnoreHitPause = 1
+
+[State -2]
+type = null;lifeset
+triggerAll = alive
+trigger1 = var(51)>999
+triggerall = power >=1000
+trigger1 = Life = 0
+value = 1
+IgnoreHitPause = 1
+
+;---------------------------------------------------------------------------
+;ダメージ補正
+;---------------------------------------------------------------------------
+
+;コンボ補正
+;-------ヒット数初期化
+;[state -2]
+;type=varset
+;trigger1=!numtarget
+;var(0)=0
+
+;------ヒット数加算
+;[state -2]
+;type=varadd
+;triggerall=numtarget
+;triggerall=enemynear,movetype=h
+;triggerall=enemynear,gethitvar(hitcount)>var(0)
+;triggerall=StateNo != 2000
+;trigger1=movehit
+;var(0)=1
+;IgnoreHitPause=1
+
+
+;-----補正
+;[state -2]
+;type=attackmulset
+;trigger1=1
+;value=1.00-0.015*var(0)
+
+;[state -2]
+;type=attackmulset
+;trigger1=var(0)>=60
+;value=0.1
+
+;===========================================================================
+;ステート奪われ判断
+;===========================================================================
+
+[State -2, gametime];-2ステートへ置く
+Type=varset
+Trigger1 = var(49) != Gametime
+var(49) = -1
+ignorehitpause=1 ;Var(49)=-1でステート奪われ状態の認識。
+
+;--------------------------------------------------------
+
+;===========================================================================
+; 準常時監視ステート（－３）
+;===========================================================================
+;---------------------------------------------------------------------------
+; こちらは通常の食らい状態以外の「P2StateNo」や「TargetState」等で制御された、
+; 作成者が任意に指定した相手側の食らいステートに限り、
+; 登録したステートコントローラが有効にはなりません。
+; －１や－２と上手く使い分けて行きましょう。
+;---------------------------------------------------------------------------
+
+[Statedef -3]
+
+;-----------------------------------
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;強制リザ
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[State adi, NoMove]
+Type = Null;ChangeState
+Value = 7125 ;強制リザレクション
+triggerAll = var(49) != -1;ステートが奪われていない
+triggerAll = alive
+triggerAll = Stateno != 7125 
+triggerAll = Stateno != 7126 
+triggerAll = var(51)>999
+triggerall= power>=1000
+trigger1 = Life = 1
+trigger2 = Life = 0
+IgnoreHitPause = 1
+
+[State -3, 音を鳴らす]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 52  ;着地ステート
+trigger2 = stateno = 106 ;バックステップ後の着地ステート
+value = 40, 0
+
+[State -3, 音を鳴らす]
+type =   Varset
+triggerall = Time = 1
+trigger1 = stateno = 52  ;着地ステート
+var(10) =   0 
+      
+[State -3, gametime];-3ステートへ置く
+Type=null
+Trigger1 = var(49) := Gametime
+ignorehitpause=1 ;Var(49)= Gametimeでステート奪われてない状態の認識。
+
+
+;---------------------------------------------------------------------------
+
+[State -3]
+type = Lifeadd
+triggerAll = alive
+TriggerAll= var(17) =1
+trigger1 =  GameTime % 45 = 0;GameTime % 10 = 0
+value = 3;2
+
+[State -1]
+type = poweradd
+triggerAll = alive
+TriggerAll= var(17) =1
+trigger1 = GameTime % 10 = 0
+value = 10
+;---------------------------------------------------------------------------
+;ゲージ↑↓
+;---------------------------------------------------------------------------
+
+;[State -1]
+;type = poweradd
+;trigger1 = GameTime % 10 = 0
+;value = 100000
+
+;---------------------------------------------------------------------------

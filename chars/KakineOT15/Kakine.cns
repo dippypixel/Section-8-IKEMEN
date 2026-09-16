@@ -1,0 +1,921 @@
+; サンプルキャラクター『カンフーマン』のコンスタンツとステートのファイルです。
+;===========================================================================
+; コンスタンツ（定数）
+;===========================================================================
+;---------------------------------------------------------------------------
+; ここがキャラの心臓部とも言うべき場所。
+; １キャラ単位のライフや大きさなど、標準のステータスを予め決めておく部分。
+; このコーナー自体省略出来ません。
+;---------------------------------------------------------------------------
+; 基本データ
+;---------------------------------------------------------------------------
+[Data]
+life              = 1000   ;ライフ（体力ゲージ）最大値
+power             = 6000   ;パワーゲージ最大値（オプション・デフォルトは3000=Lv.3）
+attack            = 100    ;攻撃力（デフォルトは１００％）
+defence           = 100   ;防御力（デフォルトは１００％）
+fall.defence_up   = 50     ;横に倒れている時に一時的に加える防御力（％）
+liedown.time      = 60     ;横に倒れている時間（フレーム）
+airjuggle         = 15     ;ジャグルポイント限界値（「小ネタ.txt」参照）
+sparkno           = -1      ;デフォルトのヒットスパーク（fightfxから）
+guard.sparkno     = 40     ;デフォルトのガードスパーク（fightfxから）
+KO.echo           = 0      ;ＫＯ時の音声（11,0）にエコーを掛けるか否か（0=掛けない,1=掛ける）
+volume            = 0      ;キャラの標準の音量（最小-255・最大255）
+IntPersistIndex   = 50     ;次のラウンドへ持ち越せる「Var」のアドレスの範囲を決める（※１）
+FloatPersistIndex = 40     ;次のラウンドへ持ち越せる「FVar」のアドレスの範囲を決める（※１）
+
+;---------------------------------------------------------------------------
+; ※１：変数のラウンド持ち越し方法
+;
+; 　変数を次のラウンドへ持ち越したい場合は、↑の
+; 　「IntPersistIndex」と「FloatPersistIndex」を使う。
+; 　そのやり方はM.U.G.E.Nの説明書にすら載ってないので、ここで例を元に解説。
+;
+; 　?IntPersistIndex = 23　（Var(23)～Var(59)までを全て次のラウンドへ持ち越せる）
+; 　?FloatPersistIndex = 18（FVar(18)～FVar(39)までを全て次のラウンドへ持ち越せる）
+;
+; 　つまり「Var(**)（Fvar(**)）以降全ての変数を持ち越す」という命令になる。
+; 　それ以前のアドレスの変数は全て持ち越さなくなる。
+;
+; 　全ての変数を持ち越さない場合は、
+; 　IntPersistIndexは60以上、FloatPersistIndexは40以上にしておこう。
+;
+; 　×これはダメ×
+; 　　?IntPersistIndex = 10,15,20,25　（15,20,25の部分は意味無し）
+; 　　?FloatPersistIndex = 4,16 　　　（16の部分は意味無し）
+; 　　これらは最初の数字以外全て無効。
+; 
+;---------------------------------------------------------------------------
+; 改訂前の和訳ＫＦＭではPersistIndexの解釈が無茶苦茶間違ってました。
+; 大変失礼致しました。(人・ω・｀)ごめんなさい
+; 今回はちゃんと調べて正確な情報を載せてるんで安心してください（苦笑
+;---------------------------------------------------------------------------
+; サイズ
+;---------------------------------------------------------------------------
+[Size]
+xscale           = 1       ;キャラの横の大きさ（絶対値・float）
+yscale           = 1       ;キャラの縦の大きさ（絶対値・float）
+ground.back      = 15      ;地上にいる時の「後方の物理的な幅」
+ground.front     = 16      ;地上にいる時の「前方の物理的な幅」
+air.back         = 12      ;空中にいる時の「後方の物理的な幅」
+air.front        = 12      ;空中にいる時の「前方の物理的な幅」
+height           = 60      ;キャラの物理的な高さ（高いほど相手は飛び越しにくくなる）
+attack.dist      = 160     ;相手がガード態勢に入る最低の距離
+proj.attack.dist = 90      ;自分の「Projectile」に対して相手がガード態勢に入る最低の距離
+proj.doscale     = 0       ;xscaleとyscaleを「Projectile」にも影響させるか否か（0=させない・1=させる）
+head.pos         = -5,-90  ;キャラの標準の頭の座標（Bind系で適用される）
+mid.pos          = -5,-60  ;キャラの標準の体中心の座標（Bind系で適用される）
+shadowoffset     = 0       ;影のＹ軸方向の位置座標
+draw.offset      = 0,0     ;キャラの表示座標（Ｘ軸,Ｙ軸）
+
+;---------------------------------------------------------------------------
+; 移動速度
+;---------------------------------------------------------------------------
+[Velocity]
+walk.fwd     = 1.3         ;前進速度（Ｘ軸・[Statedef 20]に適用される）
+walk.back    = -0.7        ;後退速度（Ｘ軸・[Statedef 20]に適用される）
+run.fwd      = 14,0       ;前方に走る速度（Ｘ軸,Ｙ軸・[Statedef 100]に適用される）
+run.back     = -6,-3.8   ;後方に走る速度（Ｘ軸,Ｙ軸・[Statedef 105]に適用される）
+jump.neu     = 0,-9      ;垂直ジャンプの速度（Ｘ軸,Ｙ軸・[Statedef 40]に適用される）
+jump.back    = -2.8       ;後方ジャンプの速度（Ｘ軸・[Statedef 40]に適用される）
+jump.fwd     = 1.8        ;前方ジャンプの速度（Ｘ軸・[Statedef 40]に適用される）
+runjump.back = -2.55,-8.1  ;後方に走ってからのジャンプ速度（Ｘ軸,Ｙ軸・[Statedef 40]に適用される）
+runjump.fwd  = 4,-8.1      ;前方に走ってからのジャンプ速度（Ｘ軸,Ｙ軸・[Statedef 40]に適用される）
+airjump.neu  = 0,-8.1      ;空中垂直ジャンプ速度（Ｘ軸,Ｙ軸・[Statedef 45]に適用される）
+airjump.back = -2.55       ;空中後方ジャンプ速度（Ｘ軸・[Statedef 45]に適用される）
+airjump.fwd  = 2.5         ;空中前方ジャンプ速度（Ｘ軸・[Statedef 45]に適用される）
+
+;---------------------------------------------------------------------------
+; 運動関係
+;---------------------------------------------------------------------------
+[Movement]
+airjump.num     = 0;3        ;空中ジャンプが出来る回数
+airjump.height  = 20       ;空中ジャンプが出来る最低の高度（Ｙ軸）
+yaccel          = .44      ;Ｙ軸加速度（重力）
+stand.friction  = .85      ;立っている時の摩擦係数（ステートのPhysicsが「S」の時）
+crouch.friction = .82      ;しゃがんでいる時の摩擦係数（ステートのPhysicsが「C」の時）
+
+;===========================================================================
+; ステート
+;===========================================================================
+;---------------------------------------------------------------------------
+; ここからはキャラのそれぞれの行動（ステート）を設定する。
+; 番号（ステートナンバー）に気を付ければ良いだけで、
+; 行動の決め方もステートの数も作りたいキャラによって自由。
+;
+; 本来ステートは別のファイルとして扱っているものだけど、
+; このようにコンスタンツファイルと一緒にまとめる事も可能。
+;
+; ステートの基本的な設定はおまけフォルダの「テンプレート.txt」を参照。
+;===========================================================================
+; 基本行動
+;===========================================================================
+;---------------------------------------------------------------------------
+
+;タイムオーバー（負けた時）
+[Statedef 170]
+type = S
+ctrl = 0
+anim = 170
+velset = 0,0
+
+[State 170, 無敵]
+type = NotHitBy
+trigger1 = 1 ;トリガーを何も書かず「1」にする事により、『無条件で常に実行させる命令』になる。
+value = SCA
+time = 1
+
+[State 170,voice]
+		Type=playSnd
+		Trigger1=AnimElem=2
+		value=571,0
+		channel=0
+
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+;勝利ポーズ分岐（common1.cnsには無いけど、これもコモンステート）
+[Statedef 180]
+type = S
+
+[State 180, ステート変更]
+type = ChangeState
+trigger1 = Time = 0
+value = 181 +random%3
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+;勝利ポーズ
+[Statedef 181]
+type = S
+ctrl = 0
+anim = 192
+velset = 0,0
+
+[State 181, 無敵]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = -1
+
+[State 181]
+type = PlaySnd
+trigger1 = animelem = 5
+value = 572,0
+volume = 255
+
+[State 181 ]
+type = Explod
+trigger1 = animelem = 2
+anim = 30212
+postype = back
+ownpal = 1
+facing = 1
+id = 8888
+sprpriority = 9
+BindTime = -1
+RemoveTime = -2
+scale = 0.75,0.75
+Persistent = 1
+IgnoreHitPause = 1
+SuperMoveTime = 9999
+PauseMoveTime = 9999
+
+[State 181,Round not over]
+Type=assertSpecial
+Trigger1=Time <=310
+flag=Roundnotover
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+;勝利ポーズ
+[Statedef 182]
+type = S
+ctrl = 0
+anim = 192
+velset = 0,0
+
+[State 182, 無敵]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = -1
+
+[State 182]
+type = PlaySnd
+trigger1 = animelem = 5
+value = 574,0
+volume = 255
+
+[State 182 ]
+type = Explod
+trigger1 = animelem = 2
+anim = 30212
+postype = back
+ownpal = 1
+facing = 1
+id = 8888
+sprpriority = 9
+BindTime = -1
+RemoveTime = -2
+scale = 0.75,0.75
+Persistent = 1
+IgnoreHitPause = 1
+SuperMoveTime = 9999
+PauseMoveTime = 9999
+
+[State 182,Round not over]
+Type=assertSpecial
+Trigger1=Time <=310
+flag=Roundnotover
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+;勝利ポーズ
+[Statedef 183]
+type = S
+ctrl = 0
+anim = 192
+velset = 0,0
+
+[State 183, 無敵]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = -1
+
+[State 183]
+type = PlaySnd
+trigger1 = animelem = 5
+value = 569,0
+volume = 255
+
+[State 183 ]
+type = Explod
+trigger1 = animelem = 2
+anim = 30212
+postype = back
+ownpal = 1
+facing = 1
+id = 8888
+sprpriority = 9
+BindTime = -1
+RemoveTime = -2
+scale = 0.75,0.75
+Persistent = 1
+IgnoreHitPause = 1
+SuperMoveTime = 9999
+PauseMoveTime = 9999
+
+[State 183,Round not over]
+Type=assertSpecial
+Trigger1=Time <=310
+flag=Roundnotover
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+[Statedef 191,イントロ分岐]
+	Type=S
+[State 190, 1]
+type = AssertSpecial
+trigger1 = 1
+flag = intro
+[State 191,AAイントロ分岐]
+		Type=ChangeState
+		trigger1 = P2Name!="Accelerator"
+		value=193
+[State 191,AAイントロ分岐]
+		Type=ChangeState
+		trigger1 = P2Name="Accelerator"
+		value=192
+;イントロ（試合開始前の登場演出アクション）
+[Statedef 192]
+type = S
+ctrl = 0
+anim = 190
+velset = 0,0
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+[State 191, 特殊効果];ダークマターゲージ
+Type= Varset
+Trigger1= 1
+var(50)=900
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+[State 192, アニメ変更];バトル画面に切り替わった瞬間のフェードインの時、アニメを固定している
+type = ChangeAnim
+trigger1 = RoundState = 0
+value = 190
+
+
+[State 192]
+type = PlaySnd
+trigger1 = animelem = 2
+trigger1 = anim = 190
+value = 565,0
+volume = 255
+
+[State 192, アニメ変更];バトル画面に切り替わった瞬間のフェードインの時、アニメを固定している
+type = Posset
+trigger1 = RoundState = 0
+y = -200
+
+[state 192]
+type = velset
+trigger1 = anim = 190
+y = 0.790
+
+[State 192, ]
+type = Explod
+trigger1 = !time
+anim = 30211
+postype = back
+ownpal = 1
+facing = 1
+id = 8888
+sprpriority = 9
+BindTime = -1
+RemoveTime = -2
+RemoveOnGetHit = 0
+Persistent = 1
+IgnoreHitPause = 1
+SuperMoveTime = 9999
+PauseMoveTime = 9999
+
+[State 192]
+type = VelSet
+trigger1 = vel y > 0 && pos y >= 0
+y = 0
+
+[State 192]
+type = PosSet
+trigger1 = vel y > 0 && pos y >= 0
+y = 0
+
+[State 192, 2]
+type = Explod
+trigger1 = anim = 190 && pos y >= 0
+Anim = 30046
+id = 195
+Pos = 5,-9
+sprpriority = 9
+
+[state 192]
+type = changeanim
+trigger1 = anim != 191
+trigger1 = pos y >= -15
+value = 191
+
+
+
+[State 192]
+type = PlaySnd
+trigger1 = !time
+value = S30000, 0
+
+[State 192, 特殊効果];試合が開始するまではこのコントローラを使おう（※２）
+type = AssertSpecial
+trigger1 = 1
+flag = Intro ;イントロの状態
+
+[State 192, ステート変更];アニメーションが終われば「通常立ち」のステートに変更する
+type = ChangeState
+trigger1 = anim = 191
+trigger1 = AnimTime = 0
+trigger1 = pos y >= 0
+value = 0
+
+
+
+;イントロ（試合開始前の登場演出アクション）
+[Statedef 193]
+type = S
+ctrl = 0
+anim = 190
+velset = 0,0
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+[State 191, 特殊効果];ダークマターゲージ
+Type= Varset
+Trigger1= 1
+var(50)=900
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+[State 193, アニメ変更];バトル画面に切り替わった瞬間のフェードインの時、アニメを固定している
+type = ChangeAnim
+trigger1 = RoundState = 0
+value = 190
+
+[State 193]
+type = PlaySnd
+trigger1 = animelem = 2
+trigger1 = anim = 190
+value = 568,0
+volume = 255
+
+[State 193, アニメ変更];バトル画面に切り替わった瞬間のフェードインの時、アニメを固定している
+type = Posset
+trigger1 = RoundState = 0
+y = -200
+
+[state 193]
+type = velset
+trigger1 = anim = 190
+y = 0.790
+
+[State 193, ]
+type = Explod
+trigger1 = !time
+anim = 30211
+postype = back
+ownpal = 1
+facing = 1
+id = 8888
+sprpriority = 9
+BindTime = -1
+RemoveTime = -2
+RemoveOnGetHit = 0
+Persistent = 1
+IgnoreHitPause = 1
+SuperMoveTime = 9999
+PauseMoveTime = 9999
+
+[State 193]
+type = VelSet
+trigger1 = vel y > 0 && pos y >= 0
+y = 0
+
+[State 193]
+type = PosSet
+trigger1 = vel y > 0 && pos y >= 0
+y = 0
+
+[State 193, 2]
+type = Explod
+trigger1 = anim = 190 && pos y >= 0
+Anim = 30046
+id = 195
+Pos = 5,-9
+sprpriority = 9
+
+[state 193]
+type = changeanim
+trigger1 = anim != 191
+trigger1 = pos y >= -15
+value = 191
+
+
+
+[State 193]
+type = PlaySnd
+trigger1 = !time
+value = S30000, 0
+
+[State 193, 特殊効果];試合が開始するまではこのコントローラを使おう（※２）
+type = AssertSpecial
+trigger1 = 1
+flag = Intro ;イントロの状態
+
+[State 193, ステート変更];アニメーションが終われば「通常立ち」のステートに変更する
+type = ChangeState
+trigger1 = anim = 191
+trigger1 = AnimTime = 0
+trigger1 = pos y >= 0
+value = 0
+
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+; ※２：AssertSpecial
+;
+; 　他のコントローラでは設定出来ない『特殊な効果』を指定する命令。
+; 　設定したトリガーが有効になってる間だけ一時的に適用される。
+;
+; 　適用出来るパラメータはこのコントローラを一つ設置する場合、最大３つまで。
+; 　書式としては「flag」「flag2」「flag3」を順に加えていく形。
+; 　flag2とflag3はオプション。ではその特殊効果を全て紹介。
+;
+; 　Intro          = イントロ（試合開始前の登場演出アクション）の状態になる。イントロステート専用。
+; 　Invisible      = 自分の姿を消す。しかし残像（AfterImage）は消せない。
+; 　RoundNotOver   = 現在のラウンドを過ぎない。勝利ポーズ専用。
+; 　NoBarDisplay   = ライフバーを非表示にする。
+; 　NoBG           = ステージの奥の画像を非表示にし、「真っ黒の背景」にする。
+; 　NoFG           = ステージの手前の画像を非表示にする。
+; 　NoStandGuard   = 立ちガードが出来なくなる。
+; 　NoCrouchGuard  = しゃがみガードが出来なくなる。
+; 　NoAirGuard     = 空中ガードが出来なくなる。
+; 　NoAutoTurn     = 自動で振り向かない。
+; 　NoJuggleCheck  = ジャグルをチェックしない。（ジャグルポイントが減らなくなる）
+; 　NoKOSnd        = ＫＯ時の音声（11,0）を鳴らさないようにする。画面中に存在する全員に有効なので注意。
+; 　NoKOSlow       = ＫＯ時のスローモーションを無効にする。（ＫＯ直前に有効にしないといけない）
+; 　NoShadow       = 自分の影を消す。
+; 　GlobalNoShadow = 画面中に存在する全てのプレイヤー（ヘルパーとProjectileも含む）の影を消す。
+; 　NoMusic        = 演奏しているＢＧＭを止める。（プラグインによってはＢＧＭがバグるので要注意）
+; 　NoWalk         = 歩かない。（前か後ろのキーを入力中コントロールが可能の時に勝手に[Statedef 20]にならない）
+; 　TimerFreeze    = タイムカウント（制限時間）を停止する。
+; 　UnGuardable    = 自分の全ての攻撃が『ガード不可』になる。
+;
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+; AirJump Start
+[Statedef 45]
+type    = A
+physics = N
+ctrl = 0
+velset = 0,0
+
+[State -2];Jump Var Add
+Type= VarAdd
+trigger1=time=0
+v=23
+value=1
+
+[State 0, VelAdd]
+type = VarAdd
+trigger1 = time=0
+v= 51
+value=-15
+ignorehitpause = 1
+;persistent = 
+
+[State 45, 1]
+type = ChangeAnim
+trigger1 = SelfAnimExist(44)
+value = 44
+
+[State 45, 2]
+type = ChangeAnim
+trigger1 = !SelfAnimExist(44)
+value = 41
+
+[State 45, 3]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 45, 4]
+type = VarSet
+trigger1 = command = "holdfwd"
+sysvar(1) = 1
+
+[State 45, 5]
+type = VarSet
+trigger1 = command = "holdback"
+sysvar(1) = -1
+
+[State 45, 6]
+type = VelSet
+trigger1 = Time = 2
+x = ifelse(sysvar(1)=0, const(velocity.airjump.neu.x), ifelse(sysvar(1)=1, const(velocity.airjump.fwd.x), const(velocity.airjump.back.x)))
+y = const(velocity.airjump.y)
+
+[State 45, 7]
+type = ChangeState
+trigger1 = Time = 2
+value = 50
+ctrl = 1
+
+
+;　降下
+[Statedef 51]
+type    = A
+physics = A
+anim = 51
+
+[State -1]
+Type = Turn
+Trigger1 = P2Dist X < -1
+Trigger1 = 1
+
+[State 51, 1]
+type = Null
+trigger1 = 1
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+; ダッシュ
+[Statedef 100]
+type    = S
+physics = S
+anim = 100
+sprpriority = 1
+velset = 0,0
+ctrl = 0
+
+[State 100]
+type = PlaySnd
+trigger1 = animelem = 3
+trigger2 = animtime = 0
+value = S100, 0
+
+[State 100]
+type = PlaySnd
+trigger1 = animelem = 4
+trigger2 = animtime = 0
+value = S100, 0
+
+[State 100]
+type = PlaySnd
+trigger1 = animelem = 5
+trigger2 = animtime = 0
+value = S100, 0
+
+[State 100]
+type = Explod
+type    = S
+movetype= A
+physics = S
+trigger1 = animelem = 3
+trigger2 = animtime = 0
+anim = 104
+ontop = 0
+pos = -55,0
+
+[State 100]
+type = Explod
+type    = S
+movetype= A
+physics = S
+trigger1 = animelem = 4
+trigger2 = animtime = 0
+anim = 104
+ontop = 0
+pos = -55,0
+
+[State 100]
+type = Explod
+type    = S
+movetype= A
+physics = S
+trigger1 = animelem = 5
+trigger2 = animtime = 0
+anim = 104
+ontop = 0
+pos = -55,0
+
+[State 100, 1]
+type = VelSet
+trigger1 = AnimElem = 2,>= 0
+x = const(velocity.run.fwd.x)
+
+[State 100, 2]
+type = ChangeState
+trigger1 = command = "holdup"
+value = 40
+
+[State 100, 3]
+type = ChangeState
+triggerAll = Time > 12
+trigger1 = command != "holdfwd"
+Trigger1 = Var(59) = 0
+trigger2 = RoundState != 2
+value = 101
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+; ダッシュ(止まる)
+[Statedef 101]
+type    = S
+physics = S
+anim = 101
+
+[State 101, 1]
+type = CtrlSet
+trigger1 = time = 3
+value = 1
+
+[State 101, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+; バックステッポ
+[Statedef 105]
+type    = A
+physics = A
+ctrl = 0
+anim = 105
+sprpriority = 1
+
+[State 105]
+Type     = NotHitBy
+Trigger1 = 1
+Value    = SAC, NT, ST, HT ,NA, SA, HA ,NP, SP, HP
+Time     = 2
+
+[State 105]
+type = Explod
+type    = S
+movetype= A
+physics = S
+trigger1 = AnimElem = 1
+anim = 113
+ontop = 1
+pos = -20,-50
+
+[State 105]
+type = PlaySnd
+trigger1 = Time = 2
+value = S111,0  
+
+[State 105, 1]
+type = VelSet
+trigger1 = Time = 0
+x = const(velocity.run.back.x)
+y = const(velocity.run.back.y)
+
+[State 105, 3]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 106
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+; バックステッポ (着地)
+[Statedef 106]
+type    = S
+physics = S
+ctrl = 0
+anim = 52
+
+type = PlaySnd
+trigger1 = Time = 2
+value = s111, 0
+
+[State 106, 1]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 106, 2]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 106, 3]
+type = MakeDust
+trigger1 = Time = 2
+pos = -5,-2
+spacing = 1
+
+[State 106, 4]
+type = ChangeState
+trigger1 = Time = 2
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+;空中前ダッシュ
+[Statedef 111]
+Type    = A
+Physics = A
+Anim    = 110
+Ctrl    = 0
+VelSet  = 0,0
+
+[State 111]
+type = Explod
+type    = S
+movetype= A
+physics = S
+trigger1 = AnimElem = 1
+anim = 112
+ontop = 1
+pos = 20,-50
+
+[State 0, VelAdd]
+type = VarAdd
+trigger1 = time=0
+v= 51
+value=-15
+ignorehitpause = 1
+;persistent = 
+
+[State 111]
+Type = Turn
+Trigger1 = P2Dist X < -5
+Trigger1 = AnimElem = 8
+
+
+[State 111]
+type = PlaySnd
+trigger1 = Time = 1
+value = S111,0 
+
+[State -1, VelSet]
+Type = VelSet
+Trigger1 = Time = [0,4]
+X = 0
+Y = 0
+
+[State 111, VelSet]
+Type = VelSet
+Trigger1 = Time = [5,13]
+X = 7
+Y = 0
+
+[State 111, VelSet]
+Type = VelSet
+Trigger1 = Time = 14
+X = 5
+Y = 0
+
+[State 111, VelSet]
+type = VarAdd 
+trigger1 = AnimElem = 1
+var(10) = 1
+
+
+[State 111, CtrlSet]
+Type = CtrlSet
+Trigger1 = Time >=7
+Value = 1
+
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+; 空中後ダッシュ
+[Statedef 112]
+Type    = A
+Physics = A
+Anim    = 111
+Ctrl    = 0
+VelSet  = 0,0
+
+[State 112]
+type = Explod
+type    = S
+movetype= A
+physics = S
+trigger1 = AnimElem = 1
+anim = 113
+ontop = 1
+pos = -20,-50
+
+[State 0, VelAdd]
+type = VarAdd
+trigger1 = time=0
+v= 51
+value=-15
+ignorehitpause = 1
+;persistent = 
+
+[State 112]
+Type = Turn
+Trigger1 = P2Dist X < -5
+Trigger1 = AnimElem = 6
+
+[State 112]
+type = PlaySnd
+trigger1 = Time = 1
+value = S111,0 
+
+[State 112, VelSet]
+Type = VelSet
+Trigger1 = Time = [0,2]
+X = 0
+Y = 0
+
+[State 112, VelSet]
+Type = VelSet
+Trigger1 = Time = [3,8]
+X = -7
+Y = 0
+
+[State 112, VelSet]
+Type = VelSet
+Trigger1 = Time = 9
+X = -5
+Y = 0
+
+[State 112, VelSet]
+type = VarAdd 
+trigger1 = AnimElem = 1
+var(10) = 1
+
+
+;---------------------------------------------------------------------------

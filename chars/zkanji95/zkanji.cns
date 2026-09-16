@@ -1,0 +1,754 @@
+[Data]
+life = 1000
+attack = 100
+defence = 100
+fall.defence_up = 50
+liedown.time = 50
+airjuggle = 15
+sparkno = 2
+guard.sparkno = 40
+KO.echo = 0
+volume = 0
+IntPersistIndex = 60
+FloatPersistIndex = 40
+
+[Size]
+xscale = 0.275
+yscale = 0.275
+ground.back = 26
+ground.front = 18
+air.back = 16
+air.front = 16
+height = 60
+attack.dist = 160
+proj.attack.dist = 90
+proj.doscale = 0
+head.pos = -5, -90
+mid.pos = -5, -60
+shadowoffset = 0
+draw.offset = 0,0
+
+[Velocity]
+walk.fwd  = 1.8
+walk.back = -1.6
+run.fwd  = 4.6, 0
+run.back = -4.5,-3.8
+jump.neu = 0,-8.4
+jump.back = -2.55
+jump.fwd = 2.5
+runjump.back = -2.55,-8.1
+runjump.fwd = 4,-8.1
+airjump.neu = 0,-8.1
+airjump.back = -2.55
+airjump.fwd = 2.5
+
+[Movement]
+airjump.num = 1
+airjump.height = 35
+yaccel = .44
+stand.friction = .85
+crouch.friction = .82
+
+;---------------------------------------------------------------------------
+; Variable usage:
+; This is a record of the variables that KFM uses. Keeping a record of your
+; variable usage helps you avoid careless mistakes later.
+; var(1)  - Used in kfm.cmd for combo condition (updated every tick)
+; var(2)  - Used in Kung Fu Throw (state 800) to remember if fwd was being
+;           held (remembered from state 800 through state 810).
+
+
+;---------------------------------------------------------------------------
+; FUCK
+[Statedef 666]
+type = S
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = 1
+value = 0
+
+;---------------------------------------------------------------------------
+; Lose by Time Over
+; CNS difficulty: basic
+; CNS ƒŒƒxƒ‹: Šî–{
+[Statedef 170]
+type = S
+ctrl = 0
+anim = 170
+velset = 0,0
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Win state decider
+; CNS difficulty: basic
+; CNS ƒŒƒxƒ‹: Šî–{
+[Statedef 180]
+type = S
+ctrl = 0
+anim = 180
+velset = 0,0
+
+[State 180, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 180, 1]
+type = ChangeState
+trigger1 = PalNo = 7
+value = 182
+
+[State 190, 0]
+type = ChangeState
+trigger1 = Time <= 0
+trigger1 = PalNo != 7
+trigger1 = Random <= 500
+trigger2 = PalNo >= 10
+value = 181
+
+;---------------------------------------------------------------------------
+; Win pose 1 - Bow
+; CNS difficulty: basic
+; CNS ƒŒƒxƒ‹: Šî–{
+[Statedef 181]
+type = S
+ctrl = 0
+anim = 181
+velset = 0,0
+
+[State 181, 0]
+type = AssertSpecial
+trigger1 = Time < 200
+flag = RoundNotOver
+
+[State 181, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 181, 2]
+type = PlaySnd
+trigger1 = AnimElem = 5
+value = 15, 0
+
+;---------------------------------------------------------------------------
+; Win pose - Matrix Flight
+[Statedef 182]
+type = A
+physics = N
+ctrl = 0
+anim = 10
+velset = 0,0
+
+[State 182, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 182, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 1
+movecamera = 0,0
+
+[State 182, Pause]
+type = Pause
+trigger1 = Anim = 10
+time = 5
+
+[State 182, 1]
+type = ChangeAnim
+trigger1 = Anim = 10
+trigger1 = AnimTime = 0
+value = 40
+
+[State 182, AfterImage]
+type = AfterImage
+trigger1 = Anim = 40
+trigger1 = AnimTime = 0
+palcontrast = 100,100,100
+palbright = 0,0,0
+paladd = 0,0,0
+palmul = 1,1,1
+trans = Add1
+framegap = 2
+length = 8
+time = 50
+
+[State 182, Explod]
+type = Explod
+trigger1 = Time = 0
+sprpriority = 5
+anim = F130
+pos = 0, 0
+id = 130
+
+[State 182, Explod]
+type = Explod
+trigger1 = Anim = 40
+trigger1 = AnimTime = 0
+sprpriority = 4
+anim = F60
+pos = 0, 20
+id = 60
+
+[State 182, Explod]
+type = Explod
+trigger1 = Anim = 40
+trigger1 = AnimTime = 0
+sprpriority = 3
+anim = F61
+pos = 0, 20
+id = 61
+
+[State 182, VarSet]
+type = VarSet
+trigger1 = Time <= 0
+var(0) = 10
+
+[State 182, VarAdd]
+type = VarAdd
+trigger1 = Anim = 41
+var(0) = 1
+
+[State 182, Explod]
+type = ModifyExplod
+trigger1 = Anim = 41
+scale = (Var(0))*.10, (Var(0))*.10
+id = 61
+
+[State 182, VelSet]
+type = VelSet
+trigger1 = Anim = 40
+trigger1 = AnimTime = 0
+y = -20
+
+[State 182, 1]
+type = ChangeAnim
+trigger1 = Anim = 40
+trigger1 = AnimTime = 0
+trigger2 = Anim = 41
+value = 41
+
+[State 182, VelAdd]
+type = VelAdd
+trigger1 = Anim = 41
+y = -1
+
+;---------------------------------------------------------------------------
+; Introduction
+; CNS difficulty: basic
+; CNS ƒŒƒxƒ‹: Šî–{
+[Statedef 190]
+type = S
+ctrl = 0
+anim = 190
+velset = 0,0
+
+[State 190, 0]
+type = ChangeState
+trigger1 = PalNo = 7
+value = 191
+
+[State 190, 0]
+type = ChangeState
+trigger1 = PalNo != 7
+trigger1 = Random <= 500
+trigger1 = Time <= 0
+value = 193
+
+[State 190, 1] ;Freeze animation until PreIntro is over
+type = ChangeAnim
+trigger1 = RoundState = 0
+value = 190
+
+[State 190, 2] ;Assert this until you want "round 1, fight" to begin
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 190, 3] ;Change to stand state when done
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+
+; You can delete the following two controllers if you're building your own
+; character using KFM. These are the wood pieces that KFM kicks.
+; ‚±‚ê‚ªKFM‚ªR‚é–Ø‚Ì”Â‚Å‚·BKFM‚ÌCNS‚ð‹M•û‚ÌƒLƒƒƒ‰‚É—˜—p‚µ‚Ä‚¢‚é‚È‚çA
+; ‰º‚É‚ ‚é“ñ‚Â‚ÌƒRƒ“ƒgƒƒ‰[‚ðÁ‚µ‚½‚ç‚¢‚¢‚Å‚·B
+[State 190, Wood 1]
+type = Explod
+trigger1 = RoundState != 0
+persistent = 0
+anim = 191
+postype = p1
+pos = 260, -90
+velocity = -4.2, -7
+accel = 0, .32
+removetime = 48
+
+[State 190, Wood 2]
+type = Explod
+trigger1 = AnimElemTime(7) = 1
+anim = 192
+postype = p1
+pos = 60, -70
+velocity = 2, -4
+accel = 0, .32
+removetime = 35
+
+; You can delete the following two controllers if you're building your own
+; character using KFM. These play back the sounds of the wood block being
+; broken.
+[State 190, Snd 1]
+type = PlaySnd
+trigger1 = AnimElem = 7
+value = F5,2
+volume = -40
+
+[State 190, Snd 2]
+type = PlaySnd
+trigger1 = AnimElemTime(7) = 3
+value = F5,3
+volume = -80
+
+;---------------------------------------------------------------------------
+; Matrix Intro
+[Statedef 191]
+type = S
+ctrl = 0
+anim = 193
+velset = 0,0
+
+[State 190, 0]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 190, VarSet]
+type = VarSet
+trigger1 = Time <= 0
+v = 0
+value = 0
+
+[State 190, VarAdd]
+type = VarAdd
+trigger1 = Time > 50
+v = 0
+value = 10
+
+[State 190, 1]
+type = ChangeAnim
+trigger1 = Time <= 50
+value = 193
+
+[State 190, 1]
+type = ChangeAnim
+trigger1 = Time > 100
+trigger1 = Time < 110
+value = 195
+elem = 11
+
+[State 190, 1]
+type = ChangeAnim
+trigger1 = Time > 110
+trigger1 = Time < 115
+value = 195
+elem = 12
+
+[State 190, 1]
+type = ChangeAnim
+trigger1 = Time > 115
+trigger1 = Time < 120
+value = 195
+elem = 13
+
+[State 190, 2]
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 190, Helper]
+type = Helper
+trigger1 = Time = 51
+helpertype = normal
+name = "Illusion"
+id = 190
+pos = -100,0
+postype = p1
+stateno = 192
+keyctrl = 0
+ownpal = 1
+
+[State 190, Helper]
+type = Helper
+trigger1 = Time = 51
+helpertype = normal
+name = "Illusion"
+id = 191
+pos = 100,0
+postype = p1
+stateno = 192
+keyctrl = 0
+ownpal = 1
+
+[State 190, PalFX]
+type = PalFX
+trigger1 = Time >= 50
+trigger1 = Time < 100
+time = 2
+mul = 0,Var(0),0
+
+[State 190, 5]
+type = ChangeState
+trigger1 = Anim = 195
+trigger1 = AnimTime = 0
+value = 0
+
+;---------------------------------------------------------------------------
+; Illusion
+[Statedef 192]
+type = S
+ctrl = 0
+anim = 193
+velset = 0,0
+
+[State 190, 0]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 190, Push]
+type = PlayerPush
+trigger1 = 1
+value = 0
+
+[State 190, VarSet]
+type = VarSet
+trigger1 = Time <= 0
+v = 0
+value = 250
+
+[State 190, VarAdd]
+type = VarAdd
+trigger1 = Var(0) > 0
+trigger1 = Time > 0
+v = 0
+value = -5
+
+[State 190, PalFX]
+type = PalFX
+trigger1 = 1
+time = 2
+mul = 0,Var(0),0
+
+[State 190, 1]
+type = VelSet
+trigger1 = RootDist X > 0
+trigger2 = RootDist X < 0
+x = (RootDist X)/10
+
+[State 190, 5]
+type = DestroySelf
+trigger1 = Time >= 50
+
+;---------------------------------------------------------------------------
+; Walking Intro
+[Statedef 193]
+type = S
+ctrl = 0
+anim = 22
+velset = 0,0
+
+[State 190, 0]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+[State 190, 2]
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 190, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0,0
+
+[State 190, PosAdd]
+type = PosAdd
+trigger1 = Time = 0
+x = -200
+
+[State 190, VelSet]
+type = VelSet
+trigger1 = Time = 50
+x = 2.5
+
+[State 190, VelSet]
+type = VelSet
+trigger1 = Time = 130
+x = 0
+
+[State 190, 1]
+type = ChangeAnim
+trigger1 = Time >= 130
+trigger1 = Time < 150
+value = 181
+elem = 4
+
+[State 190, 2]
+type = AssertSpecial
+trigger1 = Time < 50
+flag = Invisible
+
+[State 190, 2]
+type = PlaySnd
+trigger1 = Anim = 181
+trigger1 = AnimElem = 5
+value = 15, 0
+
+[State 190, 3]
+type = ChangeAnim
+trigger1 = Time = 290
+value = 195
+elem = 11
+
+[State 190, 3]
+type = ChangeAnim
+trigger1 = Time > 250
+trigger1 = Time < 255
+value = 195
+elem = 12
+
+[State 190, 3]
+type = ChangeAnim
+trigger1 = Time > 255
+trigger1 = Time < 260
+value = 195
+elem = 13
+
+[State 190, 5]
+type = ChangeState
+trigger1 = Anim = 195
+trigger1 = AnimTime = 0
+value = 0
+
+;---------------------------------------------------------------------------
+; Taunt
+; CNS difficulty: easy
+[Statedef 195]
+type = S
+ctrl = 0
+anim = 195
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+[State 195, 1]
+type = CtrlSet
+trigger1 = Time = 40
+value = 1
+
+[State 195, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Roll Forward Taunt
+[Statedef 196]
+type    = C
+movetype= I
+physics = N
+velset = 0,0
+anim = 5230
+ctrl = 0
+
+[State 196, 1]
+type = VarSet
+trigger1 = 1
+v = 0
+value = 1
+
+[State 196, 2]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 196, 3]
+type = VelSet
+trigger1 = Anim = 5230
+x = 4
+
+[State 196, 4]
+type = ChangeState
+trigger1 = Time > 15
+value = 5110
+
+;---------------------------------------------------------------------------
+; Stand Light Punch
+[Statedef 200]
+type    = S
+movetype= A
+physics = S
+juggle  = 1
+velset = 0,0
+ctrl = 0
+anim = 200
+poweradd = 20
+sprpriority = 2
+
+[State 200, 1]
+type = HitDef
+trigger1 = AnimElem = 3
+attr = S, NA
+damage = 23, 0
+animtype = Light
+guardflag = MA
+hitflag = MAF
+priority = 3, Hit
+pausetime = 8, 8
+sparkno = 0
+sparkxy = -10, -76
+hitsound = S5, 0
+guardsound = S6, 0
+ground.type = High
+ground.slidetime = 5
+ground.hittime  = 10
+ground.velocity = -4
+airguard.velocity = -1.9,-.8
+air.type = High
+air.velocity = -1.4,-3
+air.hittime = 12
+
+[State 200, 1]
+type = PlaySnd
+trigger1 = Time = 1
+value = 0, 0
+
+[State 200, 7]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; States that are always executed (use statedef -2)
+;---------------------------------------------------------------------------
+[Statedef -2]
+
+[State -2, Remove Sparks]
+type = RemoveExplod
+trigger1 = StateNo != 1030
+trigger1 = StateNo != 1040
+trigger1 = StateNo != 3400
+id = 1030
+
+[State -2, Remove Sparks]
+type = RemoveExplod
+trigger1 = StateNo != 3010
+id = 3000
+
+;=====Parry=====
+;-----Variables-----
+[State -2, Parry]
+type = VarAdd
+triggerall = Var(50) = 0
+triggerall = Command = "fwd" || Command = "down"
+trigger1 = StateNo = 10
+trigger2 = StateNo = 20
+trigger3 = StateNo = 50
+trigger3 = Time >= 5
+v = 50
+value = 1
+
+[State -2, Parry]
+type = VarAdd
+trigger1 = Var(50) != 0
+v = 51
+value = 1
+
+[State -2, Parry]
+type = VarSet
+trigger1 = var(50) = 0
+v = 51
+value = 0
+
+[State -2, Parry]
+type = VarSet
+trigger1 = Var(50) != 0
+trigger1 = Var(51) > 5
+trigger2 = StateNo != 10
+trigger2 = StateNo != 11
+trigger2 = StateNo != 20
+trigger2 = StateNo != 50
+v = 50
+value = 0
+
+;-----Override-----
+[State -2, Parry]
+type = HitOverride
+triggerall = Var(50) = 1
+triggerall = command = "holdfwd"
+triggerall = command != "holddown"
+trigger1 = StateType = S
+trigger1 = ctrl
+slot = 0
+stateno = 1300
+attr = SA, AA, AP
+time = 1
+
+[State -2, Parry]
+type = HitOverride
+triggerall = Var(50) = 1
+triggerall = command = "holddown"
+triggerall = command != "holdfwd"
+trigger1 = StateType = C
+trigger1 = ctrl
+slot = 0
+stateno = 1320
+attr = SC, AA, AP
+time = 1
+
+[State -2, Parry]
+type = HitOverride
+triggerall = Var(50) = 1
+triggerall = command = "holdfwd"
+triggerall = command != "holddown"
+trigger1 = StateType = A
+trigger1 = ctrl
+slot = 0
+stateno = 1340
+attr = SA, AA, AP
+time = 1
+;---------------
+;===============
+
+;---------------------------------------------------------------------------
+; States that are executed when in self's state file (use statedef -3)
+;---------------------------------------------------------------------------
+[Statedef -3]
+;This controller plays a sound everytime KFM lands from a jump, or
+;from his back-dash.
+[State -3, Landing Sound]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 52 ;Jump land
+trigger2 = stateno = 106 ;Run-back land
+value = 40, 0
