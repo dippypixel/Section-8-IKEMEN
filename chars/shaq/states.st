@@ -8899,7 +8899,7 @@ ignorehitpause = 1
 type = DisplayToClipboard
 trigger1 = 1
 text = "pro = %f, x = %f | y = %f | real = %f"
-params = fvar(13),(p2bodydist x / const(size.xscale)),(p2bodydist y / const(size.yscale)),p2bodydist x
+params = var(15),(p2bodydist x / const(size.xscale)),(p2bodydist y / const(size.yscale)),p2bodydist x
 ignorehitpause = 1
 
 ;================================================================================

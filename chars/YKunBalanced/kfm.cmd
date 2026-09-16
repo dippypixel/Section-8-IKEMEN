@@ -308,8 +308,14 @@ command = F, F, b
 name = "FB_x"
 command = ~10$B, F, x
 [Command]
+name = "FB_x"
+command = ~10$B, F+x
+[Command]
 name = "FB_y"
 command = ~10$B, F,y
+[Command]
+name = "FB_y"
+command = ~10$B, F+y
 
 ;-| Double Tap |-----------------------------------------------------------
 [Command]
@@ -900,7 +906,6 @@ trigger1 = stateno != 100
 type = ChangeState
 value = 1000
 triggerall=!ailevel
-triggerall = power>100
 triggerall = var(10)<1
 triggerall = command = "QCF_x"||command = "QCF_y"
 trigger1 = statetype = A
@@ -912,7 +917,6 @@ trigger2 = moveContact
 type = ChangeState
 value = 1030
 triggerall=!ailevel
-triggerall = power>200
 triggerall = command = "QCF_x"||command = "QCF_y"
 trigger1 = statetype = S
 trigger1 = ctrl
@@ -921,7 +925,6 @@ trigger2 =HITDEFATTR = SC,NA&&movecontact
 type = ChangeState
 value = 1020
 triggerall=!ailevel
-triggerall = power>100
 triggerall = command = "FB_x"||command = "FB_y"
 triggerall = command != "holddown"
 trigger1 = ctrl
@@ -931,7 +934,6 @@ trigger2 =HITDEFATTR = SCA,NA&&movecontact
 type = ChangeState
 value = 1010
 triggerall=!ailevel
-triggerall = power>100
 triggerall = !var(11)
 triggerall = command = "QCF_a"||command = "QCF_b"
 trigger1 = ctrl
@@ -946,7 +948,7 @@ triggerall = command = "x"
 triggerall = command != "holddown"
 trigger1 = statetype = S
 trigger1 = ctrl
-trigger2 = stateno = 200&&movecontact&&PrevStateNo!=200
+trigger2 = stateno = 200&&movecontact
 
 ;---------------------------------------------------------------------------
 ;Knockdown
@@ -1021,6 +1023,7 @@ trigger1 = ctrl
 trigger2 = (stateno = 200) &&movecontact
 trigger3 = (stateno = [230,231]) &&movecontact
 trigger4 = stateno = 232 &&animelemtime(19)>0 &&movecontact
+trigger5 = (stateno = 212) &&movecontact && TIME > 20
 
 ;---------------------------------------------------------------------------
 ;Taunt
@@ -1044,7 +1047,8 @@ triggerall = command = "x"
 triggerall = command = "holddown"
 trigger1 = statetype = C
 trigger1 = ctrl
-trigger2 = stateno=400&&MoveContact&&prevstateno!=400
+trigger2 = stateno=400&&MoveContact
+trigger3 = stateno=200&&MoveContact
 ;---------------------------------------------------------------------------
 ;Crouching Strong Punch
 [State -1, Crouching Strong Punch]

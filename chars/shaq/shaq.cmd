@@ -1752,16 +1752,6 @@ triggerall = anim != 101
 trigger1 = !statetype = A
 trigger1 = ctrl
 
-[State -1, Double Jump]
-type = ChangeState
-value = 45
-triggerall = var(59) <= 3
-triggerall = var(15) = 0
-triggerall = var(16) = 0
-triggerall = statetype = A
-triggerall = ctrl
-trigger1 = command = "holdup"
-
 ;---------------------------------------------------------------------------
 ;Run Back
 ;Œã‘Þƒ_ƒbƒVƒ…
