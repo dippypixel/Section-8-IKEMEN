@@ -861,8 +861,14 @@ player = 50,20
 type = AngleSet
 trigger1 = time = 1
 value = 1
-;ignorehitpause = 
-;persistent = 
+[State 7300, AngleDraw]
+type = AngleDraw ;activacte Angle modification
+trigger1 = pos y < -2
+
+[State 7300, AngleAdd]
+type = AngleAdd ; add Value to rotate, more value, more fast its rotate.
+trigger1 = pos y < -2
+value = -15-((abs(vel y))*.5) ; modify this value to spin. Negative numbers are allowed.
 
 [State 0, ChangeState]
 type = ChangeState
@@ -870,14 +876,7 @@ trigger1 = pos y > 0
 trigger1 = vel y > -pos y
 value = 52
 
-[State 7300, ]
-type = AngleDraw ;activacte Angle modification
-trigger1 = pos y < -2
 
-[State 7300, ]
-type = AngleAdd ; add Value to rotate, more value, more fast its rotate.
-trigger1 = pos y < -2
-value = -15-((abs(vel y))*.5) ; modify this value to spin. Negative numbers are allowed.
 
 
 ;---------------------------------------------------------------------------
@@ -1296,18 +1295,18 @@ ctrl = 0
 anim = 220
 
 ;------SOUND STUFF----------
-[State 200, 2]
+[State 200, PlaySnd]
 type = PlaySnd
 trigger1 = !time
 value = 200, 2
 
 
-[State 200, 2]
+[State 200, PlaySnd]
 type = PlaySnd
 trigger1 = animelem = 7
 value = 200, 3
 
-[State 200, 2]
+[State 200, PlaySnd]
 type = PlaySnd
 trigger1 = !time
 value = s220,0
@@ -1440,6 +1439,8 @@ guard.velocity = -3
 air.type = High
 airguard.velocity = -1.25,-.5
 airguard.hittime = 16
+maxdist = 999,999
+mindist = 40,-999
 yaccel = .6/fvar(20)
 
 [State 200, Velocity Dampen]
@@ -1451,7 +1452,7 @@ fvar(20) = fvar(20)*(ifelse(.925*fvar(21)>1,	1,	.925*fvar(21)))
 ignorehitpause = 1
 persistent = 0
 
-[State 210, 5]
+[State 210, ChangeState]
 type = ChangeState
 trigger1 = pos y = 0 && animelemtime(9) >= 0 
 value = ifelse(moveguarded,622,52)
@@ -1545,7 +1546,7 @@ anim = 610
 sprpriority = 2
 
 
-[State 200, 2]
+[State 200, Playsnd]
 type = PlaySnd
 trigger1 = animelem = 2
 ;trigger1 = random >= 500
@@ -1554,7 +1555,7 @@ channel = -1
 volumescale = 100
 
 
-[State 200, 2]
+[State 200, Playsnd]
 type = PlaySnd
 trigger1 = animelem = 3
 value = 200, 2
@@ -1565,7 +1566,7 @@ trigger1 = animelemtime(4) >= 0 && animelemtime(7) < 0
 player = 30,0
 ignorehitpause = 1
 
-[State 600, 2]
+[State 600, HitDef]
 type = HitDef
 ground.cornerpush.veloff = 0
 trigger1 = time = 0
@@ -1610,9 +1611,9 @@ trigger1 = MoveContact && vel y > -6
 trigger1 = numtarget
 y = -6*(fvar(20)*1.2)
 persistent = 0
+ignorehitpause=1
 
-
-[State 600, 3]
+[State 600, CtrlSet]
 type = CtrlSet
 trigger1 = Time = 20
 value = 1
@@ -1669,6 +1670,7 @@ trigger1 = time = 0
 attr = A, NA
 damage    = 21,1
 guardflag = HA
+animtype=up
 priority = 3
 pausetime = 5,5
 sparkno = s20002
@@ -3074,7 +3076,7 @@ guard.sparkno = S20010
 ground.type = High
 ground.slidetime = 26
 ground.hittime  = 26
-ground.velocity = (vel x*-1) + -7, ifelse(statetype=A,-2.85,0)
+ground.velocity = (vel x*-1) + ifelse(statetype=A,-3,-7), ifelse(statetype=A,-2.85,0)
 air.velocity = -1.4,-2.85
 guard.velocity = -2.5
 airguard.velocity = -.8,-.6
@@ -4046,6 +4048,7 @@ type = AssertSpecial
 trigger1 = 1
 flag = TimerFreeze
 
+
 [State 0, PALCHANGE ON]
 type = VarSet
 trigger1 = !ailevel
@@ -4180,6 +4183,7 @@ ground.cornerpush.veloff = 0
 trigger1 = !movecontact && anim = [3001,3003]
 attr = A, HA
 damage    = 2,1
+getpower =0,1
 guardflag = HA
 hitflag = MAFD
 priority = 3
@@ -5579,6 +5583,7 @@ id = 30000
 ignorehitpause = 1
 [State 0, DestroySelf]
 type = DestroySelf
+trigger1 = !numexplod(30000)
 trigger1 = root,stateno!=[3000,3003]
 
 
@@ -6023,7 +6028,7 @@ value = 0
 movecamera = 0,0
 ignorehitpause = 1
 
-[State 0, AssertSpecial]
+[State 0, AssertSpecial];IKEMEN PRIVILEGE IKEMEN PRIVILEGE IKEMEN PRIVILEGE IKEMEN PRIVILEGE IKEMEN PRIVILEGE 
 type = AssertSpecial
 trigger1 = 1
 flag = CameraFreeze 
@@ -6765,6 +6770,26 @@ type = ModifyExplod
 trigger1 = 1
 ID = 10012
 anim = ifelse(parent,var(13)= 0,302,310)
+
+[State 0, ShieldMeter]
+type = null;Explod
+trigger1 = !NumExplod(10003)
+anim = 400
+ID = 10003
+pos = var(41)-7,(ScreenHeight-root,var(40))-7
+postype = left  ;P2, Front, Back, Left, Right
+bindtime = -1
+removetime = -1
+sprpriority = 9
+ontop = 1
+ownpal = 1
+
+[State 0, ShieldMeter]
+type = null;ModifyExplod
+trigger1 = NumExplod(10003)
+ID = 10003
+scale = parent,var(5)/840.0,.5
+
 ;---------------------------------------------------------------------------
 ;Nick Hooper Animation Thing
 [StateDef 10001]   
@@ -6804,8 +6829,6 @@ trigger1 = 1
 trans = add1    ;None, Add, AddAlpha, Add1, Sub
 alpha = 150, 150
 ignorehitpause = 1
-
-
 
 
 
@@ -6986,6 +7009,129 @@ trigger2=root,AILevel && enemy,stateno = 0
 trigger3=time >= 600
 
 
+;---------------------------------------------------------------------------
+;MaxPowerVFX
+[StateDef 10010]   
+movetype = U      ; AIHU
+physics = N       ; SCANU          ;refers to the .Air file
+sprpriority = 9    ; Stand behind everything 
+anim = 2
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time=1
+value = S10010,0
+volume = 0
+channel = -1
+[State 0, MaxPowerVFX]
+type = Helper
+trigger1 = power =powermax
+trigger1 = numhelper(10011)<4
+helpertype = Normal 
+name = "Afterimage"
+ID = 10011
+stateno = 10011
+pos = 0,0
+postype = p1    ;P2, Front, Back, Left, Right
+keyctrl = 0
+ignorehitpause=1
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = root,power !=powermax||lose
+;ignorehitpause = 
+;persistent = 
+
+
+
+
+;---------------------------------------------------------------------------
+;MaxPowerAfterImage
+[StateDef 10011]   
+movetype = U      ; AIHU
+physics = N       ; SCANU          ;refers to the .Air file
+sprpriority = 9   ; Stand behind everything 
+anim = 2
+
+[State 0, TornadoBullshittery]
+type = AngleDraw
+trigger1 =root,anim = 1000 && root,animelemtime(4)>0
+value = root,vel x*-1
+;scale = 1 
+ignorehitpause = 1
+
+[State 0, AirTauntBullshittery]
+type = AngleSet
+triggerall=root,stateno=196
+trigger1 = root,time = 1
+value = 1
+[State 7300, AirTauntBullshittery]
+type = AngleDraw ;activacte Angle modification
+triggerall=root,stateno=196
+trigger1 = root,pos y < -2
+
+[State 7300, AirTauntBullshittery]
+type = AngleAdd ; add Value to rotate, more value, more fast its rotate.
+triggerall=root,stateno=196
+trigger1 = root,pos y < -2
+value = -15-((abs(root,vel y))*.5) ; modify this value to spin. Negative numbers are allowed.
+
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = 1
+fv = 3  ;fv = 10
+value = 350
+[State 0, VarRandom]
+type = VarRandom
+trigger1 = !var(2)
+v = 2
+range = 10,50
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = 1
+x = root,pos x + (-fvar(3)+random%fvar(3)*2)*0.01
+y = root,pos y + (-fvar(3)+random%fvar(3)*2)*0.01
+ignorehitpause = 
+;persistent = 
+
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+time = 2
+ignorehitpause = 1
+
+[State 0, Turn]
+type = Turn
+trigger1 = root,facing !=facing
+
+[State 0, ChangeAnim]
+type = ChangeAnim
+trigger1 = 1
+value = root,anim
+elem = root,AnimElemNo(0)
+ignorehitpause = 1
+
+[State 0, Trans]
+type = Trans
+trigger1 = 1
+trans = Add    ;None, Add, AddAlpha, Add1, Sub
+alpha = var(2), 256
+ignorehitpause = 1
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = time >4
+trigger2 = root,power !=powermax
+;ignorehitpause = 
+;persistent = 
+
+
+
+
+
 [statedef -2]
 ;These Initialize before the start of the round. (statedef 5900)
 
@@ -6996,13 +7142,13 @@ text = " guard = %d, cooldown = %d, combo = %f, V-Scale = %f, VMULT = %f, LOSE=%
 params = var(5), 		fvar(22),	fvar(12),		fvar(20),	fvar(21),	var(35),	var(7)
 ignorehitpause = 1
 
-[State 0, ANGRY]
+[State 0, LoseMultiplier]
 type = Varset
 trigger1 = lose
 v = 35
-value = 1
+value = 2
 
-[State 0, Not angry anymore]
+[State 0, Reset Lose Multiplier]
 type = Varset
 trigger1 = win
 v = 35
@@ -7051,18 +7197,21 @@ stateno = 10000
 pos = 0,0
 postype = p1    ;P2, Front, Back, Left, Right
 keyctrl = 0
-[State 0, Nick Hooper Animation Thing Activate]
-type = null;Helper
-trigger1 =  !numhelper(10001) 
+[State 0, MaxPowerVFX Activate]
+type = Helper
+trigger1 =var(37)&&power =powermax  && roundstate=2
+trigger1 =!numhelper(10010)
 helpertype = Normal 
-name = "Nick Hooper Animation Thing"
-ID = 10001
-stateno = 10001
+name = "MaxPowerVFX"
+ID = 10010
+stateno = 10010
 pos = 0,0
-postype = Left    ;P2, Front, Back, Left, Right
+postype = p1    ;P2, Front, Back, Left, Right
 keyctrl = 0
-size.xscale =const(size.xscale)*.5
-size.yscale =const(size.xscale)*.5
+supermovetime=99999999
+
+
+
 [State 0, SuperBackground Activate]
 type = Helper
 trigger1 = var(34)
