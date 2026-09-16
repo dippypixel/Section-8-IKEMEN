@@ -15,8 +15,8 @@ FloatPersistIndex = 40
 [Size]
 xscale = .9           
 yscale = .9           
-ground.back = 15     
-ground.front = 16   
+ground.back = 18     
+ground.front = 18   
 air.back = 12        
 air.front = 12       
 height = 60        
@@ -29,10 +29,10 @@ shadowoffset = 0
 draw.offset = 0,0
 
 [Velocity]
-walk.fwd  = 2.4   
-walk.back = -2.2  
-run.fwd  = 4.6, 0   
-run.back = -4.5,-3.8
+walk.fwd  = 2.6   
+walk.back = -2.4  
+run.fwd  = 6, -4  
+run.back = -6,-4
 jump.neu = 0,-8.4    
 jump.back = -2.55  
 jump.fwd = 2.5    
@@ -52,8 +52,8 @@ crouch.friction = .82
 ;---------------------------------------------------------------------------
 [Quotes]
 victory1 = "You tried!"
-victory2 = "mmm chezburger"
-victory3 = "HAX!"
+victory2 = "Pizza!"
+victory3 = "ZOMBIES!"
 victory4 = "Wanna be friends?"
 victory5 = "I hav big muscle inside me"
 victory6 = "everybody made of blocks... but I’m built different..."
@@ -61,7 +61,7 @@ victory7 = "What do you mean guests are gone? You're crazy!"
 victory8 = "5 years late but not to worry"
 victory9 = "._."
 victory10 = "can you guess which of my animations were made most recently?"
-victory11 = "Welcome to my barbeque"
+victory11 = "To think all I used to want to do was sell insurance!"
 victory12 = "You’re no match for me!"
 victory13 = "Stinktastic!"
 victory14 = "I like how I initially went for an old school text to speech when my design is literally based off the latest guest designs."
@@ -206,6 +206,7 @@ x = .1
 [State 61, 11]
 type = Turn
 trigger1 = P2Dist X < -5 ;0
+
 ;---------------------------------------------------------------------------
 ; Ground Parry
 [Statedef 161]
@@ -798,8 +799,8 @@ ctrl = 1
 ;---------------------------------------------------------------------------
 ; RUN_FWD
 [Statedef 100]
-type    = S
-physics = S
+type    = A
+physics = A
 anim = 100
 sprpriority = 1
 
@@ -829,10 +830,11 @@ type = PlaySnd
 trigger1 = Time = 0
 value = 100, 0
 
-[State 100, 1]
-type = VelSet
-trigger1 = 1
+[State 105, 1]
+type = Velset
+trigger1 = Time = 0
 x = const(velocity.run.fwd.x)
+y = const(velocity.run.fwd.y)
 
 [State 100, 2] ;Prevent run from canceling into walk
 type = AssertSpecial
@@ -845,12 +847,18 @@ trigger1 = 1
 flag = NoAutoTurn
 
 [State 100, 4]
-type = ChangeState
+type = null;ChangeState
 trigger1 = var(59) <= 0
 trigger1 = command != "holdfwd"
 trigger2 = var(59) > 0
 trigger2 = time > 10+random%15 || p2bodyDist X <= 20
 value = 0
+
+[State 105, 3]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 52
 
 ;---------------------------------------------------------------------------
 ; Dash FWD
@@ -965,9 +973,8 @@ physics = A         ;A,C,S,N
 ;---------------------------------------------------------------------------
 ; RUN_BACK
 [Statedef 105]
-type    = S
-physics = N
-ctrl = 0
+type    = A
+physics = A
 anim = 105
 sprpriority = 1
 
@@ -992,33 +999,32 @@ removeongethit = 1
 ignorehitpause = 1
 persistent = 1
 
-[State 0, VelMul]
-type = VelMul
-trigger1 = time >= 19
-x = .3
-
-
 [State -3, Sound]
 type = PlaySnd
 trigger1 = Time = 0
 value = 100, 0
 
 [State 105, 1]
-type = VelSet
-trigger1 = Time = 0
-x = const(velocity.run.back.x)
-
-[State 105, 1]
-type = Null
+type = Velset
 trigger1 = Time = 0
 x = const(velocity.run.back.x)
 y = const(velocity.run.back.y)
 
+[State 100, 2] ;Prevent run from canceling into walk
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+
+[State 100, 3] ;Prevent from turning
+type = AssertSpecial
+trigger1 = 1
+flag = NoAutoTurn
+
 [State 105, 3]
 type = ChangeState
-trigger1 = time = 25
-value = 0
-ctrl = 1
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 52
 
 ;---------------------------------------------------------------------------
 ; RUN_BACK2 (land)
@@ -1078,7 +1084,7 @@ type    = S
 movetype= I
 physics = N
 velset = 0,0
-anim = 111
+anim = 1820;111
 ctrl = 0
 sprpriority = -4
 
@@ -1147,7 +1153,7 @@ type    = S
 movetype= I
 physics = N
 velset = 0,0
-anim = 112
+anim = 1820;112
 ctrl = 0
 sprpriority = -4
 
@@ -1209,6 +1215,7 @@ type = ChangeState
 trigger1 = AnimTime = 0
 value = 0
 ctrl = 1
+
 ;---------------------------------------------------------------------------
 ; GUARD (start)
 [Statedef 120]
@@ -2919,151 +2926,7 @@ type=destroyself
 trigger1= time>=60
 trigger2=root,movetype=H
 
-;-------------------------------------------------------------------------------
-;================================
-;FATAL MOVE PEKETO - DECAPITACION
-;================================
 
-;---------------------------------------------------------
-;decapitacion - fatal move P2 - 1
-[Statedef 91230]
-type = S
-movetype = H
-ctrl = 0
-;physics = A
-velset = 0, 0
-anim = 91230
-
-[State 182, 1]
-type = screenbound
-trigger1 = 1
-movecamera = 1,0
-value = 1
-
-[State 210, Width]
-type = Width
-trigger1 = alive = 1
-value = 50,50
-
-;cabeza rebanada
-[State 1201, helper]
-type = Helper
-trigger1 = AnimElem = 2
-name = "cabeza"
-ID = 4011
-stateno = 912320
-postype = p1
-pos = 0,-20
-sprpriority = 7
-
-[State 220, 3]
-type = changestate
-trigger1 = time = 140
-value = 91231
-ctrl = 0
-
-;---------------------------------------------------------
-;decapitacion - fatal move P2 - 2
-[Statedef 91231]
-type = S
-movetype = H
-ctrl = 0
-physics = N
-velset = 0, 0
-
-[State 700, 10]
-type = Changeanim
-trigger1 = Time = 0
-value = 91231
-
-[State 182, 1]
-type = screenbound
-trigger1 = 1
-movecamera = 1,0
-value = 1
-
-[State 1050, 1]
-type = veladd
-trigger1 = 1
-y = .3
-
-[State 3050, 5]
-type = sprpriority
-trigger1 = 1
-value = 1
-
-[State 210, Width]
-type = Width
-trigger1 = alive = 1
-value = 50,50
-
-[State 700, 10]
-type = selfstate
-trigger1 = pos Y >= -20 && vel y > 0
-value = 5150
-ctrl = 0
-
-;----------------------------
-;decapitado - cabeza (helper)
-[Statedef 912320]
-type = A
-movetype= I
-physics = N
-poweradd= 0
-ctrl = 0
-velset = -1,-5
-sprpriority = 7
-anim = 912320
-[State 210, Width]
-type = veladd
-trigger1 = 1
-y = .3
-
-[State 191, Snd 2]
-type = PlaySnd
-trigger1 = pos Y >= -3 && vel y > 0
-value = F7,0
-freqmul = 1.3
-volume = 100
-persistent = 0
-
-[State 220, 3]
-type = velset
-trigger1 = pos Y >= -3 && vel y > 0
-y = -4.8
-persistent = 0
-
-[State 220, 3]
-type = changeanim
-trigger1 = pos Y >= 0 && vel y > 0
-value = 912321
-
-[State 0, VelSet]
-type = VelSet
-trigger1 = anim = 912321
-x = 0
-y = 0
-
-[State 0, VelSet]
-type = posSet
-trigger1 = anim = 912321
-y = 4
-
-[State 191, Snd 2]
-type = PlaySnd
-trigger1 = anim = 912321
-value = F7,0
-freqmul = 1.3
-volume = 100
-persistent = 0
-
-;================================
-;================================
-;================================
-;============== FIN =============
-;============== END =============
-;================================
-;================================
 ;---------------------------------------------------------------------------
 ; Override common states (use same number to override) :
 ;---------------------------------------------------------------------------
@@ -3073,24 +2936,10 @@ persistent = 0
 ;---------------------------------------------------------------------------
 [Statedef -2]
 
-[State -3, Sound]
-type = PlaySnd
-triggerall = time = 1
-trigger1 = anim = 7696
-value = S5000, 12
-channel = 1
-
-[State -3, Sound]
-type = PlaySnd
-triggerall = time <=20 && random <= 500
-trigger1 = anim = 7696
-value = S7696, 0+random%3
-
-[State 0, StopSnd]
-type = StopSnd
-trigger1 = prevstateno = 111 || prevstateno = 112
-channel = 1
-
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1 = numtarget = 0
+id = 67
 
 [State 0, StopSnd]
 type = StopSnd
@@ -3127,8 +2976,8 @@ ignorehitpause = 1
 [State 0, DisplayToClipboard]
 type = DisplayToClipboard
 trigger1 = 1
-text = "var(59) AI on? = %d  p2dist x = %f p2dist y = %f"
-params = Var(59),p2dist x,p2dist y
+text = "var(59) AI on? = %d  p2dist x = %f p2dist y = %f  var(30) = %d"
+params = Var(59),p2dist x,p2dist y,var(30)
 
 [State -2, StopAI]
 type = VarSet
@@ -3202,7 +3051,7 @@ channel = 1
 type = PlaySnd
 triggerall = Life && Time = 1 && random > 500
 trigger1 = stateno = 5070
-value = S5000,0+ (random % 13)
+value = S5000,0+ (random % 12)
 channel = 1
 
 [State -3, Sound]
