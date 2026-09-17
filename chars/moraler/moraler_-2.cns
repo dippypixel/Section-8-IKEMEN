@@ -1,0 +1,452 @@
+
+[Statedef -2]
+
+;■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+;オプション
+;ここから
+
+[State -2, ＡＩレベル]
+Type = VarSet
+Trigger1 = 1
+V = 58
+Value = 10			;1～11まで
+
+[State -2, 最初からＡＩ]
+Type = NULL;VarSet		;「NULL;」を削除したら常にＡＩ
+Trigger1 = 1
+V = 59
+Value = 1
+
+;ここまで
+;■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+;---------------------------------------------------------------------------
+;製作用
+;---------------------------------------------------------------------------
+[State -2, コンボ確認]
+Type = VarSet
+Trigger1 = 1
+fvar(39) = 0
+
+;---------------------------------------------------------------------------
+;タッグ用生死判別
+;---------------------------------------------------------------------------
+[State -1, VarSet]
+Type = Varset
+trigger1 = 1
+var(56) = IfElse((!EnemyNear,Alive && NumEnemy = 2),1,0)
+
+;---------------------------------------------------------------------------
+;ヒット判定
+;---------------------------------------------------------------------------
+[State -2, Combo]
+type = VarSet
+trigger1 = movehit
+trigger2 = projhit = 1
+var(36) = ifelse(movehit,1,3)
+ignorehitpause = 1
+
+[State -2, Combo]
+type = VarSet
+trigger1 = moveguarded
+trigger2 = projguarded = 1
+var(36) = ifelse(moveguarded,2,4)
+ignorehitpause = 1
+
+;---------------------------------------------------------------------------
+;ヒット数
+;---------------------------------------------------------------------------
+[State -2, リセット]
+type = VarSet
+trigger1 = P2movetype != H
+var(17) = 0
+
+[State -2, VarAdd]
+type = VarAdd
+trigger1 = (stateno != [800,811])
+trigger1 = stateno != 1100 && stateno != 1110
+trigger1 = stateno != 1101 && stateno != 1111
+trigger1 = stateno != 1201 && stateno != 1211
+trigger1 = stateno != 2001 && stateno != 2011 && stateno != 2021 && stateno != 2031
+trigger1 = stateno != 2101 && stateno != 2111 && stateno != 2121 && stateno != 2131 && stateno != 2141
+trigger1 = stateno != 2201 && stateno != 2211 && stateno != 2221 && stateno != 2231 && stateno != 2241 && stateno != 2251
+trigger1 = stateno != 2800 && stateno != 2810 && stateno != 2820 && stateno != 2830 && stateno != 2840
+trigger1 = stateno != 3200 && stateno != 3210 && stateno != 3220 && stateno != 3230
+trigger1 = movehit = 1
+trigger2 = projhit = 1
+trigger3 = movehit = 1 && hitcount = 1 && (stateno = 1101 || stateno = 1201)
+var(17) = 1
+ignorehitpause = 1
+
+;---------------------------------------------------------------------------
+リコイルガード
+;---------------------------------------------------------------------------
+[State -2, フラグオフ]
+type = varset
+trigger1 = command != "holdback"
+trigger2 = var(6) >= 11
+var(5) = 0
+ignorehitpause = 1
+
+[State -2, フラグオン]
+type = varset
+trigger1 = var(6) < 11
+trigger1 = command = "holdback"
+var(5) = 1
+ignorehitpause = 1
+
+[State -2, holdback入力時間]
+type = varadd
+trigger1 = command = "holdback"
+var(6) = 1
+ignorehitpause = 1
+
+[State -2, holdback入力時間リセット]
+type = varset
+trigger1 = command != "holdback"
+trigger1 = stateno != [150,155]
+var(6) = 0
+ignorehitpause = 1
+
+[State -2, リコイル移行] 
+type = ChangeState
+triggerall = stateno = 150 || stateno = 152 || stateno = 154
+triggerall = time = 0
+trigger1 = !var(59) && var(5) = 1 
+trigger2 = var(59) && Random<=var(58)*10
+value = 160
+
+;---------------------------------------------------------------------------
+;カウンター
+;---------------------------------------------------------------------------
+[State -2, VarSet]
+type = VarSet
+trigger1 = P2MoveType = A
+var(14) = 1
+
+[State -2, VarSet]
+type = VarSet
+trigger1 = P2MoveType != A
+var(14) = 0
+
+;---------------------------------------------------------------------------
+;コンボ補正
+;---------------------------------------------------------------------------
+[State -2, コンボ補正]
+type = VarSet
+trigger1 = var(17) >= 30
+trigger1 = stateno != 2001 && stateno != 2011 && stateno != 2021 && stateno != 2031
+trigger1 = stateno != 2101 && stateno != 2111 && stateno != 2121 && stateno != 2131 && stateno != 2141
+trigger1 = stateno != 2201 && stateno != 2211 && stateno != 2221 && stateno != 2231 && stateno != 2241 && stateno != 2251
+trigger1 = stateno != 2700 && stateno != 2710
+trigger1 = stateno != 2800 && stateno != 2810 && stateno != 2820 && stateno != 2830 && stateno != 2840
+trigger1 = stateno != 2900 && stateno != 2910 && stateno != 2920 && stateno != 2930 && stateno != 2940 && stateno != 2950 && stateno != 2960
+trigger1 = stateno != 3200 && stateno != 3210 && stateno != 3220 && stateno != 3230
+fvar(0) = .02
+ignorehitpause = 1
+
+[State -2, コンボ補正]
+type = VarSet
+trigger1 = var(17) = [6,29]
+trigger1 = stateno != 2001 && stateno != 2011 && stateno != 2021 && stateno != 2031
+trigger1 = stateno != 2101 && stateno != 2111 && stateno != 2121 && stateno != 2131 && stateno != 2141
+trigger1 = stateno != 2201 && stateno != 2211 && stateno != 2221 && stateno != 2231 && stateno != 2241 && stateno != 2251
+trigger1 = stateno != 2700 && stateno != 2710
+trigger1 = stateno != 2800 && stateno != 2810 && stateno != 2820 && stateno != 2830 && stateno != 2840
+trigger1 = stateno != 2900 && stateno != 2910 && stateno != 2920 && stateno != 2930 && stateno != 2940 && stateno != 2950 && stateno != 2960
+trigger1 = stateno != 3200 && stateno != 3210 && stateno != 3220 && stateno != 3230
+fvar(0) = (25-(var(17)-5))*.02
+ignorehitpause = 1
+
+[State -2, コンボ補正]
+type = VarSet
+trigger1 = var(17) <= 5
+trigger2 = stateno = 2001 || stateno = 2011 || stateno = 2021 || stateno = 2031
+trigger3 = stateno = 2101 || stateno = 2111 || stateno = 2121 || stateno = 2131 || stateno = 2141
+trigger4 = stateno = 2201 || stateno = 2211 || stateno = 2221 || stateno = 2231 || stateno = 2241 || stateno = 2251
+trigger5 = stateno = 2700 || stateno = 2710
+trigger6 = stateno = 2800 || stateno = 2810 || stateno = 2820 || stateno = 2830 || stateno = 2840
+trigger7 = stateno = 2900 || stateno = 2910 || stateno = 2920 || stateno = 2930 || stateno = 2940 || stateno = 2950 || stateno = 2960
+trigger8 = stateno = 3200 || stateno = 3210 || stateno = 3220 || stateno = 3230
+fvar(0) = 1
+ignorehitpause = 1
+
+[State -2, 攻撃力補正]
+type = VarSet
+trigger1 = 1
+fvar(10) = (10+(var(14)*2))*.1*fvar(0)
+ignorehitpause = 1
+
+;---------------------------------------------------------------------------
+;起き上がり無敵時間
+;---------------------------------------------------------------------------
+[State -3]
+Type = VarSet
+Trigger1 = P2StateType = L
+V = 57
+Value = -1
+IgnoreHitPause = 1
+
+[State -3]
+Type = VarAdd
+TriggerAll = Var(57) > 0
+Trigger1 = P2StateType != L
+V = 57
+Value = -1
+IgnoreHitPause = 1
+
+[State -3]
+Type = VarSet
+TriggerAll = Var(57) = -1
+Trigger1 = P2StateType != L
+V = 57
+Value = 12
+IgnoreHitPause = 1
+
+;---------------------------------------------------------------------------
+;KO時演出
+;---------------------------------------------------------------------------
+[State -2, KO]
+type = Varadd
+trigger1 = roundstate = 3
+ignorehitpause = 1
+var(32) = 1
+
+[State -2, KO]
+type = Varset
+trigger1 = roundstate != 3
+ignorehitpause = 1
+var(32) = 0
+
+[State -2, BGPalFX]
+type = BGPalFX
+triggerall = WinKo && var(32) = 1
+trigger1 = stateno = 2001 || stateno = 2011 || stateno = 2021 || stateno = 2031
+trigger2 = stateno = 2101 || stateno = 2111 || stateno = 2121 || stateno = 2131 || stateno = 2141
+trigger3 = stateno = 2201 || stateno = 2211 || stateno = 2221 || stateno = 2231 || stateno = 2241 || stateno = 2251
+trigger4 = stateno = 2700 || stateno = 2710
+trigger5 = stateno = 2800 || stateno = 2810 || stateno = 2820 || stateno = 2830 || stateno = 2840
+trigger6 = stateno = 2900 || stateno = 2910 || stateno = 2920 || stateno = 2930 || stateno = 2940 || stateno = 2950 || stateno = 2960
+mul = 460,430,300
+sinadd = 155,155,205,60
+time = 30
+invertall = 0
+ignorehitpause = 1
+persistent = 0
+
+;---------------------------------------------------------------------------
+;AI起動用ヘルパー
+;---------------------------------------------------------------------------
+[State -3, AI起動用ヘルパー]
+type=helper
+trigger1=!NumHelper(10000)
+trigger1=roundstate=2
+trigger1=alive
+trigger1=var(59)=0
+Trigger1=PrevStateNo=190||(PrevStateNo=[4050,4080])||(PrevStateNo=[4100,4110])||PrevStateNo=5900
+Trigger1=ctrl&&stateno=0
+helpertype=normal
+name="AI"
+stateno=10000
+ID=10000
+pos=9999,9999
+keyctrl=1
+pausemovetime=2147483647
+supermovetime=2147483647
+persistent = 0
+
+[State -3, 関係無いステートに行かないように]
+type=changestate
+trigger1= ishelper(10000)
+trigger1= stateno!=10000
+value=10000
+
+;---------------------------------------------------------------------------
+;汎用処理
+;---------------------------------------------------------------------------
+[State -2, 投げサウンド]
+type = PlaySnd
+triggerall = numtarget = 1
+trigger1 = target,movetype = H
+trigger1 = target,stateno = 840
+trigger1 = target,statetype = A
+trigger1 = target, Pos Y >= 0
+trigger1 = target, Vel Y > 0
+value = 6, 32
+ignorehitpause = 1
+
+[State -2, ダークバリアヒット判定]
+type = VarSet
+trigger1 = projguarded1520 = 1 || projhit1520 = 1
+fvar(18) = 1
+ignorehitpause = 1
+
+[State -2, スパークヘルパー]
+type = Helper
+triggerall = !numhelper(1720)
+trigger1 = (stateno = 1700 || stateno = 2200) && movehit && numtarget
+trigger2 = projhit1710 = 1 || projhit2210 = 1
+ID = 1720
+pos = 9999, 9999
+stateno = 1720
+ownpal = 1
+persistent = 0
+ignorehitpause = 1
+
+[State -2, バニシングラッシュヘルパー]
+type = Helper
+triggerall = !NumHelper(2010)
+trigger1 = stateno = 2000
+trigger1 = movecontact
+trigger1 = numtarget
+ID = 2010
+stateno = 2010
+pos = 0, 0
+postype = p2
+ownpal = 1
+
+[State -2, わんひょうヒット硬直]
+type = Pause
+triggerall = (stateno = 1101 && animelemtime(6) < 0) || (stateno = 1201 && animelemtime(6) < 0)
+trigger1 = var(36) = 1
+trigger1 = gametime%2 = 1
+trigger1 = numtarget
+trigger1 = time > 1
+time = 1
+movetime = 0
+ignorehitpause = 1
+
+[State -2 ,残像消去]
+type = AfterImageTime
+trigger1 = MoveType = H
+trigger2 = StateNo = [0,410]
+trigger3 = StateNo = [600,1800]
+trigger4 = StateNo = 2000
+trigger5 = StateNo = 2092
+trigger6 = StateNo = 2100 || StateNo = 2110 || StateNo = 2120 || StateNo = 2130 || StateNo = 2160
+trigger7 = StateNo = 2200 || StateNo = 2210 || StateNo = 2220
+trigger8 = StateNo = 2300
+trigger9 = StateNo = 2400
+trigger10 = StateNo = [4000,4110]
+time = 0
+IgnoreHitPause = 1
+
+[State -2, Combo]
+type = VarSet
+trigger1 = Time = 1
+var(36) = 0
+ignorehitpause = 1
+
+[State -2, MoveHitReset]
+type = MoveHitReset
+trigger1 = MoveContact
+ignorehitpause = 1
+
+[State -2, AssertSpecial]
+type = AssertSpecial
+trigger1 = var(59)
+flag = nowalk
+
+[State -2, モード判定]
+type = VarSet
+trigger1 = PalNo = [7,12]
+var(12) = 1
+
+;---------------------------------------------------------------------------
+;効果音オフ・エフェクト除去
+;---------------------------------------------------------------------------
+[State -2, パワー溜め]
+type = stopsnd
+trigger1 = stateno != 700
+channel = 1
+
+[State -2, グラビティスマッシュ]
+type = stopsnd
+trigger1 = stateno != 1700
+trigger1 = stateno != 2200
+channel = 2
+
+[State -2, モララーエクスキュージョン]
+type = RemoveExplod
+trigger1 = stateno != 1100
+trigger1 = numexplod(1102)
+ID = 1102
+
+[State -2, カイザーウェーブ]
+type = RemoveExplod
+trigger1 = stateno != 1200
+trigger1 = numexplod(1200)
+ID = 1200
+
+[State -2, カイザーウェーブ]
+type = RemoveExplod
+trigger1 = stateno != 1210
+trigger1 = numexplod(1210)
+ID = 1210
+
+[State -2, カイザーウェーブ]
+type = RemoveExplod
+trigger1 = stateno != 1220
+trigger1 = numexplod(1220)
+ID = 1220
+
+[State -2, ダークスマッシュ]
+type = RemoveExplod
+trigger1 = stateno != 1600
+trigger1 = numexplod(1601)
+ID = 1601
+
+[State -2, グラビティマッシュ]
+type = RemoveExplod
+trigger1 = stateno != 1700
+trigger1 = numexplod(1700)
+ID = 1700
+
+[State -2, グラビティマッシュ]
+type = RemoveExplod
+trigger1 = stateno != 2200
+trigger1 = numexplod(2200)
+ID = 2200
+
+;---------------------------------------------------------------------------
+;毒効果（ドロウィンアルカナ)
+;---------------------------------------------------------------------------
+[state -2, 0]
+type = poweradd
+triggerall = enemy,authorname = "Drowin arcana"
+triggerall = enemy,fvar(20) > 0
+trigger1 = power > 0
+value = -1
+
+[state -2, 0]
+type = lifeadd
+triggerall = enemy,authorname = "Drowin arcana"
+triggerall = enemy,fvar(20) > 0
+trigger1 = gametime % 7 = 0
+value = -1
+kill = 0
+
+[State -2, 0]
+type = Palfx
+triggerall = enemy,authorname = "Drowin arcana"
+trigger1 = enemy,fvar(20) > 0
+add = 100,0,110
+mul = 220,220,220
+time = 5
+ignorehitpause = 1
+
+;---------------------------------------------------------------------------
+;デバッグ表示
+;---------------------------------------------------------------------------
+[State -2, デバッグ表示]
+type = DisplayToClipboard
+trigger1 = 1
+text = "fvar(10)=%f var(5)=%d var(25)=%d fb=%d var(17)=%d"
+params = fvar(10),var(5),var(25),frontedgebodydist,var(17)
+ignorehitpause = 1
+
+[State -2, 表示を横に加える]
+type = AppendToClipboard
+trigger1 = 1
+text = "\nP2X=%d/P2Y=%d Vel X=%d/10,Y=%d/10  Power=%d"
+params = floor(P2BodyDist X),floor(P2BodyDist Y),floor(Vel X*10),floor(Vel Y*10),Power
+ignorehitpause = 1

@@ -1,0 +1,390 @@
+
+;■スロータークライ■
+[Statedef 2000]
+type = S
+movetype= A
+physics = S
+anim = 2000
+velset = 0, 0
+ctrl = 0
+
+[State 1100, VarSet]
+type = VarSet
+triggerall = !var(59)
+trigger1 = Time = 0
+var(25) = ifelse(Command = "レベル１スロータークライ",0,1)
+
+[State 1100, VarSet]
+type = VarSet
+triggerall = var(59) || fvar(39)
+trigger1 = Time = 0
+var(25) = ifelse(Power >= 2000,1,0)
+
+[State 1200, ChangeState]
+type = ChangeAnim
+trigger1 = Time = 0
+value = ifelse(!var(25),2000,2010)
+
+[State 2300, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = SAC
+time = 30+var(25)*16
+
+[State 3000, 1]
+type = SuperPause
+triggerall = !var(25)
+trigger1 = animelem = 3
+time = 25
+anim = s6070
+sound = s3, 2
+pos = 4, -21
+movetime = 25
+darken = 0
+poweradd = -1000
+
+[State 3000, 1]
+type = SuperPause
+triggerall = var(25)
+trigger1 = animelem = 3
+time = 35
+anim = s6080
+sound = s3, 0
+pos = 4, -21
+movetime = 35
+darken = 0
+poweradd = -2000
+
+[State 2000]
+type = AssertSpecial
+trigger1 = animelemtime(3) >= 0 && animelemtime(3) <= 24 && !var(25)
+trigger2 = animelemtime(3) >= 0 && animelemtime(3) <= 34 && var(25)
+flag = NoFG
+flag2 = NOBG
+ignorehitpause = 1
+
+[State 3000, AfterImage]
+type = AfterImage
+trigger1 = animelem = 3
+time = 999
+TimeGap  = 3
+FrameGap = 4
+length = 10
+PalBright = 1,1,1
+PalContrast = ifelse(!var(25), 128, 50),ifelse(!var(25), 128, 50),ifelse(!var(25), 128, 150)
+PalAdd = 0,0,0
+PalMul = .5,.5,.5
+trans = add1
+
+[State 1, 18]
+type = PlaySnd
+trigger1 = animelem = 6
+value = 6, 10
+freqmul = .7
+channel = 0
+
+[State 1, 18]
+type = PlaySnd
+trigger1 = animelem = 6
+value = 6, 9
+
+[State 1, 18]
+type = EnvShake
+trigger1 = animelemtime(6) = 0
+trigger2 = animelemtime(6) > 0
+trigger2 = time%20 = 0
+time = 20
+ampl = 9
+
+[State 1, 18]
+type = EnvShake
+trigger1 = animtime = 0
+time = 1
+ignorehitpause = 1
+
+[State -3,Super]
+type = Helper
+trigger1 = animelem = 6
+pos = 0, 0
+postype = p1
+stateno = 2010
+ownpal = 1
+ignorehitpause = 1
+
+[State 1480]
+type = Explod
+trigger1 = animelem = 6
+anim = 2020
+sprpriority = 4
+ownpal = 1
+
+[State 1000, ChangeState]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;■スロータークライヘルパー■
+[Statedef 2010]
+anim = 9999
+ctrl = 0
+
+[State 9000, Assert]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+ignorehitpause = 1
+
+[State 3001, VarSet]
+type = VarSet
+trigger1 = 1
+var(14) = parent,var(14)
+ignorehitpause = 1
+
+[State 3001, VarSet]
+type = VarSet
+trigger1 = time = 0
+var(25) = parent,var(25)
+ignorehitpause = 1
+
+[State 3001, VarSet]
+type = VarSet
+trigger1 = 1
+fvar(10) = parent,fvar(10)
+ignorehitpause = 1
+
+[State 640, Projectile]
+type = Projectile
+trigger1 = time = 1
+projID = 2010
+projanim = 2030
+projhitanim = -1
+projremovetime = 6
+velocity = 0, 0
+projpriority = 7
+offset = 0, 0
+postype = p1
+attr = S, HP
+hitflag = MAF
+guardflag = MA
+animtype = Heavy
+damage = ceil(ifelse(((ifelse(!var(25),150,190))*fvar(10))<7,7,((ifelse(!var(25),150,190))*fvar(10)))), ceil(ifelse(((ifelse(!var(25),150,190))*fvar(10)/8)<7,7,((ifelse(!var(25),150,190))*fvar(10)/8)))
+pausetime = 4, 9
+sparkno = s6020
+guard.sparkno = s6060
+sparkxy = 20, -21
+hitsound = s2, 2
+guardsound = s2, 10
+ground.type = Low
+ground.slidetime = 24
+ground.hittime = 24
+yaccel = .5
+ground.velocity = -3, -10
+air.velocity = -3, -10
+air.juggle = 11
+fall = 1
+fall.recover = 0
+getpower = 0, 0
+givepower = 35, 35
+palfx.time = 12*var(14)
+palfx.add = 255, 255, 255
+palfx.mul = 128, 128, 128
+envshake.time = 10
+envshake.ampl = 3
+
+[State 3001, VarSet]
+type = VarSet
+trigger1 = var(1) = 4
+var(1) = 0
+ignorehitpause = 1
+
+[State 3001, VarSet]
+type = VarSet
+trigger1 = Root,ProjContactTime(2010) = 1
+var(1) = 1
+ignorehitpause = 1
+
+[State 3001, VarSet]
+type = VarAdd
+trigger1 = var(1)
+var(1) = 1
+ignorehitpause = 1
+
+[State 1000, 0]
+type = PosFreeze
+trigger1 = var(1)
+value = 1
+persistent = 1
+ignorehitpause = 1
+
+[State 4110, DestroySelf]
+type = DestroySelf
+triggerall = time > 1
+trigger1 = !Root,NumProjID(2010)
+
+
+;■ドラッジフィーダー■
+[Statedef 2100]
+type = S
+movetype= A
+physics = S
+velset = 0, 0
+ctrl = 0
+juggle = 11
+
+[State 1100, VarSet]
+type = VarSet
+triggerall = !var(59)
+trigger1 = Time = 0
+var(25) = ifelse(Command = "レベル１ドラッジフィーダー",0,1)
+
+[State 1000, VarSet]
+type = NULL
+triggerall = var(59) || fvar(39)
+triggerall = Power >= 2000
+triggerall = Time = 0
+trigger1 = numtarget
+trigger1 = var(25) := ifelse(p2life<100,0,random%2) || 1
+trigger2 = p2movetype = A || ((100*life/lifemax)<=50)
+trigger2 = var(25) := 1
+
+[State 1000, VarSet]
+type = VarSet
+triggerall = var(59) || fvar(39)
+triggerall = Power < 2000
+trigger1 = Time = 0
+var(25) = 0
+
+[State 1200, ChangeState]
+type = ChangeAnim
+trigger1 = Time = 0
+value = ifelse(!var(25),2100,2110)
+
+[State 2300, NotHitBy]
+type = NotHitBy
+trigger1 = time = 0
+value = SAC
+time = 29+var(25)*16
+
+[State 3000, 1]
+type = SuperPause
+triggerall = !var(25)
+trigger1 = time = 0
+time = 25
+anim = s6070
+sound = s3, 2
+pos = 8, -24
+movetime = 25
+darken = 0
+poweradd = -1000
+
+[State 3000, 1]
+type = SuperPause
+triggerall = var(25)
+trigger1 = time = 0
+time = 35
+anim = s6080
+sound = s3, 0
+pos = 8, -24
+movetime = 35
+darken = 0
+poweradd = -2000
+
+[State 2000]
+type = AssertSpecial
+trigger1 = animelemtime(2) < 0
+flag = NoFG
+flag2 = NOBG
+ignorehitpause = 1
+
+[State 3000, AfterImage]
+type = AfterImage
+trigger1 = time = 0
+time = 999
+TimeGap  = 3
+FrameGap = 4
+length = 10
+PalBright = 1,1,1
+PalContrast = ifelse(!var(25), 128, 50),ifelse(!var(25), 128, 50),ifelse(!var(25), 128, 150)
+PalAdd = 0,0,0
+PalMul = .5,.5,.5
+trans = add1
+
+[State 210, 1]
+type = PlaySnd
+trigger1 = animelemtime(2) = 0
+value = 6, 12
+channel = 0
+
+[State 600, 2]
+type = HitDef
+trigger1 = animelem = 6
+trigger2 = animelem = 7
+trigger3 = animelem = 8
+attr = S, HA
+hitflag = MAF
+guardflag = MA
+animtype = Hard
+damage = ceil(ifelse(((ifelse(!var(25),30,40))*fvar(10))<7,7,((ifelse(!var(25),30,40))*fvar(10)))), ceil(ifelse(((ifelse(!var(25),30,40))*fvar(10)/8)<7,7,((ifelse(!var(25),30,40))*fvar(10)/8)))
+pausetime = 6, 6
+sparkno = s6020
+guard.sparkno = S6060
+sparkxy = -30+(ifelse(random%2,-1,1)*(random%16)), -37+(ifelse(random%2,-1,1)*(random%16))
+hitsound = s2, 3
+guardsound = s2, 10
+ground.type = High
+ground.slidetime = 15
+ground.hittime = 15
+yaccel = .5
+ground.velocity = -4
+air.velocity = -4, -5
+air.fall = 1
+fall.recover = 0
+getpower = 0, 0
+givepower = 35, 35
+palfx.time = 12*var(14)
+palfx.add = 255, 255, 255
+palfx.mul = 128, 128, 128
+envshake.time = 10
+envshake.ampl = 3
+
+[State 600, 2]
+type = HitDef
+trigger1 = animelem = 9
+attr = S, HA
+hitflag = MAF
+guardflag = MA
+animtype = Hard
+damage = ceil(ifelse(((ifelse(!var(25),30,40))*fvar(10))<7,7,((ifelse(!var(25),30,40))*fvar(10)))), ceil(ifelse(((ifelse(!var(25),30,40))*fvar(10)/8)<7,7,((ifelse(!var(25),30,40))*fvar(10)/8)))
+pausetime = 15, 15
+sparkno = s6020
+guard.sparkno = S6060
+sparkxy = -30+(ifelse(random%2,-1,1)*(random%16)), -37+(ifelse(random%2,-1,1)*(random%16))
+hitsound = s2, 3
+guardsound = s2, 10
+ground.type = High
+ground.slidetime = 18
+ground.hittime = 18
+yaccel = .5
+ground.velocity = -8
+air.velocity = -7, -6
+air.fall = 1
+fall.recover = 0
+getpower = 0, 0
+givepower = 35, 35
+palfx.time = 12*var(14)
+palfx.add = 255, 255, 255
+palfx.mul = 128, 128, 128
+envshake.time = 10
+envshake.ampl = 3
+
+[State 105, 1]
+type = statetypeset
+trigger1 = animelem = 10
+movetype = I
+
+[State 1200, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
