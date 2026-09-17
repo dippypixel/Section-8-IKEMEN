@@ -4587,7 +4587,7 @@ envshake.ampl = 8
 [State 1437, NotHitBy]
 type = NotHitBy
 trigger1 = Time = 0
-value = ,NA,SA,NP,SP
+value = ,NP,SP
 time = 16
 
 [State 1436, StateTypeSet]
@@ -4739,7 +4739,7 @@ ID=400;Detector
 [State 1437, NotHitBy]
 type = NotHitBy
 trigger1 = Time = 0
-value = ,NA,SA,NP,SP
+value = ,NP,SP
 time = 25
 
 [State 1436, StateTypeSet]
@@ -4864,7 +4864,7 @@ ID=400;Detector
 [State 1437, NotHitBy]
 type = NotHitBy
 trigger1 = Time = 0
-value = ,NA,SA,NP,SP
+value = ,NP,SP
 time = 37
 
 [State 1436, StateTypeSet]
@@ -5026,7 +5026,7 @@ ID=400;Detector
 [State 1437, NotHitBy]
 type = NotHitBy
 trigger1 = Time = 0
-value = ,NA,SA,NP
+value = ,NP,SP
 time = 20
 
 [State 1436, StateTypeSet]
