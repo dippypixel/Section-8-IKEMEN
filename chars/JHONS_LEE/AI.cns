@@ -1,0 +1,2796 @@
+
+;---------------------------------------------------------------------------
+;AI　㍻㌢さんのAI説明書を参考にさせてもらいました。
+;　　厨忍さんのサイトのAI製作メモを参考にさせてもらいました。
+;---------------------------------------------------------------------------
+;
+;テキトーに技を振って、狙える場面ではコンボしたりしなかったりするAIです。
+;全体的に迂闊な行動が多いのでそこを付けば簡単に勝てるような気がします。
+;火力が異常に高いので事故にだけは気をつけましょう。
+;
+
+[Statedef -3]
+
+[State -3, AIフラグセット]
+type = VarSet
+triggerall = !var(59)
+triggerall = RoundState = [1,2]
+trigger1 = Command = "AI0"
+trigger2 = Command = "AI1"
+trigger3 = Command = "AI2"
+trigger4 = Command = "AI3"
+trigger5 = Command = "AI4"
+trigger6 = Command = "AI5"
+trigger7 = Command = "AI6"
+trigger8 = Command = "AI7"
+trigger9 = Command = "AI8"
+trigger10 = Command = "AI9"
+trigger11 = Command = "AI10"
+trigger12 = Command = "AI11"
+trigger13 = Command = "AI12"
+trigger14 = Command = "AI13"
+trigger15 = Command = "AI14"
+trigger16 = Command = "AI15"
+trigger17 = Command = "AI16"
+trigger18 = Command = "AI17"
+trigger19 = Command = "AI18"
+trigger20 = Command = "AI19"
+trigger21 = Command = "AI20"
+trigger22 = Command = "AI21"
+trigger23 = Command = "AI22"
+trigger24 = Command = "AI23"
+trigger25 = Command = "AI24"
+trigger26 = Command = "AI25"
+trigger27 = Command = "AI26"
+trigger28 = Command = "AI27"
+trigger29 = Command = "AI28"
+trigger30 = Command = "AI29"
+trigger31 = Command = "AI30"
+trigger32 = Command = "AI31"
+trigger33 = Command = "AI32"
+trigger34 = Command = "AI33"
+trigger35 = Command = "AI34"
+trigger36 = Command = "AI35"
+trigger37 = Command = "AI36"
+trigger38 = Command = "AI37"
+trigger39 = Command = "AI38"
+trigger40 = Command = "AI39"
+trigger41 = Command = "AI40"
+trigger42 = Command = "AI41"
+trigger43 = Command = "AI42"
+trigger44 = Command = "AI43"
+trigger45 = Command = "AI44"
+trigger46 = Command = "AI45"
+trigger47 = Command = "AI46"
+trigger48 = Command = "AI47"
+trigger49 = Command = "AI48"
+trigger50 = Command = "AI49"
+trigger51 = Command = "AI50"
+var(59) = 10;←1～11で設定可能、11が最高レベル(超反応アリ)
+
+[State -3,勁ポイント横の位置]
+type = VarSet
+trigger1 = 1
+v = 14
+value = 0   ;(1P側の場合)負数だと左に、正数だと右によります。
+
+[State -3,勁ポイント縦の位置]
+type = VarSet
+trigger1 = 1
+v = 15
+value = 0   ;負数だと上に、正数だと下によります。
+
+[State -3, 発勁返し率]
+type = VarSet
+triggerall = var(59)!= 0
+trigger1 = RoundState = [1,2]
+var(57) = 30;←0～100で設定可能。
+
+[State -3, AIの最大の勁の一撃使用有無]
+type = VarSet
+triggerall = var(59)!= 0
+trigger1 = RoundState = [1,2]
+var(56) = 1;　一撃を使わせたくない場合は0にしてください。
+
+[State -3, タッグ時におけるヒットストップ減少(ジョンス・リー側が一人で相手二人の場合は作用しません)]
+type = VarSet
+TriggerAll=TeamMode = simul
+trigger1 = Numpartner
+trigger1 = partner,ALIVE
+trigger1 = RoundState = [1,2]
+var(55) = 5;　数字を大きくするほどヒットストップが減ります。5くらいが適切です。0でいつも通り。
+           ;  大きくしすぎるとエラーメッセージが出るので注意。(プレイは普通にできる。)
+
+[State -3, 相方死亡時のヒットストップ減少解除]
+type = VarSet
+TriggerAll=TeamMode = simul
+trigger1 = Numpartner
+trigger1 = partner,ALIVE = 0
+trigger1 = RoundState = [1,2]
+var(55) = 0
+
+[State -3];変数設定
+Type=varset
+triggerall=!ishelper
+Trigger1=numenemy=1
+var(12)=enemynear,ID
+
+[State -3];変数設定
+Type=varset
+triggerall=!ishelper
+Trigger1=numenemy=2
+var(12)=ifelse(EnemyNear(0),alive,enemynear(0),ID,enemynear(1),ID)
+
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;暴発
+;Time=1 Random StateNo
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;切り替えし
+;PrevStateNo = [120,159] PrevStateNo = [5000,5270] playerID(var(12)),HitDefAttr = SCA,AT;投げ
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[State -3,こんなもん裡門(本気)]
+Type = ChangeState
+Value = 200
+TriggerAll=var(59) != 0
+TriggerAll=PalNo != 11
+TriggerAll=StateType!=A
+TriggerAll=RoundState=2
+TriggerAll=P2BodyDist X=[0,70]
+TriggerAll=P2BodyDist Y>=-160
+TriggerAll=StateNo = 1026
+triggerall = var(2) = 1
+TriggerAll=playerID(var(12)),MoveType=A
+TriggerAll=Random<=var(59)*80||var(59)>9
+TriggerAll=playerID(var(12)),AnimTime<=-4||var(59)<7
+TriggerAll=playerID(var(12)),Time>=2||var(59)>10
+Trigger1 = playerID(var(12)),Time>=20||var(59) = 11
+
+[State -3,こんなもん昇]
+Type = ChangeState
+Value = 1040
+TriggerAll=var(59) != 0
+TriggerAll=PalNo != 11
+TriggerAll=StateType!=A
+TriggerAll=RoundState=2
+TriggerAll=P2BodyDist X=[-20,70]
+TriggerAll=playerID(var(12)),Vel X = [-1,1]
+TriggerAll=playerID(var(12)),Vel Y = [-1,1]
+TriggerAll=P2BodyDist Y>=-100
+TriggerAll=StateNo = 1026
+TriggerAll=Random<=var(59)*100||var(59)>9
+TriggerAll=playerID(var(12)),AnimTime<=-8||var(59)<7
+TriggerAll=playerID(var(12)),Time>=2||var(59)>11
+Trigger1 = playerID(var(12)),Time>=20||var(59) = 11
+
+[State -3,VIP待遇]
+Type = ChangeState
+Value = 3030
+TriggerAll=var(59) != 0
+TriggerAll=PalNo != 11
+triggerall = var(54) <= 1
+TriggerAll=StateType!=A
+TriggerAll=RoundState=2
+TriggerAll=P2BodyDist X=[-20,40]
+TriggerAll=P2BodyDist Y>=-60
+TriggerAll=Ctrl||StateNo = 20
+TriggerAll=playerID(var(12)),MoveType=A
+TriggerAll=playerID(var(12)),StateType != A
+triggerall = power >= 2000
+triggerall = var(2) = 0
+TriggerAll=playerID(var(12)),Vel X = [-2,2]
+TriggerAll=Random<=var(59)*50||var(59)>9
+TriggerAll=playerID(var(12)),AnimTime<=-7||var(59)<7
+TriggerAll=playerID(var(12)),Time>=30||var(59)>11
+Trigger1 = playerID(var(12)),Time>=50||var(59) = 11
+
+[State -3,昇]
+Type     = ChangeState
+Value    = 1040
+TriggerAll=var(59) != 0
+TriggerAll=PalNo != 11
+TriggerAll=StateType != A
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100||StateNo = 105||StateNo = [540,550]
+TriggerAll = PrevStateNo != 1040
+TriggerAll=P2BodyDist X=[-25,60]
+TriggerAll=P2BodyDist Y=[-100,0]
+TriggerAll=playerID(var(12)),Vel X = [-3,3]
+TriggerAll=playerID(var(12)),Vel Y = [-3,3]
+TriggerAll=playerID(var(12)),MoveType=A
+TriggerAll=Random<=var(59)*12||var(59)>9
+TriggerAll=playerID(var(12)),AnimTime<=-8||var(59)<7
+TriggerAll=playerID(var(12)),Time>=30||var(59)>11
+Trigger1 = playerID(var(12)),Time>=50||var(59)>11
+Trigger2 = (PrevStateNo=[120,159])
+
+[State -3,こんなもん]
+Type = ChangeState
+Value = 1020
+TriggerAll=var(59) != 0
+TriggerAll=PalNo != 11
+TriggerAll=StateType!=A
+TriggerAll=RoundState=2
+TriggerAll=P2BodyDist X=[-30,50]
+TriggerAll=P2BodyDist Y>=-60
+TriggerAll=playerID(var(12)),Vel X = [-1,1]
+TriggerAll=playerID(var(12)),Vel Y = [-1,1]
+TriggerAll=playerID(var(12)),HitDefAttr = SA, NA, SA, HA
+TriggerAll=Ctrl||StateNo = 20
+TriggerAll=TeamMode = single
+TriggerAll = PrevStateNo != 1020
+TriggerAll=Life >= 500
+TriggerAll=playerID(var(12)),StateType != C
+TriggerAll=playerID(var(12)),MoveType=A
+TriggerAll=Random<=var(59)*7||var(59)>9
+TriggerAll=playerID(var(12)),AnimTime<=-10||var(59)<7
+TriggerAll=playerID(var(12)),Time>=30||var(59)>11
+TriggerAll = playerID(var(12)),Time>=50||var(59) = 11
+trigger1 = Facing = 1
+trigger1 = playerID(var(12)),Facing = -1
+trigger2 = Facing = -1
+trigger2 = playerID(var(12)),Facing = 1
+Trigger3 = (PrevStateNo=[5000,5270])
+
+[State -3,ﾊﾞｯｸｽﾃｯﾌﾟ]
+Type     = ChangeState
+Value    = 105
+TriggerAll=var(59) != 0
+TriggerAll=PalNo != 11
+TriggerAll=StateType != A
+TriggerAll=Ctrl||StateNo = 20||StateNo = [540,550]
+triggerall = PrevStateNo != 105
+TriggerAll=(playerID(var(12)),StateNo=[200,699])||playerID(var(12)),HitDefAttr=SCA,AT
+TriggerAll=P2BodyDist X=[-15,50]
+TriggerAll=P2BodyDist Y=[-80,0]
+TriggerAll=playerID(var(12)),vel x<3
+TriggerAll=playerID(var(12)),MoveType=A
+Triggerall = BackEdgeBodyDist >= 40
+TriggerAll=Random<=var(59)*20||var(59)>9
+TriggerAll=playerID(var(12)),Time>=30||var(59)>11
+Triggerall = BackEdgeBodyDist >= 40
+triggerall = PalNo != 11
+Trigger1 = playerID(var(12)),Time>=50||var(59)>11
+Trigger2 = (PrevStateNo=[5000,5270])
+Trigger3 = (PrevStateNo=[120,159])
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;タッグ用行動
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[State -3,落下追撃（構え裡門）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType = A
+triggerall = playerID(var(12)),StateType != L
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+TriggerAll=playerID(var(12)),Vel Y = [-3,1]
+triggerall = P2bodydist X = [0,60]
+triggerall = P2bodydist Y = [-150,-50]
+trigger1 = Ctrl||StateNo = 20
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = partner,ALIVE
+trigger1 = partner,MoveType = A
+value = 400
+
+[State -3,落下追撃低い位置（表）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType = A
+triggerall = playerID(var(12)),StateType != L
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [0,120]
+triggerall = P2bodydist Y = [-100,-40]
+TriggerAll=playerID(var(12)),Vel Y = [-3,2]
+trigger1 = Ctrl||StateNo = 20||StateNo = 100||StateNo = 105||StateNo = [540,550]
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = partner,ALIVE
+trigger1 = partner,MoveType = A
+value = 1000
+
+[State -3,落下追撃高い位置（表）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType = A
+triggerall = playerID(var(12)),StateType != L
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [20,120]
+triggerall = P2bodydist Y = [-180,-90]
+TriggerAll=playerID(var(12)),Vel Y = [0,7]
+trigger1 = Ctrl||StateNo = 20||StateNo = 100||StateNo = 105||StateNo = [540,550]
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = partner,ALIVE
+trigger1 = partner,MoveType = A
+value = 1000
+
+[State -3,落下追撃（昇）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType = A
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-30,50]
+triggerall = P2bodydist Y = [-160,-40]
+TriggerAll=playerID(var(12)),Vel Y = [-3,1]
+trigger1 = Ctrl||StateNo = 20||StateNo = 100||StateNo = 105
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = partner,ALIVE
+trigger1 = partner,MoveType = A
+value = 1040
+
+[State -3,落下追撃（裡門）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType = A
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-10,40]
+triggerall = P2bodydist Y = [-120,-60]
+TriggerAll=playerID(var(12)),Vel Y = [-1,2]
+trigger1 = Ctrl||StateNo = 20||StateNo = 100||StateNo = 105||StateNo = [540,550]
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = partner,ALIVE
+trigger1 = partner,MoveType = A
+value = 200
+
+[State -3,空中追撃（昇）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType = A
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-20,50]
+triggerall = P2bodydist Y = [-60,-30]
+TriggerAll=playerID(var(12)),Vel Y = [-1,1]
+trigger1 = Ctrl||StateNo = 20||StateNo = 100||StateNo = 105
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = partner,ALIVE
+trigger1 = partner,MoveType = A
+value = 1040
+
+[State -3,空中追撃（裡門）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType = A
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-30,40]
+triggerall = P2bodydist Y = [-150,-120]
+TriggerAll=playerID(var(12)),Vel Y = [2,5]
+trigger1 = Ctrl||StateNo = 20||StateNo = 100||StateNo = 105||StateNo = [540,550]
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = partner,ALIVE
+trigger1 = partner,MoveType = A
+value = 200
+
+[State -3,空中追撃（最大）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = var(56) != 0
+triggerall = var(54) = 5
+triggerall = var(16) = 0
+triggerall = Life <= (LifeMax/4)
+triggerall = playerID(var(12)),StateType = A
+TriggerAll=playerID(var(12)),Vel Y = [-1,1]
+TriggerAll=playerID(var(12)),Vel X = [-2,2]
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != L
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-30,60]
+triggerall = P2bodydist Y >= -100
+triggerall = Ctrl||StateNo = 20
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = partner,ALIVE
+trigger1 = partner,MoveType = A
+value = 3100
+
+[State -3,追撃（最大）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = var(56) != 0
+triggerall = var(54) = 5
+triggerall = var(16) = 0
+triggerall = Life <= (LifeMax/4)
+triggerall = playerID(var(12)),StateType != A
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != L
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-30,60]
+triggerall = P2bodydist Y >= -100
+triggerall = Ctrl||StateNo = 20
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = partner,ALIVE
+trigger1 = partner,MoveType = A
+value = 3100
+
+[State -3,追撃（構え裡門）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [0,50]
+triggerall = P2bodydist Y >= -90
+triggerall = Ctrl||StateNo = 20
+trigger1 = PrevStateNo != 400
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = partner,ALIVE
+trigger1 = partner,MoveType = A
+value = 400
+
+[State -3,追撃（表）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [0,120]
+triggerall = P2bodydist Y >= -90
+triggerall = Ctrl||StateNo = 20||StateNo = 100||StateNo = 105||StateNo = [540,550]
+trigger1 = PrevStateNo != 1000
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = partner,ALIVE
+trigger1 = partner,MoveType = A
+value = 1000
+
+[State -3,追撃（裡門）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-30,50]
+triggerall = P2bodydist Y >= -90
+trigger1 = Ctrl||StateNo = 20||StateNo = 100||StateNo = 105||StateNo = [540,550]
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = partner,ALIVE
+trigger1 = partner,MoveType = A
+value = 200
+
+[State -3,追撃（直突き）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType = A
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [0,120]
+triggerall = P2bodydist Y >= -130
+trigger1 = Ctrl||StateNo = 20
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = partner,ALIVE
+trigger1 = partner,MoveType = A
+value = 610
+
+[State -3,追撃ジャンプ]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-20,40]
+triggerall = P2bodydist Y = [-220,-180]
+triggerall = Ctrl||StateNo = 20||StateNo = 100
+trigger1 = PrevStateNo != 400
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = partner,ALIVE
+trigger1 = partner,MoveType = A
+value = 40
+
+[State -3,救出（最大）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = var(56) != 0
+triggerall = var(54) = 5
+triggerall = var(16) = 0
+triggerall = Life <= (LifeMax/4)
+triggerall = playerID(var(12)),StateType = A
+TriggerAll=playerID(var(12)),Vel Y = [-1,1]
+TriggerAll=playerID(var(12)),Vel X = [-2,2]
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != L
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-30,60]
+triggerall = P2bodydist Y >= -100
+triggerall = Ctrl||StateNo = 20
+trigger1 = partner,MoveType = H
+trigger1 = partner,ALIVE
+value = 3100
+
+[State -3,救出（最大）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = var(56) != 0
+triggerall = var(54) = 5
+triggerall = var(16) = 0
+triggerall = Life <= (LifeMax/4)
+triggerall = playerID(var(12)),StateType != A
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != L
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-30,60]
+triggerall = P2bodydist Y >= -100
+triggerall = Ctrl||StateNo = 20
+trigger1 = partner,MoveType = H
+trigger1 = partner,ALIVE
+value = 3100
+
+[State -3,パートナー救出表]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [50,100]
+triggerall = P2bodydist Y >= -120
+trigger1 = Ctrl||StateNo = 20||StateNo = 100||StateNo = 105||StateNo = [540,550]
+trigger1 = partner,MoveType = H
+trigger1 = partner,ALIVE
+value = 1000
+
+[State -3,パートナー救出裏]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = playerID(var(12)),ALIVE
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [0,100]
+triggerall = P2bodydist Y >= -120
+trigger1 = Ctrl||StateNo = 20||StateNo = 100||StateNo = 105||StateNo = [540,550]
+trigger1 = partner,MoveType = H
+trigger1 = partner,ALIVE
+value = 1010
+
+[State -3,パートナー救出震脚]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != A
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*35
+triggerall = P2bodydist X = [-20,120]
+triggerall = P2bodydist Y >= -40
+triggerall = PrevStateNo != 1030
+trigger1 = Ctrl||StateNo = 20||StateNo = 100||StateNo = 105
+trigger1 = partner,MoveType = H
+trigger1 = partner,ALIVE
+value = 1030
+
+[State -3,パートナー救出直突き]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = RoundState = 2
+triggerall = StateType = A
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [50,130]
+triggerall = P2bodydist Y >= -130
+trigger1 = Ctrl||StateNo = 20
+trigger1 = partner,MoveType = H
+trigger1 = partner,ALIVE
+value = 610
+
+[State -3,救助ダッシュ]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*35
+triggerall = P2bodydist X = [120,320]
+trigger1 = Ctrl||StateNo = 20
+trigger1 = partner,MoveType = H
+trigger1 = partner,ALIVE
+value = 100
+
+[State -3,加勢ダッシュ]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = Numpartner
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll=TeamMode = simul
+Triggerall = Random <= var(59)*35
+triggerall = P2bodydist X = [120,360]
+trigger1 = Ctrl||StateNo = 20
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = partner,ALIVE
+trigger1 = partner,MoveType = A
+value = 100
+
+[State -3,距離取り]
+Type = ChangeState
+value = 105
+TriggerAll = var(59) != 0
+triggerall = Numpartner
+triggerall = RoundState = 2
+TriggerAll=TeamMode = simul
+TriggerAll = StateType != A
+TriggerAll = Random <= var(59)*100
+Triggerall = BackEdgeBodyDist >= 40
+TriggerAll = PrevStateNo != 105
+TriggerAll = Ctrl||StateNo = 20
+Trigger1 = P2BodyDist X = [-10,10]
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;ガード 
+;inguarddist playerID(var(12)),HitDefAttr = SCA,AA;打撃
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[State -3,立ちガード]
+Type = ChangeState
+Value = 120
+triggerall = RoundState = 2
+TriggerAll=var(59) != 0
+TriggerAll=StateNo!=[120,155]
+TriggerAll=Ctrl||StateNo = 20
+TriggerAll=inguarddist
+Trigger1 = Random<=var(59)*60
+Trigger2 = P2BodyDist X>90||playerID(var(12)),Time>50
+Trigger2 = Random<=var(59)*150
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;地上起き攻め 
+;playerID(var(12)),StateType = L playerID(var(12)),AnimTime P2bodyDist Y P2bodyDist X
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[State -3,本気にさせたな]
+Type = ChangeState
+value = 3050
+TriggerAll = var(59) != 0
+TriggerAll = StateType != A
+triggerall = playerID(var(12)),ALIVE
+TriggerAll = playerID(var(12)),StateType = L
+TriggerAll = Random <= var(59)*100
+TriggerAll = Ctrl||StateNo = 20
+triggerall = power >= 3000
+triggerall = Life <= 500
+triggerall = Life >= 250
+triggerall = var(2) = 0
+triggerall = PalNo <= 6
+TriggerAll = P2BodyDist X <= 320
+Trigger1 = playerID(var(12)),StateNo = 5120
+
+[State -3,最大]
+Type = ChangeState
+value = 3100
+TriggerAll = var(59) != 0
+triggerall = var(56) != 0
+triggerall = var(54) = 5
+triggerall = var(16) = 0
+triggerall = Life <= (LifeMax/4)
+TriggerAll = StateType != A
+triggerall = playerID(var(12)),ALIVE
+TriggerAll = playerID(var(12)),StateType = L
+TriggerAll = Random <= var(59)*60
+TriggerAll = Ctrl||StateNo = 20
+TriggerAll = P2BodyDist X = [-20,60]
+Trigger1 = playerID(var(12)),StateNo = 5120
+Trigger1 = playerID(var(12)),AnimTime = -7
+
+[State -3,構え裡門]
+Type = ChangeState
+value = 400
+TriggerAll = var(59) != 0
+TriggerAll = StateType != A
+triggerall = playerID(var(12)),ALIVE
+TriggerAll = playerID(var(12)),StateType = L
+TriggerAll = Random <= var(59)*60
+triggerall = playerID(var(12)),power <= 999
+TriggerAll = Ctrl||StateNo = 20
+TriggerAll = P2BodyDist X = [-20,60]
+Trigger1 = playerID(var(12)),StateNo = 5120
+Trigger1 = playerID(var(12)),AnimTime = -23
+
+[State -3,構え猛虎]
+Type = ChangeState
+value = 410
+TriggerAll = var(59) != 0
+TriggerAll = StateType != A
+triggerall = playerID(var(12)),ALIVE
+TriggerAll = playerID(var(12)),StateType = L
+TriggerAll = Random <= var(59)*60
+TriggerAll = Ctrl||StateNo = 20
+TriggerAll = P2BodyDist X = [20,50]
+Trigger1 = playerID(var(12)),StateNo = 5120
+Trigger1 = playerID(var(12)),AnimTime = [-21,-16]
+
+[State -3,中段手刀発勁]
+Type = ChangeState
+value = 440
+TriggerAll = var(59) != 0
+TriggerAll = StateType != A
+triggerall = playerID(var(12)),ALIVE
+TriggerAll = playerID(var(12)),StateType = L
+TriggerAll = Random <= var(59)*60
+TriggerAll = Ctrl||StateNo = 20
+triggerall = playerID(var(12)),power <= 999
+TriggerAll = P2BodyDist X = [-20,50]
+Trigger1 = playerID(var(12)),StateNo = 5120
+Trigger1 = playerID(var(12)),AnimTime = -23
+
+[State -3,下段貼山靠]
+Type = ChangeState
+value = 430
+TriggerAll = var(59) != 0
+TriggerAll = StateType != A
+triggerall = playerID(var(12)),ALIVE
+TriggerAll = playerID(var(12)),StateType = L
+TriggerAll = Random <= var(59)*100
+TriggerAll = Ctrl||StateNo = 20
+triggerall = playerID(var(12)),power <= 999
+TriggerAll = P2BodyDist X = [-20,50]
+Trigger1 = playerID(var(12)),StateNo = 5120
+Trigger1 = playerID(var(12)),AnimTime = -19
+
+[State -3,距離取り]
+Type = ChangeState
+value = 105
+TriggerAll = var(59) != 0
+triggerall = RoundState = 2
+triggerall = playerID(var(12)),ALIVE
+TriggerAll = StateType != A
+TriggerAll = playerID(var(12)),StateType = L
+TriggerAll = Random <= var(59)*100
+TriggerAll = Ctrl||StateNo = 20
+Triggerall = BackEdgeBodyDist >= 40
+Trigger1 = P2BodyDist X = [-35,10]
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;空中起き攻め(詐欺飛び) 
+;playerID(var(12)),StateType = L playerID(var(12)),AnimTime P2bodyDist Y P2bodyDist X 
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;地上目押し 
+;Prevstateno playerID(var(12)),Movetype = H playerID(var(12)),stateno = [120,159]
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[State -3,最大]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = var(56) != 0
+triggerall = var(54) = 5
+triggerall = var(16) = 0
+triggerall = Life <= (LifeMax/4)
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-15,60]
+triggerall = P2bodydist Y >= -80
+triggerall = Ctrl||StateNo = 20||stateno = 1025
+triggerall = playerID(var(12)),GetHitVar(hittime)>= 20
+Triggerall = playerID(var(12)),BackEdgeBodyDist <= 15
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 3100
+
+[State -3,追撃裡門（本気）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType = A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-5,55]
+triggerall = PrevStateNo != 500||PrevStateNo != 510
+triggerall = Ctrl||StateNo = 20||StateNo = 100||stateno = 1025
+triggerall = var(2) = 1
+triggerall = playerID(var(12)),MoveType = H
+triggerall = (playerID(var(12)),StateNo != [120,159])
+trigger1 = P2bodydist Y = [-170,-40]
+trigger1 = PalNo != 11
+trigger2 = P2bodydist Y = [-120,-10]
+trigger2 = PalNo = 11
+value = 200
+
+[State -3,中段手刀発勁]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType = C
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [30,50]
+triggerall = P2bodydist Y >= -80
+triggerall = Ctrl||StateNo = 20||stateno = 1025
+Triggerall = playerID(var(12)),BackEdgeBodyDist <= 20
+trigger1 = playerID(var(12)),MoveType = H
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 440
+
+[State -3,中段手刀発勁]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-5,50]
+triggerall = P2bodydist Y >= -80
+triggerall = Ctrl||StateNo = 20||stateno = 1025
+triggerall = playerID(var(12)),GetHitVar(hittime)>= 25
+Triggerall = playerID(var(12)),BackEdgeBodyDist <= 15
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 440
+
+[State -3,追撃構え裡門2]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType = A
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-15,60]
+triggerall = P2bodydist Y >= -130
+TriggerAll = playerID(var(12)),Vel Y <= 0
+triggerall = Ctrl||StateNo = 20
+triggerall = playerID(var(12)),GetHitVar(hittime)>= 21
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 400
+
+[State -3,追撃構え裡門1]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-5,30]
+triggerall = P2bodydist Y >= -80
+triggerall = Ctrl||StateNo = 20
+triggerall = playerID(var(12)),GetHitVar(hittime)>= 21
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 400
+
+[State -3,追撃構え裡門端]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-5,70]
+Triggerall = playerID(var(12)),BackEdgeBodyDist <= 20
+triggerall = P2bodydist Y >= -80
+triggerall = Ctrl||StateNo = 20
+triggerall = playerID(var(12)),GetHitVar(hittime)>= 21
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 400
+
+[State -3,追撃構え猛虎]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-5,50]
+triggerall = P2bodydist Y >= -80
+triggerall = Ctrl||StateNo = 20
+triggerall = playerID(var(12)),GetHitVar(hittime)>= 25
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 410
+
+[State -3,表]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType = S
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-5,90]
+triggerall = P2bodydist Y >= -80
+triggerall = Ctrl||StateNo = 20||StateNo = 100||StateNo = 105||StateNo = [540,550]
+triggerall = playerID(var(12)),GetHitVar(hittime)>= 12
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 1000
+
+[State -3,11Pカラー専用表]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType = S
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-5,190]
+triggerall = P2bodydist Y >= -150
+triggerall = Ctrl||StateNo = 20||StateNo = 100||StateNo = 105||StateNo = [540,550]
+triggerall = PalNo = 11
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 1000
+
+[State -3,追撃ダッシュ猛虎]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*50
+triggerall = P2bodydist X = [90,120]
+triggerall = P2bodydist Y >= -80
+triggerall = PrevStateNo != 500||PrevStateNo != 510
+triggerall = StateNo = 100
+triggerall = playerID(var(12)),GetHitVar(hittime)>= 18
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 210
+
+[State -3,追撃連続貼山靠3]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = var(54) <= 1
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+triggerall = power >= 3000
+TriggerAll=playerID(var(12)),Life >= 400
+triggerall = var(2) = 0
+Triggerall = Random <= var(59)*70
+triggerall = P2bodydist X = [0,70]
+triggerall = P2bodydist Y >= -80
+triggerall = PrevStateNo != 500||PrevStateNo != 510
+triggerall = Ctrl||StateNo = 20||stateno = 1025
+triggerall = playerID(var(12)),GetHitVar(hittime)>= 18
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+value = 3020
+
+[State -3,追撃連続貼山靠2]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = var(54) <= 1
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+triggerall = power >= 2000
+TriggerAll=playerID(var(12)),Life >= 300
+triggerall = var(2) = 0
+Triggerall = Random <= var(59)*70
+triggerall = P2bodydist X = [0,70]
+triggerall = P2bodydist Y >= -80
+triggerall = PrevStateNo != 500||PrevStateNo != 510
+triggerall = Ctrl||StateNo = 20||stateno = 1025
+triggerall = playerID(var(12)),GetHitVar(hittime)>= 18
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+value = 3010
+
+[State -3,追撃連続貼山靠1]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = var(54) <= 1
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+triggerall = power >= 1000
+TriggerAll=playerID(var(12)),Life >= 200
+triggerall = var(2) = 0
+Triggerall = Random <= var(59)*70
+triggerall = P2bodydist X = [0,70]
+triggerall = P2bodydist Y >= -80
+triggerall = PrevStateNo != 500||PrevStateNo != 510
+triggerall = Ctrl||StateNo = 20||stateno = 1025
+triggerall = playerID(var(12)),GetHitVar(hittime)>= 18
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+value = 3000
+
+[State -3,追撃猛虎]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*70
+triggerall = P2bodydist X = [40,60]
+triggerall = P2bodydist Y >= -80
+triggerall = PrevStateNo != 500||PrevStateNo != 510
+triggerall = Ctrl||StateNo = 20||stateno = 1025
+triggerall = playerID(var(12)),GetHitVar(hittime)>= 18
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 210
+
+[State -3,追撃ダッシュ裡門]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [70,80]
+triggerall = P2bodydist Y >= -80
+TriggerAll=playerID(var(12)),Vel X >= -2
+triggerall = PrevStateNo != 500||PrevStateNo != 510
+TriggerAll = PrevStateNo != 200
+triggerall = StateNo = 100
+triggerall = playerID(var(12)),GetHitVar(hittime)>= 14
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 200
+
+[State -3,追撃裡門]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-5,50]
+triggerall = P2bodydist Y >= -80
+TriggerAll=playerID(var(12)),Vel X >= -2
+triggerall = PrevStateNo != 500||PrevStateNo != 510
+TriggerAll = PrevStateNo != 200
+triggerall = Ctrl||StateNo = 20||stateno = 1025
+triggerall = playerID(var(12)),GetHitVar(hittime)>= 8
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 200
+
+[State -3,追撃昇]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-5,50]
+triggerall = P2bodydist Y >= -50
+TriggerAll=playerID(var(12)),Vel X >= -2
+triggerall = PrevStateNo != 500||PrevStateNo != 510
+TriggerAll = PrevStateNo != 200
+triggerall = Ctrl||StateNo = 20||StateNo = 100||stateno = 1025
+triggerall = playerID(var(12)),GetHitVar(hittime)>= 12
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+value = 1040
+
+[State -3,投げ裡門]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != L
+triggerall = playerID(var(12)),StateType = A
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = PrevStateNo = 810
+triggerall = PalNo != 11
+triggerall = power >= 2000
+triggerall = Ctrl||StateNo = 20
+Triggerall = playerID(var(12)),BackEdgeBodyDist <= 20
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 400
+
+[State -3,当身貼山靠]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != L
+triggerall = playerID(var(12)),StateType = A
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [150,500]
+triggerall = P2bodydist Y >= -420
+triggerall = PrevStateNo = 1065
+triggera;; = Numtarget(1065) != 0
+triggerall = Ctrl||StateNo = 20
+triggerall = var(2) = 0
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+value = 1000
+
+[State -3,投げ貼山靠]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != L
+triggerall = playerID(var(12)),StateType = A
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+Triggerall = playerID(var(12)),BackEdgeBodyDist >= 20
+triggerall = power >= 1000
+triggerall = PrevStateNo = 810
+triggerall = Ctrl||StateNo = 20
+triggerall = var(2) = 0
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 1000
+
+[State -3,投げジャンプ]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != L
+triggerall = playerID(var(12)),StateType = A
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = PrevStateNo = 810
+triggerall = power >= 1000
+triggerall = power <= 2000
+triggerall = Ctrl||StateNo = 20
+triggerall = var(2) = 0
+Triggerall = playerID(var(12)),BackEdgeBodyDist <= 20
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+value = 40
+
+[State -3,投げ昇貼山]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != L
+triggerall = playerID(var(12)),StateType = A
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+Triggerall = playerID(var(12)),BackEdgeBodyDist <= 20
+triggerall = P2bodydist X = [-65,70]
+triggerall = P2bodydist Y = [-90,5]
+triggerall = PrevStateNo = 200
+triggerall = Ctrl||StateNo = 20
+triggerall = var(2) = 0
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 1040
+
+[State -3,投げ裡門]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != L
+triggerall = playerID(var(12)),StateType = A
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-65,70]
+triggerall = P2bodydist Y = [-130,-65]
+triggerall = PalNo != 11
+triggerall = Ctrl|StateNo = 20
+Triggerall = playerID(var(12)),BackEdgeBodyDist <= 20
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 200
+
+[State -3,投げダッシュ（空中）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != L
+triggerall = playerID(var(12)),StateType = A
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-30,250]
+triggerall = P2bodydist Y = [-350,-40]
+triggerall = PrevStateNo = 810
+triggerall = Ctrl||StateNo = 20
+triggerall = var(2) = 1
+triggerall = PalNo != 11
+Triggerall = playerID(var(12)),BackEdgeBodyDist >= 20
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 100
+
+[State -3,11P追撃裡門（空中）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType = A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-65,70]
+triggerall = P2bodydist Y = [-100,5]
+triggerall = PrevStateNo != 500||PrevStateNo != 510
+triggerall = Ctrl||StateNo = 20||StateNo = 100||stateno = 1025
+triggerall = PalNo = 11
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 200
+
+[State -3,追撃昇1（空中）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType = A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-35,60]
+triggerall = P2bodydist Y = [-130,-20]
+TriggerAll=playerID(var(12)),Vel X = [-3,3]
+TriggerAll=playerID(var(12)),Vel Y = [-3,3]
+triggerall = PrevStateNo != 500||PrevStateNo != 510
+triggerall = Ctrl||StateNo = 20||StateNo = 100||stateno = 1025
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 1040
+
+[State -3,追撃昇2（空中）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType = A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-35,60]
+triggerall = P2bodydist Y = [-160,-120]
+TriggerAll=playerID(var(12)),Vel X = [-2,2]
+TriggerAll=playerID(var(12)),Vel Y = [3,7]
+Triggerall = playerID(var(12)),BackEdgeBodyDist >= 20
+triggerall = PrevStateNo != 500||PrevStateNo != 510
+triggerall = Ctrl||StateNo = 20||StateNo = 100||stateno = 1025
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 1040
+
+[State -3,震脚]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+TriggerAll = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [0,100]
+triggerall = P2bodydist Y >= -80
+triggerall = PrevStateNo = 200||PrevStateNo = 230
+triggerall = Ctrl||StateNo = 20||StateNo = 100
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+value = 1030
+
+[State -3,11P喰らいにダッシュ（空中）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != L
+triggerall = playerID(var(12)),StateType = A
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [20,320]
+triggerall = PalNo = 11
+triggerall = Ctrl||StateNo = 20
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 100
+
+[State -3,喰らいにダッシュ（地上）]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != A
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*30
+triggerall = P2bodydist X = [170,320]
+triggerall = Ctrl||StateNo = 20
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 100
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;地上繋ぎ 
+;Movecontact MoveHit MoveGuarded AnimElem = ,>0
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[State -1,裏]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[0,100]
+TriggerAll=P2BodyDist Y>=-60
+TriggerAll = playerID(var(12)),BackEdgeBodyDist <= 20
+TriggerAll=Movehit=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=1000
+Value    = 1010
+
+[State -1,表]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[0,150]
+TriggerAll=P2BodyDist Y>=-120
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=1030 && playerID(var(12)),StateType != A
+Value    = 1000
+
+[State -1,表]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[0,120]
+TriggerAll=P2BodyDist Y>=-120
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=400 && playerID(var(12)),BackEdgeBodyDist <= 20
+Trigger2 = StateNo=430
+Trigger3 = StateNo=1005
+Trigger4 = StateNo=410
+Trigger4 = playerID(var(12)),BackEdgeBodyDist <= 20
+Trigger5 = StateNo=210 && playerID(var(12)),StateType != A
+Value    = 1000
+
+[State -1,浦島]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X= [0,340]
+TriggerAll=P2BodyDist Y>=-120
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=400
+Trigger2 = StateNo=1050 && playerID(var(12)),StateType != A
+Trigger3 = StateNo=1000
+Trigger4 = StateNo=410
+Trigger5 = StateNo=230 && playerID(var(12)),StateType = A
+Value    = 1070
+
+[State -1,浦島]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X= [0,340]
+TriggerAll=P2BodyDist Y>=-120
+TriggerAll=MoveHit=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=1010
+Value    = 1070
+
+[State -1,枯木]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X= [0,140]
+TriggerAll=P2BodyDist Y>=-120
+triggerall = var(2) = 1
+Trigger1 = StateNo=240 && MoveGuarded=1
+Trigger2 = StateNo=1010 && MoveGuarded=1
+Value    = 1050
+
+[State -1,中段(空中)]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=playerID(var(12)),StateType = A
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[-25,50]
+TriggerAll=P2BodyDist Y=[-190,-20]
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=200
+Trigger1 = AnimElemTime(4)>0
+Value    = 440
+
+[State -1,中段]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=playerID(var(12)),StateType != A
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[0,70]
+TriggerAll=P2BodyDist Y>=-90
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=230
+Value    = 440
+
+[State -1,崩し中段]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=playerID(var(12)),StateType = C
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[0,60]
+TriggerAll=P2BodyDist Y>=-60
+TriggerAll=MoveGuarded=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=210
+Trigger2 = StateNo=641
+Value    = 440
+
+[State -1,遠め表]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[60,120]
+TriggerAll=P2BodyDist Y>=-60
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=210 && playerID(var(12)),StateType != A
+Trigger2 = StateNo=641
+Trigger3 = StateNo=1030
+Trigger3 = playerID(var(12)),StateType != A
+Value    = 1000
+
+[State -1,11P遠め表]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=!InGuardDist
+triggerall = PalNo = 11
+TriggerAll=P2BodyDist X=[60,360]
+TriggerAll=P2BodyDist Y>=-60
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=210 && playerID(var(12)),StateType != A
+Trigger2 = StateNo=641
+Trigger3 = StateNo=1030
+Trigger3 = playerID(var(12)),StateType != A
+Value    = 1000
+
+[State -1,構え猛虎]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=playerID(var(12)),StateType != A
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[0,70]
+TriggerAll=P2BodyDist Y>=-60
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 1
+triggerall = PalNo != 11
+Trigger1 = StateNo=400
+Trigger1 = playerID(var(12)),BackEdgeBodyDist <= 20
+Value    = 410
+
+[State -1,構え裡門]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=playerID(var(12)),StateType != A
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[-20,70]
+TriggerAll=P2BodyDist Y>=-80
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=440
+Value    = 400
+
+[State -1,構え裡門（空中）]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=playerID(var(12)),StateType = A
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[-20,80]
+TriggerAll=P2BodyDist Y=[-160,-15]
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=440
+Value    = 400
+
+[State -1,表（空中）]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=playerID(var(12)),StateType = A
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[80,120]
+TriggerAll=P2BodyDist Y=[-160,-15]
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=440
+Value    = 1000
+
+[State -1,爆打]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X <= 50
+TriggerAll=P2BodyDist Y>=-150
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=200
+Value    = 230
+
+[State -1,立ち猛虎]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X >= 50
+TriggerAll=P2BodyDist Y>=-150
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=200
+Trigger2 = StateNo=641
+Trigger2 = playerID(var(12)),BackEdgeBodyDist <= 20
+Value    = 210
+
+[State -1,立ち裡門]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[0,50]
+TriggerAll=P2BodyDist Y>=-60
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=641
+Value    = 200
+
+[State -1,立ち猛虎]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X <= 120
+TriggerAll=P2BodyDist Y>=-150
+TriggerAll=MoveGuarded=1
+triggerall = var(2) = 0
+Trigger1 = StateNo=240
+Value    = 210
+
+[State -1,JC]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=playerID(var(12)),StateType != A
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X <= 120
+TriggerAll=P2BodyDist Y>=-150
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 0
+Trigger1 = StateNo=210
+Value    = 40
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;空中目押し 
+;AnimTime=0 Prevstateno playerID(var(12)),Movetype = H playerID(var(12)),stateno = [120,159]
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[State -3,投げ後追撃直突き]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType = A
+triggerall = playerID(var(12)),StateType = A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-5,90]
+triggerall = P2bodydist Y = [-150,0]
+triggerall = Ctrl
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+value = 610
+
+[State -3,固め双打]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType = A
+triggerall = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [20,50]
+triggerall = P2bodydist Y = [-20,70]
+triggerall = Ctrl
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 630
+
+[State -3,固め直突き]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType = A
+triggerall = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [0,120]
+TriggerAll=Vel Y = [-1,1]
+triggerall = Ctrl
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 610
+
+[State -3,掌打]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType = A
+triggerall = playerID(var(12)),StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [0,50]
+triggerall = Ctrl
+trigger1 = playerID(var(12)),MoveType = H
+trigger1 = (playerID(var(12)),StateNo != [120,159])
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 600
+
+[State -3,崩し]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType = A
+triggerall = playerID(var(12)),StateType = S
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [150,170]
+triggerall = P2bodydist Y = [0,70]
+TriggerAll=Vel Y <= -3
+triggerall = Ctrl
+trigger1 = playerID(var(12)),MoveType = H
+trigger2 = (playerID(var(12)),StateNo = [120,159])
+value = 640
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;隙付き
+;playerID(var(12)),MoveType=I !EnemyNearCtrl playerID(var(12)),StateType=A
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[State -3,]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-5,80]
+triggerall = P2bodydist Y = [-60,0]
+triggerall = Ctrl
+TriggerAll = playerID(var(12)),AnimTime <= -27
+triggerAll = playerID(var(12)),MoveType = I
+trigger1 = (playerID(var(12)),StateNo = [200,649])
+Trigger2 = playerID(var(12)),StateType = A
+Trigger2 = !playerID(var(12)),Ctrl
+value = 400
+
+[State -3,]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [60,120]
+triggerall = P2bodydist Y = [-60,0]
+triggerall = Ctrl
+TriggerAll = playerID(var(12)),AnimTime <= -26
+triggerAll = playerID(var(12)),MoveType = I
+trigger1 = (playerID(var(12)),StateNo = [200,649])
+Trigger2 = playerID(var(12)),StateType = A
+Trigger2 = !playerID(var(12)),Ctrl
+value = 1000
+
+[State -3,]
+type = ChangeState
+triggerall = var(59) != 0
+triggerall = RoundState = 2
+triggerall = StateType != A
+triggerall = playerID(var(12)),StateType != L
+Triggerall = !inguarddist
+Triggerall = Random <= var(59)*100
+triggerall = P2bodydist X = [-5,100]
+triggerall = P2bodydist Y = [-60,0]
+triggerall = Ctrl||StateNo = 100
+TriggerAll = playerID(var(12)),AnimTime <= -21
+triggerAll = playerID(var(12)),MoveType = I
+trigger1 = (playerID(var(12)),StateNo = [200,649])
+Trigger2 = playerID(var(12)),StateType = A
+Trigger2 = !playerID(var(12)),Ctrl
+value = 210
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;空中繋ぎ 
+;Movecontact MoveHit MoveGuarded AnimElem = ,>0
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[State -1,]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType = A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=!InGuardDist
+TriggerAll=(P2BodyDist X=[0,50])
+TriggerAll=(P2BodyDist Y=[-30,60])
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=630
+Value    = 630
+
+[State -1,]
+Type     = ChangeState
+TriggerAll=(var(59) != 0&&Random<=var(59)*100)
+TriggerAll=StateType = A
+TriggerAll=playerID(var(12)),Alive
+TriggerAll=playerID(var(12)),MoveType=H
+TriggerAll=!InGuardDist
+TriggerAll=(P2BodyDist X=[0,50])
+TriggerAll=(P2BodyDist Y=[-30,60])
+TriggerAll=MoveContAct=1
+triggerall = var(2) = 1
+Trigger1 = StateNo=610
+Value    = 600
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;ぶっぱ
+;playerID(var(12)),Ctrl playerID(var(12)),MoveType=A P2BodyDist X
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[State -3,ぶっぱ]
+Type = ChangeState
+value = 3020
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=playerID(var(12)),MoveType=A||playerID(var(12)),Ctrl
+triggerall = power >= 3000
+triggerall = var(2) = 0
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100||StateNo = [540,550]
+triggerall = P2bodydist X = [0,120]
+Trigger1 = var(59)<6
+Trigger1 = Random<=var(59)*20
+Trigger2 = var(59)=[5,9]
+Trigger2 = Random<=(10-var(59))*4
+
+[State -3,ぶっぱ]
+Type = ChangeState
+value = 3010
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=playerID(var(12)),MoveType=A||playerID(var(12)),Ctrl
+triggerall = power >= 2000
+triggerall = var(2) = 0
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100||StateNo = [540,550]
+triggerall = P2bodydist X = [0,120]
+Trigger1 = var(59)<6
+Trigger1 = Random<=var(59)*20
+Trigger2 = var(59)=[5,9]
+Trigger2 = Random<=(10-var(59))*4
+
+[State -3,ぶっぱ]
+Type = ChangeState
+value = 3000
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=playerID(var(12)),MoveType=A||playerID(var(12)),Ctrl
+triggerall = power >= 1000
+triggerall = var(2) = 0
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100||StateNo = [540,550]
+triggerall = P2bodydist X = [0,120]
+Trigger1 = var(59)<6
+Trigger1 = Random<=var(59)*20
+Trigger2 = var(59)=[5,9]
+Trigger2 = Random<=(10-var(59))*4
+
+[State -3,ぶっぱ]
+Type = ChangeState
+value = 200
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=playerID(var(12)),MoveType=A||playerID(var(12)),Ctrl
+TriggerAll=Ctrl||StateNo = 100||StateNo = [540,550]
+triggerall = P2bodydist X = [0,220]
+Trigger1 = var(59)<6
+Trigger1 = Random<=var(59)*40
+Trigger2 = var(59)=[5,9]
+Trigger2 = Random<=(10-var(59))*4
+
+[State -3,ぶっぱ]
+Type = ChangeState
+value = 210
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=playerID(var(12)),MoveType=A||playerID(var(12)),Ctrl
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100||StateNo = [540,550]
+triggerall = P2bodydist X = [0,200]
+Trigger1 = var(59)<6
+Trigger1 = Random<=var(59)*20
+Trigger2 = var(59)=[5,9]
+Trigger2 = Random<=(10-var(59))*4
+
+[State -3,ぶっぱ]
+Type = ChangeState
+value = 230
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=playerID(var(12)),MoveType=A||playerID(var(12)),Ctrl
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100
+Trigger1 = var(59)<6
+Trigger1 = Random<=var(59)*20
+Trigger2 = var(59)=[5,9]
+Trigger2 = Random<=(10-var(59))*4
+
+[State -3,ぶっぱ]
+Type = ChangeState
+value = 240
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=playerID(var(12)),MoveType=A||playerID(var(12)),Ctrl
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100
+Trigger1 = var(59)<6
+Trigger1 = Random<=var(59)*20
+Trigger2 = var(59)=[5,9]
+Trigger2 = Random<=(10-var(59))*4
+
+[State -3,ぶっぱ]
+Type = ChangeState
+value = 400
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=playerID(var(12)),MoveType=A||playerID(var(12)),Ctrl
+triggerall = P2bodydist X = [0,120]
+TriggerAll=Ctrl||StateNo = 20
+Trigger1 = var(59)<6
+Trigger1 = Random<=var(59)*20
+Trigger2 = var(59)=[5,9]
+Trigger2 = Random<=(10-var(59))*4
+
+[State -3,ぶっぱ]
+Type = ChangeState
+value = 410
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=playerID(var(12)),MoveType=A||playerID(var(12)),Ctrl
+triggerall = P2bodydist X = [0,200]
+TriggerAll=Ctrl||StateNo = 20
+Trigger1 = var(59)<6
+Trigger1 = Random<=var(59)*40
+Trigger2 = var(59)=[5,9]
+Trigger2 = Random<=(10-var(59))*4
+
+[State -3,ぶっぱ]
+Type = ChangeState
+value = 430
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=playerID(var(12)),MoveType=A||playerID(var(12)),Ctrl
+triggerall = P2bodydist X = [0,120]
+TriggerAll=Ctrl||StateNo = 20
+Trigger1 = var(59)<6
+Trigger1 = Random<=var(59)*40
+Trigger2 = var(59)=[5,9]
+Trigger2 = Random<=(10-var(59))*4
+
+[State -3,ぶっぱ]
+Type = ChangeState
+value = 440
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=playerID(var(12)),MoveType=A||playerID(var(12)),Ctrl
+triggerall = P2bodydist X = [0,120]
+TriggerAll=Ctrl||StateNo = 20
+Trigger1 = var(59)<6
+Trigger1 = Random<=var(59)*40
+Trigger2 = var(59)=[5,9]
+Trigger2 = Random<=(10-var(59))*4
+
+[State -3,ぶっぱ]
+Type = ChangeState
+value = 1000
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=playerID(var(12)),MoveType=A||playerID(var(12)),Ctrl
+triggerall = P2bodydist X = [0,200]
+TriggerAll=Ctrl||StateNo = 20
+Trigger1 = var(59)<6
+Trigger1 = Random<=var(59)*40
+Trigger2 = var(59)=[5,9]
+Trigger2 = Random<=(10-var(59))*4
+
+[State -3,ぶっぱ]
+Type = ChangeState
+value = 1010
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=playerID(var(12)),MoveType=A||playerID(var(12)),Ctrl
+triggerall = P2bodydist X = [0,200]
+TriggerAll=Ctrl||StateNo = 20
+Trigger1 = var(59)<6
+Trigger1 = Random<=var(59)*40
+Trigger2 = var(59)=[5,9]
+Trigger2 = Random<=(10-var(59))*4
+
+[State -3,ぶっぱ]
+Type = ChangeState
+value = 1020
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=playerID(var(12)),MoveType=A||playerID(var(12)),Ctrl
+triggerall = P2bodydist X = [0,160]
+TriggerAll=Ctrl||StateNo = 20
+Trigger1 = var(59)<6
+Trigger1 = Random<=var(59)*40
+Trigger2 = var(59)=[5,9]
+Trigger2 = Random<=(10-var(59))*4
+
+[State -3,ぶっぱ]
+Type = ChangeState
+value = 1040
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=playerID(var(12)),MoveType=A||playerID(var(12)),Ctrl
+triggerall = P2bodydist X = [0,120]
+TriggerAll=Ctrl||StateNo = 20
+Trigger1 = var(59)<6
+Trigger1 = Random<=var(59)*40
+Trigger2 = var(59)=[5,9]
+Trigger2 = Random<=(10-var(59))*4
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;地上移動 
+;Ctrl Random P2bodyDist X
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[State -3,ダッシュ]
+Type     = ChangeState
+Value    = 100
+TriggerAll=RoundState = 2
+Triggerall = var(59) != 0
+Triggerall = StateType != A
+Triggerall = playerID(var(12)),StateType != L
+Triggerall = playerID(var(12)),MoveType = I
+Triggerall = !inguarddist
+TriggerAll=playerID(var(12)),Vel X = [-5,5]
+TriggerAll=playerID(var(12)),Vel Y = [-5,5]
+Triggerall = Ctrl||StateNo = 20
+trigger1 = Random <= var(59)*6
+Trigger1 = P2BodyDist X >= 120
+
+[State -3,ﾊﾞｯｸｽﾃｯﾌﾟ]
+Type     = ChangeState
+Value    = 105
+TriggerAll=RoundState = 2
+Triggerall = var(59) != 0
+Triggerall = StateType != A
+Triggerall = playerID(var(12)),StateType != L
+Triggerall = playerID(var(12)),MoveType != H
+Triggerall = playerID(var(12)),Stateno != [120,159]
+Triggerall = playerID(var(12)),Vel X <= 3
+Triggerall = Ctrl||StateNo = 20
+Triggerall = backedgebodydist > 62
+triggerall = PalNo != 11
+Trigger1 = P2BodyDist X <= 40
+trigger1 = Random <= var(59)*6
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;地上立ち回り技振り 
+;Ctrl Random playerID(var(12)),Movetype = I　inguarddist  P2bodyDist Y P2bodyDist X
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[State -3,投げ]
+Type = ChangeState
+value = 800
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),StateType != A
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=Ctrl||StateNo = 20||StateNo = [540,550]
+triggerall = p2bodydist X < 10
+triggerall = PrevStateNo != 800
+Trigger1 = Random <= var(59)*20
+Trigger2 = (playerID(var(12)),StateNo=[120,159])
+
+[State -3,最大]
+Type = ChangeState
+value = 3100
+TriggerAll=var(59) != 0
+triggerall = var(56) != 0
+triggerall = var(54) = 5
+triggerall = var(16) = 0
+triggerall = Life <= (LifeMax/4)
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [-20,60]
+TriggerAll=P2BodyDist Y >= -140
+TriggerAll=Ctrl||StateNo = 20
+triggerall = PalNo != 11
+Trigger1 = Random <= var(59)*30
+
+[State -3,なんだそりゃ裏]
+Type = ChangeState
+value = 1010
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [30,150]
+TriggerAll=P2BodyDist Y >= -90
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll = PrevStateNo != 1000
+TriggerAll=StateNo = [540,550]
+triggerall = var(2) = 0||PalNo >= 7
+Trigger1 = Random <= var(59)*45
+
+[State -3,対空構え裡門]
+Type = ChangeState
+value = 400
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[60,110]
+TriggerAll=P2BodyDist Y=[-200,0]
+TriggerAll=playerID(var(12)),Vel X = [1,3]
+TriggerAll=playerID(var(12)),Vel Y >= -7
+TriggerAll=playerID(var(12)),StateType=A
+TriggerAll=Ctrl||StateNo = 20
+Trigger1 = Random <= var(59)*40
+
+[State -3,対空構え猛虎]
+Type = ChangeState
+value = 410
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[70,130]
+TriggerAll=P2BodyDist Y=[-240,-90]
+TriggerAll=playerID(var(12)),Vel X = [0,2]
+TriggerAll=playerID(var(12)),Vel Y = [-1,2]
+TriggerAll=playerID(var(12)),StateType=A
+TriggerAll=Ctrl||StateNo = 20
+Trigger1 = Random <= var(59)*20
+
+[State -3,対空爆打]
+Type = ChangeState
+value = 230
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[20,70]
+TriggerAll=P2BodyDist Y>=-140
+TriggerAll=playerID(var(12)),Vel X <= 2
+TriggerAll=playerID(var(12)),Vel Y >= 2
+TriggerAll=playerID(var(12)),StateType=A
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100||StateNo = [540,550]
+Trigger1 = Random <= var(59)*20
+
+[State -3,対空猛虎]
+Type = ChangeState
+value = 210
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[60,100]
+TriggerAll=P2BodyDist Y>=-140
+TriggerAll=playerID(var(12)),Vel X <= 2
+TriggerAll=playerID(var(12)),Vel Y >= 2
+TriggerAll=playerID(var(12)),StateType=A
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100||StateNo = [540,550]
+Trigger1 = Random <= var(59)*20
+
+[State -3,対空昇]
+Type = ChangeState
+value = 1040
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [-10,60]
+TriggerAll=P2BodyDist Y = [-140,-40]
+TriggerAll=playerID(var(12)),Vel X = [-3,3]
+TriggerAll=playerID(var(12)),Vel Y = [-2,5]
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll=playerID(var(12)),StateType=A
+TriggerAll=Ctrl||StateNo = 20||StateNo = [540,550]
+Trigger1 = Random <= var(59)*20
+
+[State -3,ダッシュ震脚]
+Type = ChangeState
+value = 1030
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),StateType = S
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [120,140]
+TriggerAll=P2BodyDist Y >= -30
+TriggerAll=(playerID(var(12)),StateNo != [120,159])
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100
+triggerall = PrevStateNo != 1030
+Trigger1 = Random <= var(59)*12
+
+[State -3ダッシュ裡門]
+Type = ChangeState
+value = 200
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [110,120]
+TriggerAll=P2BodyDist Y >= -30
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll = PrevStateNo != 200
+TriggerAll=StateNo = 100
+Trigger1 = Random <= var(59)*12
+
+[State -3,ダッシュ盤割り]
+Type = ChangeState
+value = 240
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),StateType != A
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [120,140]
+TriggerAll=P2BodyDist Y >= -30
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll = PrevStateNo != 200
+TriggerAll=StateNo = 100
+Trigger1 = Random <= var(59)*12
+
+[State -3,ダッシュ爆打]
+Type = ChangeState
+value = 230
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [90,120]
+TriggerAll=P2BodyDist Y >= -30
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll = PrevStateNo != 200
+TriggerAll=StateNo = 100
+Trigger1 = Random <= var(59)*12
+
+[State -3,ダッシュ猛虎]
+Type = ChangeState
+value = 210
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [160,180]
+TriggerAll=P2BodyDist Y >= -30
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll = PrevStateNo != 200
+TriggerAll=StateNo = 100
+Trigger1 = Random <= var(59)*12
+
+[State -3爆打]
+Type = ChangeState
+value = 230
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType = I
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [30,60]
+TriggerAll=P2BodyDist Y >= -30
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll = PrevStateNo != 200
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100
+Trigger1 = Random <= var(59)*15
+
+[State -3盤割り]
+Type = ChangeState
+value = 240
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),StateType != A
+TriggerAll=playerID(var(12)),MoveType = I
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [50,80]
+TriggerAll=P2BodyDist Y >= -30
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll = PrevStateNo != 200
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100
+Trigger1 = Random <= var(59)*12
+
+[State -3裡門]
+Type = ChangeState
+value = 200
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType = I
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [10,50]
+TriggerAll=P2BodyDist Y >= -30
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll = PrevStateNo != 200
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100
+Trigger1 = Random <= var(59)*15
+
+[State -3,ダッシュ裏]
+Type = ChangeState
+value = 1010
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [140,170]
+TriggerAll=P2BodyDist Y >= -30
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll = PrevStateNo != 200
+TriggerAll=StateNo = 100
+triggerall = var(2) = 0||PalNo >= 7
+Trigger1 = Random <= var(59)*10
+
+[State -3,ダッシュ表]
+Type = ChangeState
+value = 1000
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [150,170]
+TriggerAll=P2BodyDist Y >= -60
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll = PrevStateNo != 200
+TriggerAll=StateNo = 100
+triggerall = var(2) = 0||PalNo >= 7
+Trigger1 = Random <= var(59)*10
+
+[State -3,裏]
+Type = ChangeState
+value = 1010
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType = I
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [30,130]
+TriggerAll=P2BodyDist Y >= -30
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll = PrevStateNo != 200
+TriggerAll=playerID(var(12)),Vel X = [-4,4]
+TriggerAll=playerID(var(12)),Vel Y = [-4,4]
+TriggerAll=Ctrl||StateNo = 20||StateNo = 105
+triggerall = var(2) = 0||PalNo >= 7
+Trigger1 = Random <= var(59)*5
+
+[State -3,表]
+Type = ChangeState
+value = 1000
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType = I
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [110,140]
+TriggerAll=P2BodyDist Y >= -60
+TriggerAll=playerID(var(12)),Vel X = [-4,4]
+TriggerAll=playerID(var(12)),Vel Y = [-4,4]
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll = PrevStateNo != 200
+TriggerAll=Ctrl||StateNo = 20||StateNo = 105
+triggerall = var(2) = 0||PalNo >= 7
+Trigger1 = Random <= var(59)*6
+
+[State -3,当身]
+Type = ChangeState
+value = 1060
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=P2BodyDist Y >= -160
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100||StateNo = [540,550]
+Triggerall = Random <= var(59)*5
+Trigger1=P2BodyDist X = [0,90]
+
+[State -3,枯木]
+Type = ChangeState
+value = 1050
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist Y >= -160
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100||StateNo = [540,550]
+TriggerAll=playerID(var(12)),Vel X = [-4,4]
+TriggerAll=playerID(var(12)),Vel Y = [-4,4]
+Triggerall = Random <= var(59)*8
+Trigger1=P2BodyDist X = [-130,-80]
+Trigger2=P2BodyDist X = [80,130]
+
+[State -3,構え猛虎]
+Type = ChangeState
+value = 410
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=Life >= 100
+TriggerAll=P2BodyDist X = [20,60]
+TriggerAll=P2BodyDist Y >= -60
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll=Ctrl||StateNo = 20
+Trigger1 = Random <= var(59)*8
+
+[State -3,構え裡門]
+Type = ChangeState
+value = 400
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=Life >= 100
+TriggerAll=P2BodyDist X = [30,60]
+TriggerAll=P2BodyDist Y >= -60
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll=Ctrl||StateNo = 20
+Trigger1 = Random <= var(59)*6
+
+[State -3,本気にさせたな]
+Type = ChangeState
+value = 3050
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+triggerall = power >= 3000
+triggerall = Life <= (LifeMax/2)
+triggerall = var(2) = 0
+triggerall = PalNo <= 6
+TriggerAll=P2BodyDist X = [150,250]
+TriggerAll=P2BodyDist Y >= -30
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=A
+TriggerAll = PrevStateNo != 200
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100||StateNo = [540,550]
+Trigger1 = Random <= var(59)*50
+
+[State -3,震脚]
+Type = ChangeState
+value = 1030
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),StateType = S
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [70,120]
+TriggerAll=P2BodyDist Y >= -30
+TriggerAll=(playerID(var(12)),StateNo != [120,159])
+TriggerAll=Ctrl||StateNo = 20
+triggerall = PrevStateNo != 1030
+Trigger1 = Random <= var(59)*4
+
+[State -3,浦島]
+Type = ChangeState
+value = 1070
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),StateType != A
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [200,420]
+TriggerAll=P2BodyDist Y >= -30
+TriggerAll=(playerID(var(12)),StateNo != [120,159])
+TriggerAll=Ctrl||StateNo = 20||StateNo = 100||StateNo = [540,550]
+Trigger1 = Random <= var(59)*6
+
+[State -3,なんだソリャ…]
+Type = ChangeState
+value = 540
+TriggerAll=var(59)
+triggerall = PalNo != 11
+TriggerAll=RoundState = 2
+TriggerAll=StateType != A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X = [130,360]
+TriggerAll=P2BodyDist Y >= -70
+TriggerAll=(playerID(var(12)),StateNo != [120,159])
+TriggerAll=Ctrl||StateNo = 20
+TriggerAll=Life >= (LifeMax/5)
+Triggerall = Random <= var(59)*50
+Trigger1 = playerID(var(12)),NumProj >= 1
+Trigger2 = playerID(var(12)),HitDefAttr=,AP
+Trigger2 = playerID(var(12)),NumHelper >= 1
+
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;空中移動 
+;Ctrl Random P2bodyDist X
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+;空中立ち回り技振り 
+;Ctrl Random playerID(var(12)),Movetype = I inguarddist P2bodyDist Y P2bodyDist X
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[State -3,掌打]
+Type = ChangeState
+value = 600
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType=A
+TriggerAll=playerID(var(12)),StateType = A
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[0,120]
+TriggerAll=(playerID(var(12)),StateNo != [120,159])
+TriggerAll=Ctrl
+Trigger1 = Random <= var(59)*80
+
+[State -3,掌打]
+Type = ChangeState
+value = 600
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType=A
+TriggerAll=playerID(var(12)),StateType != A
+TriggerAll=!InGuardDist
+TriggerAll=Vel Y = [-1,2]
+TriggerAll=P2BodyDist X=[0,80]
+TriggerAll=(playerID(var(12)),StateNo != [120,159])
+TriggerAll=Ctrl
+Trigger1 = Random <= var(59)*80
+
+[State -3,直突き]
+Type = ChangeState
+value = 610
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType=A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[70,240]
+TriggerAll=P2BodyDist Y=[0,70]
+TriggerAll=Vel Y = [-1,1]
+TriggerAll=playerID(var(12)),StateType=A
+TriggerAll=Ctrl
+Trigger1 = Random <= var(59)*50
+
+[State -3,直突き]
+Type = ChangeState
+value = 610
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType=A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=Vel Y = [-1,1]
+TriggerAll=P2BodyDist X=[0,140]
+TriggerAll=playerID(var(12)),StateType!=A
+TriggerAll=Ctrl
+Trigger1 = Random <= var(59)*50
+
+[State -3,落ち発勁]
+Type = ChangeState
+value = 640
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType=A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=P2BodyDist X=[130,170]
+TriggerAll=Vel Y <= 0
+TriggerAll=P2BodyDist Y=[0,70]
+TriggerAll=(playerID(var(12)),StateNo != [120,159])||playerID(var(12)),StateType=S
+TriggerAll=Ctrl
+Trigger1 = Random <= var(59)*10
+
+[State -3,双打]
+Type = ChangeState
+value = 630
+TriggerAll=var(59) != 0
+TriggerAll=RoundState = 2
+TriggerAll=StateType=A
+TriggerAll=playerID(var(12)),StateType != L
+TriggerAll=playerID(var(12)),MoveType != H
+TriggerAll=!InGuardDist
+TriggerAll=Vel Y <= -2
+TriggerAll=P2BodyDist X=[0,70]
+TriggerAll=P2BodyDist Y=[-20,70]
+TriggerAll=(playerID(var(12)),StateNo != [120,159])
+TriggerAll=Ctrl
+Trigger1 = Random <= var(59)*10
+
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
