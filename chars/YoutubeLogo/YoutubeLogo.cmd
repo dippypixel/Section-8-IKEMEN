@@ -27,7 +27,7 @@ time = 10
 
 ;-| Special Motions |------------------------------------------------------
 [Command]
-name = "Demuken"     ;Required (do not remove)
+name = "Fireball"     ;Required (do not remove)
 command = ~D, F, x
 time = 10
 
@@ -166,8 +166,8 @@ trigger3 = time > 10
 
 ;===========================================================================
 ;---------------------------------------------------------------------------
-;Demuken
-[State -1, Demuken]
+;Crashin
+[State -1, Crashin]
 type = ChangeState
 value = 1010
 triggerall = !var(59)>0
@@ -178,26 +178,38 @@ trigger2 = (stateno = 200 || stateno = 210 || stateno = 230 || stateno = 240 || 
 trigger2 = time > 2
 
 ;---------------------------------------------------------------------------
-;Demuken
-[State -1, Demuken]
+;Crashin AIR
+[State -1, Crashin AIR]
+type = ChangeState
+value = 1015
+triggerall = !var(59)>0
+triggerall = command = "Crashin"
+trigger1 = statetype = A
+trigger1 = ctrl
+trigger2 = (stateno = 600 || stateno = 610 || stateno = 630 || stateno = 640) && movecontact
+trigger2 = time > 2
+
+;---------------------------------------------------------------------------
+;Fireball
+[State -1, Fireball]
 type = ChangeState
 value = 1000
 triggerall = !var(59)>0
-triggerall = numhelper(1001)= 0 && numhelper(1002) = 0
-triggerall = command = "Demuken"
+triggerall = numhelper(1002)= 0 && numhelper(1003) = 0
+triggerall = command = "Fireball"
 trigger1 = statetype != A
 trigger1 = ctrl
 trigger2 = (stateno = 200 || stateno = 210 || stateno = 230 || stateno = 240 || stateno = 400 || stateno = 410 || stateno = 430 || stateno = 440) && movecontact
 trigger2 = time > 2
 
 ;---------------------------------------------------------------------------
-;Demuken AIR
-[State -1, Demuken AIR]
+;Fireball AIR
+[State -1, Fireball AIR]
 type = ChangeState
-value = 1005
+value = 1001
 triggerall = !var(59)>0
-triggerall = numhelper(1001)= 0 && numhelper(1002) = 0
-triggerall = command = "Demuken"
+triggerall = numhelper(1002)= 0 && numhelper(1003) = 0
+triggerall = command = "Fireball"
 trigger1 = statetype = A
 trigger1 = ctrl
 trigger2 = (stateno = 600 || stateno = 610 || stateno = 630 || stateno = 640) && movecontact
@@ -256,6 +268,28 @@ value = 105
 triggerall = !var(59)>0
 trigger1 = command = "BB"
 trigger1 = statetype = S
+trigger1 = ctrl
+
+;---------------------------------------------------------------------------
+;Airdash Back
+[State -1, Airdash Fwd]
+type = ChangeState
+value = 110
+triggerall = stateno != 110 && stateno != 115
+triggerall = !var(59)>0
+trigger1 = command = "FF"
+trigger1 = statetype = A
+trigger1 = ctrl
+
+;---------------------------------------------------------------------------
+;Airdash Back
+[State -1, Airdash Back]
+type = ChangeState
+value = 115
+triggerall = stateno != 110 && stateno != 115
+triggerall = !var(59)>0
+trigger1 = command = "BB"
+trigger1 = statetype = A
 trigger1 = ctrl
 
 ;===========================================================================
