@@ -1,4 +1,27 @@
+
+[Remap]
+x = y
+y = z
+z = a
+a = x
+b = b
+c = c
+s = s
+
 ;-| 超必殺技 |--------------------------------------------------------
+[Command]
+name = "プッツンムダ"
+command = ~D, DB, B, a+x
+time = 30
+[Command]
+name = "プッツンムダ"
+command = ~D, DB, B, x+y
+time = 30
+[Command]
+name = "プッツンムダ"
+command = ~D, DB, B, y+a
+time = 30
+
 [Command]
 name = "チェックメイトだッ！"
 command = ~D, DF, F, a+x
@@ -10,19 +33,6 @@ time = 30
 [Command]
 name = "チェックメイトだッ！"
 command = ~D, DF, F, y+a
-time = 30
-
-[Command]
-name = "無駄無駄無駄無駄"
-command = ~D, DB, B, a+x
-time = 30
-[Command]
-name = "無駄無駄無駄無駄"
-command = ~D, DB, B, x+y
-time = 30
-[Command]
-name = "無駄無駄無駄無駄"
-command = ~D, DB, B, y+a
 time = 30
 
 [Command]
@@ -40,39 +50,59 @@ time = 55
 
 [Command]
 name = "時は動き出す" 
-command = a+b+c
+command = a+x+y
 time = 10
+
+[Command]
+name = "ローラーだッ！"
+command =~D, DF, F, D, DF, F, b
+time = 30
 
 ;-| 必殺技 |------------------------------------------------------
 [Command]
-name = "弱無駄無駄"
+name = "弱ここだッ！"
+command = ~F, D, DF, a
+time = 20
+
+[Command]
+name = "中ここだッ！"
+command = ~F, D, DF, x
+time = 20
+
+[Command]
+name = "強ここだッ！"
+command = ~F, D, DF, y
+time = 20
+
+[Command]
+name = "弱ムダムダ"
 command = ~D, DF, F, a
-time = 30
+time = 12
 
 [Command]
-name = "中無駄無駄"
+name = "中ムダムダ"
 command = ~D, DF, F, x
-time = 30
+time = 12
 
 [Command]
-name = "強無駄無駄"
+name = "強ムダムダ"
 command = ~D, DF, F, y
-time = 30
+time = 12
 
 [Command]
-name = "弱無駄ァーッ！"
+name = "弱ムダァッ！"
 command = ~D, DB, B, a
-time = 30
+time = 12
 
 [Command]
-name = "中無駄ァーッ！"
+name = "中ムダァッ！"
 command = ~D, DB, B, x
-time = 30
+time = 12
 
 [Command]
-name = "強無駄ァーッ！"
+name = "強ムダァッ！"
 command = ~D, DB, B, y
-time = 30
+time = 12
 
 ;-| ２回押し技 |-----------------------------------------------------------
 [Command]
@@ -108,10 +138,10 @@ name = "a"
 command = a
 time = 1
 
-;[Command]
-;name = "b"
-;command = b
-;time = 1
+[Command]
+name = "b"
+command = b
+time = 1
 
 ;[Command]
 ;name = "c"
@@ -159,519 +189,91 @@ name = "holddown"
 command = /$D
 time = 1
 
-;-| AI |------------------------------------------------------
-[Command]
+----------------------------------;AI
+[command]
 name = "CPU1"
-command = U, D, F
+command = D, D, D, D, D, D, D, D
 time = 1
-
-[Command]
+[command]
 name = "CPU2"
-command = U, B, F
+command = D, D, D, D, D, D, D, F
 time = 1
-
-[Command]
+[command]
 name = "CPU3"
-command = U, D, D
+command = D, D, D, D, D, D, D, B
 time = 1
-
-[Command]
+[command]
 name = "CPU4"
-command = F, B, U
+command = D, D, D, D, D, D, D, U
 time = 1
-
-[Command]
+[command]
 name = "CPU5"
-command = U, F, U, B
+command = F, F, F, F, F, F, F, F
 time = 1
-
-[Command]
+[command]
 name = "CPU6"
-command = U, D, B
+command = F, F, F, F, F, F, F, D
 time = 1
-
-[Command]
+[command]
 name = "CPU7"
-command = F, F, B
+command = F, F, F, F, F, F, F, B
 time = 1
-
-[Command]
+[command]
 name = "CPU8"
-command = U, D, U
+command = F, F, F, F, F, F, F, U
 time = 1
-
-[Command]
+[command]
 name = "CPU9"
-command = F, B, B
+command = B, B, B, B, B, B, B, B
 time = 1
-
-[Command]
+[command]
 name = "CPU10"
-command = F, F, B, B
+command = B, B, B, B, B, B, B, F
 time = 1
-
-[Command]
+[command]
 name = "CPU11"
-command = U, U, F
+command = B, B, B, B, B, B, B, D
 time = 1
-
-[Command]
+[command]
 name = "CPU12"
-command = U, B, B
+command = B, B, B, B, B, B, B, U
 time = 1
-
-[Command]
+[command]
 name = "CPU13"
-command = U, B, F, F
+command = U, U, U, U, U, U, U, U
 time = 1
-
-[Command]
+[command]
 name = "CPU14"
-command = U, F, B, U
+command = U, U, U, U, U, U, U, D
 time = 1
-
-[Command]
+[command]
 name = "CPU15"
-command = U, B, F, U
+command = U, U, U, U, U, U, U, F
 time = 1
-
-[Command]
+[command]
 name = "CPU16"
-command = U, B, B, B
+command = U, U, U, U, U, U, U, B
 time = 1
-
-[Command]
+[command]
 name = "CPU17"
-command = U, D, B, F
+command = a, a, a, a, a, a, a, a
 time = 1
-
-[Command]
+[command]
 name = "CPU18"
-command = U, D, B, D
+command = a, a, a, a, a, a, a, b
 time = 1
-
-[Command]
+[command]
 name = "CPU19"
-command = U, D, F, U
+command = a, a, a, a, a, a, a, c
 time = 1
-
-[Command]
+[command]
 name = "CPU20"
-command = U, D, U, B
-time = 1
-
-[Command]
-name = "CPU21"
-command = U, D, F, F
-time = 1
-
-[Command]
-name = "CPU22"
-command = F, F, F, F
-time = 1
-
-[Command]
-name = "CPU23"
-command = U, U, U, D
-time = 1
-
-[Command]
-name = "CPU24"
-command = B, B, B
-time = 1
-
-[Command]
-name = "CPU25"
-command = D, D, D, D
-time = 1
-
-[Command]
-name = "CPU26"
-command = D, D, D
-time = 1
-
-[Command]
-name = "CPU27"
-command = F, F, F
-time = 1
-
-[Command]
-name = "CPU28"
-command = U, U, U
-time = 1
-
-[Command]
-name = "CPU29"
-command = U, U, B, B
-time = 1
-
-[Command]
-name = "CPU30"
-command = D, D, F, F
-time = 1
-
-[Command]
-name = "CPU31"
-command = U, D, F, U, D
-time = 1
-
-[Command]
-name = "CPU32"
-command = U, B, F, U, D
-time = 1
-
-[Command]
-name = "CPU33"
-command = U, D, D, U, D
-time = 1
-
-[Command]
-name = "CPU34"
-command = F, B, U, U, D
-time = 1
-
-[Command]
-name = "CPU35"
-command = U, F, U, B, U, D
-time = 1
-
-[Command]
-name = "CPU36"
-command = U, D, B, U, D
-time = 1
-
-[Command]
-name = "CPU37"
-command = F, F, B, U, D
-time = 1
-
-[Command]
-name = "CPU38"
-command = U, D, U, U, D
-time = 1
-
-[Command]
-name = "CPU39"
-command = F, B, B, U, D
-time = 1
-
-[Command]
-name = "CPU40"
-command = F, F, B, B, U, D
-time = 1
-
-[Command]
-name = "CPU41"
-command = U, U, F, U, D
-time = 1
-
-[Command]
-name = "CPU42"
-command = U, B, B, U, D
-time = 1
-
-[Command]
-name = "CPU43"
-command = U, B, F, F, U, D
-time = 1
-
-[Command]
-name = "CPU44"
-command = U, F, B, U, U, D
-time = 1
-
-[Command]
-name = "CPU45"
-command = U, B, F, U, U, D
-time = 1
-
-[Command]
-name = "CPU46"
-command = U, B, B, B, U, D
-time = 1
-
-[Command]
-name = "CPU47"
-command = U, D, B, F, U, D
-time = 1
-
-[Command]
-name = "CPU48"
-command = U, D, B, D, U, D
-time = 1
-
-[Command]
-name = "CPU49"
-command = U, D, F, U, U, D
-time = 1
-
-[Command]
-name = "CPU50"
-command = U, D, U, B, U, D
+command = x, x, x, x, x, x, x, x
 time = 1
 
 ; 下の記述↓は絶対に消さないでください。
 [Statedef -1]
-;===========================================================================
-;AI用
 
-;AI
-[State -1, AI]
-type = VarSet
-triggerall = var(59) != 1
-triggerall = RoundState != 3
-trigger1  = command = "CPU1"
-trigger2  = command = "CPU2"
-trigger3  = command = "CPU3"
-trigger4  = command = "CPU4"
-trigger5  = command = "CPU5"
-trigger6  = command = "CPU6"
-trigger7  = command = "CPU7"
-trigger8  = command = "CPU8"
-trigger9  = command = "CPU9"
-trigger10  = command = "CPU10"
-trigger11  = command = "CPU11"
-trigger12  = command = "CPU12"
-trigger13  = command = "CPU13"
-trigger14  = command = "CPU14"
-trigger15  = command = "CPU15"
-trigger16  = command = "CPU16"
-trigger17  = command = "CPU17"
-trigger18  = command = "CPU18"
-trigger19  = command = "CPU19"
-trigger20  = command = "CPU20"
-trigger21  = command = "CPU21"
-trigger22  = command = "CPU22"
-trigger23  = command = "CPU23"
-trigger24  = command = "CPU24"
-trigger25  = command = "CPU25"
-trigger26  = command = "CPU26"
-trigger27  = command = "CPU27"
-trigger28  = command = "CPU28"
-trigger29  = command = "CPU29"
-trigger30  = command = "CPU30"
-trigger31  = command = "CPU31"
-trigger32  = command = "CPU32"
-trigger33  = command = "CPU33"
-trigger34  = command = "CPU34"
-trigger35  = command = "CPU35"
-trigger36  = command = "CPU36"
-trigger37  = command = "CPU37"
-trigger38  = command = "CPU38"
-trigger39  = command = "CPU39"
-trigger40  = command = "CPU40"
-trigger41  = command = "CPU41"
-trigger42  = command = "CPU42"
-trigger43  = command = "CPU43"
-trigger44  = command = "CPU44"
-trigger45  = command = "CPU45"
-trigger46  = command = "CPU46"
-trigger47  = command = "CPU47"
-trigger48  = command = "CPU48"
-trigger49  = command = "CPU49"
-trigger50  = command = "CPU50"
-var(59) = 1
-
-;===========================================================================
-;チェックメイトだッ！
-;def-3.cns　へ移行
-;---------------------------------------------------------------------------
-;無駄無駄無駄無駄
-[State -1]
-type = ChangeState
-value = ifelse((statetype = S || statetype = C),2200,2210)
-triggerall = var(59)
-triggerall = roundstate = 2
-triggerall = Enemynear,statetype != L
-triggerall = power >= 1000
-trigger1 = prevstateno = 1320
-trigger1 = p2stateno != [150,159]
-trigger1 = Enemynear,Movetype = H
-trigger1 = Enemynear,statetype != A
-trigger1 = Random >= 550
-;---------------------------------------------------------------------------
-;ザ・ワールド！ 時よ止まれ！
-[State -1]
-type = ChangeState
-value = 3000+var(8)
-triggerall = var(59)
-triggerall = roundstate = 2
-triggerall = power >= 5000
-triggerall = var(5) = 0
-triggerall = statetype != A
-trigger1 = ctrl
-trigger1 = !inguarddist
-trigger1 = p2bodydist X >= 180
-trigger1 = Random <= 80 || (Random <= 200 && p2statetype = L)
-;===========================================================================
-;===========================================================================
-;立ち弱パンチ
-[State -1, Stand Light Punch]
-type = ChangeState
-value = 200
-triggerall = var(59) && var(5) = 0
-triggerall = roundstate = 2
-triggerall = Enemynear,statetype != L
-triggerall = statetype = S || statetype = C
-triggerall = prevstateno != 1320
-trigger1 = ctrl || stateno = 100 || stateno = 105
-trigger1 = Enemynear,Vel X >= 0
-trigger1 = p2bodydist X = [-5,58]
-trigger1 = p2bodydist Y >= -50
-trigger1 = Random = [100,400]
-trigger2 = (stateno = 200) && movecontact = 1
-trigger2 = p2bodydist X <= 43
-trigger3 = ctrl || stateno = 100 || stateno = 105
-trigger3 = prevstateno = 2000
-trigger3 = p2bodydist X <= 40
-;---------------------------------------------------------------------------
-;立ち強パンチ
-[State -1, Stand Strong Punch]
-type = ChangeState
-value = 210
-triggerall = var(59) && var(5) = 0
-triggerall = roundstate = 2
-triggerall = Enemynear,statetype != L
-triggerall = statetype = S || statetype = C
-triggerall = prevstateno != 1320
-trigger1 = (stateno = 200) && movecontact = 1
-;trigger1 = ctrl
-;trigger1 = p2bodydist X <= 85
-;trigger1 = p2bodydist Y >= -50
-;trigger1 = Random = [400,450]
-;---------------------------------------------------------------------------
-;立ち強キック
-[State -1, Stand Light Kick]
-type = ChangeState
-value = 220
-triggerall = var(59) && var(5) = 0
-triggerall = roundstate = 2
-triggerall = Enemynear,statetype != L && Enemynear,statetype != C
-triggerall = statetype = S || statetype = C
-triggerall = prevstateno != 1320 && prevstateno != 1020
-triggerall = EnemyNear,Const(size.head.pos.y) <= -50
-trigger1 = ctrl || stateno = 100 || stateno = 105
-trigger1 = p2bodydist X <= 110
-trigger1 = p2bodydist Y >= -60
-trigger1 = Random = [480,500]
-trigger2 = (stateno = 200) || (stateno = 210) || (stateno = 310)
-trigger2 = movecontact = 1
-;---------------------------------------------------------------------------
-;しゃがみ弱キック
-[State -1, Crouching Light Punch]
-type = ChangeState
-value = 300
-triggerall = var(59) && var(5) = 0
-triggerall = roundstate = 2
-triggerall = Enemynear,statetype = S
-triggerall = statetype = S || statetype = C
-triggerall = p2bodydist X <= 65
-trigger1 = ctrl || stateno = 100 || stateno = 105
-trigger1 = prevstateno != 1320
-trigger1 = Enemynear,Movetype != A
-trigger1 = (Enemynear,Statetype = S && Random = [600,820]) || Random = [600,700]
-trigger2 = stateno = 1320 && AnimTime = 0
-trigger2 = EnemyNear,StateNo = [120,159]
-trigger2 = Enemynear,Statetype = S
-trigger2 = Random >= 800
-
-;---------------------------------------------------------------------------
-;しゃがみ中パンチ
-[State -1, Crouching Strong Punch]
-type = ChangeState
-value = 310
-triggerall = var(59) && var(5) = 0
-triggerall = roundstate = 2
-triggerall = Enemynear,statetype != L
-triggerall = statetype = S || statetype = C
-trigger1 = ctrl || stateno = 100 || stateno = 105
-trigger1 = p2bodydist X = [59,82]
-trigger1 = Random = [700,750]
-trigger2 = (stateno = 300) && movecontact = 1
-;---------------------------------------------------------------------------
-;しゃがみ強パンチ
-[State -1, Crouching Light Kick]
-type = ChangeState
-value = 320
-triggerall = var(59) && var(5) = 0
-triggerall = roundstate = 2
-triggerall = Enemynear,statetype != L
-triggerall = statetype = S || statetype = C
-trigger1 = stateno = 1020 && movehit && AnimTime = 0
-;---------------------------------------------------------------------------
-;空中強パンチ
-[State -1, Jump Light Kick]
-type = ChangeState
-value = 420
-triggerall = var(59) && var(5) = 0
-triggerall = roundstate = 2
-triggerall = Enemynear,statetype != L
-trigger1 = statetype = A
-trigger1 = ctrl
-trigger1 = p2bodydist X = [-2,50]
-trigger1 = p2bodydist Y = [20,50]
-trigger2 = (stateno = 400) || (stateno = 410)
-trigger2 = movecontact
-;---------------------------------------------------------------------------
-;投げ
-[State -1, Kung Fu Throw]
-type = ChangeState
-value = 800
-triggerall = var(5) = 0
-triggerall = var(59)
-triggerall = roundstate = 2
-triggerall = Enemynear,statetype != L
-triggerall = statetype = S || statetype = C
-triggerall = ctrl
-triggerall = stateno != 100
-trigger1 = p2bodydist X < 5
-trigger1 = (p2statetype = S) || (p2statetype = C)
-trigger1 = p2movetype != H
-trigger1 = Random <= 120
-trigger2 = p2bodydist X < 5
-trigger2 = (p2statetype = S) || (p2statetype = C)
-trigger2 = EnemyNear,StateNo = [120,159]
-trigger2 = Random <= 200
-trigger3 = prevstateno = 1320
-trigger3 = EnemyNear,StateNo = [120,159]
-trigger3 = (EnemyNear,Statetype = S && Random <= 20) || (EnemyNear,Statetype = C && Random <= 200)
-;===========================================================================
-;強無駄無駄
-[State -1]
-type = ChangeState
-value = ifelse((statetype = S || statetype = C),1020,1120)
-triggerall = var(59) && var(5) = 0
-triggerall = roundstate = 2
-triggerall = Enemynear,statetype != L
-trigger1 = ctrl
-trigger1 = statetype = S || statetype = A
-trigger1 = Random <= 20
-trigger2 = ctrl
-trigger2 = stateno = 1320 && AnimTime = 0
-trigger2 = Enemynear,Movetype = H
-trigger3 = Statetype = A
-trigger3 = Enemynear,Statetype != A
-trigger3 = p2bodydist X <= 120 && Random <= 200
-;trigger2 = stateno = 210 || stateno = 420 || (stateno = 220 && p2bodydist X <= 65)
-;trigger2 = movecontact = 1
-;trigger2 = Random <= 500
-;---------------------------------------------------------------------------
-;強無駄ァーッ！
-[State -1]
-type = ChangeState
-value = 1320
-triggerall = var(59) && var(5) = 0
-triggerall = roundstate = 2
-triggerall = Enemynear,statetype != L
-triggerall = statetype != A
-trigger1 = ctrl
-trigger1 = p2bodydist X = [100,130]
-trigger1 = Random <= 80
-trigger2 = stateno = 220 || stateno = 210 || stateno = 310
-trigger2 = movecontact = 1
-trigger3 = ctrl
-trigger3 = prevstateno = 2000
-trigger3 = p2bodydist X <= 120
 ;===========================================================================
 ;チェックメイトだッ！
 [State -1]
@@ -688,11 +290,11 @@ trigger4 = (stateno = 400) || (stateno = 410) || (stateno = 420)
 trigger4 = movecontact = 1
 
 ;---------------------------------------------------------------------------
-;無駄無駄無駄無駄
+;プッツンムダ
 [State -1]
 type = ChangeState
 value = ifelse((statetype = S || statetype = C),2200,2210)
-triggerall = command = "無駄無駄無駄無駄"
+triggerall = command = "プッツンムダ"
 triggerall = power >= 1000
 trigger1 = ctrl
 trigger2 = (stateno = 200) || (stateno = 210) || (stateno = 220)
@@ -720,13 +322,24 @@ trigger4 = (stateno = 400) || (stateno = 410) || (stateno = 420)
 trigger4 = movecontact = 1 || movecontact = 0
 
 ;---------------------------------------------------------------------------
-;---------------------------------------------------------------------------
+;ローラーだッ！
+[State -1]
+type = ChangeState
+value = 3100
+triggerall = numhelper(3015) = 0
+triggerall = numhelper(3000) = 0
+triggerall = numhelper(3100) = 0
+triggerall = command = "ローラーだッ！"
+triggerall = power >= 1000
+trigger1 = statetype = S
+trigger1 = ctrl
+
 ;===========================================================================
-;弱無駄無駄
+;弱ムダムダ
 [State -1]
 type = ChangeState
 value = ifelse((statetype = S || statetype = C),1000,1100)
-triggerall = command = "弱無駄無駄"
+triggerall = command = "弱ムダムダ"
 trigger1 = ctrl
 trigger1 = statetype = S || statetype = A
 trigger2 = (stateno = 200) || (stateno = 210) || (stateno = 220)
@@ -737,11 +350,11 @@ trigger4 = (stateno = 400) || (stateno = 410) || (stateno = 420)
 trigger4 = movecontact = 1
 
 ;---------------------------------------------------------------------------
-;中無駄無駄
+;中ムダムダ
 [State -1]
 type = ChangeState
 value = ifelse((statetype = S || statetype = C),1010,1110)
-triggerall = command = "中無駄無駄"
+triggerall = command = "中ムダムダ"
 trigger1 = ctrl
 trigger1 = statetype = S || statetype = A
 trigger2 = (stateno = 200) || (stateno = 210) || (stateno = 220)
@@ -752,11 +365,11 @@ trigger4 = (stateno = 400) || (stateno = 410) || (stateno = 420)
 trigger4 = movecontact = 1
 
 ;---------------------------------------------------------------------------
-;強無駄無駄
+;強ムダムダ
 [State -1]
 type = ChangeState
 value = ifelse((statetype = S || statetype = C),1020,1120)
-triggerall = command = "強無駄無駄"
+triggerall = command = "強ムダムダ"
 trigger1 = ctrl
 trigger1 = statetype = S || statetype = A
 trigger2 = (stateno = 200) || (stateno = 210) || (stateno = 220)
@@ -767,11 +380,11 @@ trigger4 = (stateno = 400) || (stateno = 410) || (stateno = 420)
 trigger4 = movecontact = 1
 
 ;---------------------------------------------------------------------------
-;弱無駄ァーッ！
+;弱ムダァッ！
 [State -1]
 type = ChangeState
 value = 1300
-triggerall = command = "弱無駄ァーッ！"
+triggerall = command = "弱ムダァッ！"
 triggerall = statetype != A
 trigger1 = ctrl
 trigger2 = (stateno = 200) || (stateno = 210) || (stateno = 220)
@@ -781,11 +394,11 @@ trigger3 = movecontact = 1
 trigger4 = (stateno = 400) || (stateno = 410) || (stateno = 420)
 trigger4 = movecontact = 1
 ;---------------------------------------------------------------------------
-;中無駄ァーッ！
+;中ムダァッ！！
 [State -1]
 type = ChangeState
 value = 1310
-triggerall = command = "中無駄ァーッ！"
+triggerall = command = "中ムダァッ！"
 triggerall = statetype != A
 trigger1 = ctrl
 trigger2 = (stateno = 200) || (stateno = 210) || (stateno = 220)
@@ -795,11 +408,11 @@ trigger3 = movecontact = 1
 trigger4 = (stateno = 400) || (stateno = 410) || (stateno = 420)
 trigger4 = movecontact = 1
 ;---------------------------------------------------------------------------
-;強無駄ァーッ！
+;強ムダァッ！
 [State -1]
 type = ChangeState
 value = 1320
-triggerall = command = "強無駄ァーッ！"
+triggerall = command = "強ムダァッ！"
 triggerall = statetype != A
 trigger1 = ctrl
 trigger2 = (stateno = 200) || (stateno = 210) || (stateno = 220)
@@ -808,13 +421,39 @@ trigger3 = (stateno = 300) || (stateno = 310) || (stateno = 320)
 trigger3 = movecontact = 1
 trigger4 = (stateno = 400) || (stateno = 410) || (stateno = 420)
 trigger4 = movecontact = 1
+
 ;---------------------------------------------------------------------------
+;弱ここだッ！
+[State -1]
+type = ChangeState
+value = 1400
+triggerall = command = "弱ここだッ！"
+trigger1 = statetype != A
+trigger1 = ctrl = 1
+
+;---------------------------------------------------------------------------
+;中ここだッ！
+[State -1]
+type = ChangeState
+value = 1410
+triggerall = command = "中ここだッ！"
+trigger1 = statetype != A
+trigger1 = ctrl = 1
+
+;---------------------------------------------------------------------------
+;強ここだッ！
+[State -1]
+type = ChangeState
+value = 1420
+triggerall = command = "強ここだッ！"
+trigger1 = statetype != A
+trigger1 = ctrl = 1
+
 ;---------------------------------------------------------------------------
 ;ダッシュ
 [State -1, Run Fwd]
 type = ChangeState
 value = 100
-triggerall = !var(59)
 trigger1 = command = "FF"
 trigger1 = statetype = S
 trigger1 = ctrl
@@ -824,7 +463,6 @@ trigger1 = ctrl
 [State -1, Run Back]
 type = ChangeState
 value = 105
-triggerall = !var(59)
 trigger1 = command = "BB"
 trigger1 = statetype = S
 trigger1 = ctrl
@@ -847,7 +485,6 @@ trigger2 = command = "holdback"
 trigger2 = p2bodydist X < 5
 trigger2 = (p2statetype = S) || (p2statetype = C)
 trigger2 = p2movetype != H
-
 
 ;===========================================================================
 ;---------------------------------------------------------------------------
@@ -949,24 +586,20 @@ trigger2 = (stateno = 400) || (stateno = 410)
 trigger2 = movecontact
 
 ;---------------------------------------------------------------------------
-;---------------------------------------------------------------------------
 ;挑発
 [State -1, Taunt]
 type = ChangeState
 value = 195
-triggerall = !var(59)
 triggerall = command = "start"
 trigger1 = statetype != A
 trigger1 = ctrl
 
 ;---------------------------------------------------------------------------
-;---------------------------------------------------------------------------
-[Statedef -2]　　　　　　　　　　　　；この記述より下に書いてください、無い場合は追加してください
-[State -2]
-Type = DisplayToClipboard
-Trigger1 = 1
-Text = "AI:%d, Pos X:%f, Pos Y:%f"
-Params = Var(59), P2BodyDist X, P2BodyDist Y
-IgnoreHitPause = 1
-SuperMoveTime = 9999
-PauseMoveTime = 9999
+;回り込み
+[State -1, Taunt]
+type = ChangeState
+value = 900
+triggerall = command = "b"
+trigger1 = statetype != A
+trigger1 = ctrl
+
