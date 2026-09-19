@@ -532,7 +532,10 @@ sprpriority = 0
 
 [State FootSteps]
 type = PlaySnd
+trigger1 = anim !=22
 trigger1 = AnimElem=5||AnimElem=10
+trigger2 = anim =22
+trigger2 = AnimElem=12
 value = S20,0+AnimElem=9
 
 [State 20, 1]
@@ -545,12 +548,26 @@ type = VelSet
 trigger1 = command = "holdback"
 x = const(velocity.walk.back.x)
 
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = anim = 22
+flag = NoMusic
+
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = anim = 22
+value = S22,0+random%3
+persistent = 0
+channel = 8
+pan = 1
+
 [State 20, 3]
 type = ChangeAnim
 triggerall = vel x > 0
-trigger1 = Anim != 20 && Anim != 5
+trigger1 = Anim != 20 && Anim != 5 && anim != 22
 trigger2 = Anim = 5 && AnimTime = 0
-value = 20
+value = ifelse(random>25,20,22) ;he does this
 
 [State 20, 4]
 type = ChangeAnim

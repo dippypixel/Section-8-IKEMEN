@@ -5801,6 +5801,11 @@ ignorehitpause=1
 
 [Statedef -2]
 
+[State 0, STOP walk SOUND]
+type = StopSnd
+trigger1 = anim != 22
+channel = 8
+
 [State Blafgh]
 type = VarSet
 trigger1 = 1
