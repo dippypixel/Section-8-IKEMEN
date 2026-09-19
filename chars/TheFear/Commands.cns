@@ -1,0 +1,341 @@
+;The Commands.
+;This is how you tell your character to move, based on what inputs the player applies.
+;This is also where you'll be putting your AI.
+
+[Remap] ;These are all mandatory. Do not remove any of them!
+x = x
+y = y
+z = z
+a = a
+b = b
+c = c
+s = s
+
+[Defaults]
+command.time = 15
+command.buffer.time = 1
+
+;-| Super Motions |---------------------------------------------------------
+
+[Command]
+name = "Japanese Fucking Weapon"
+command = ~D, DB, B, a
+
+[Command]
+name = "Cleaning Blaster"
+command = ~D, DF, F, a
+
+[Command]
+name = "Extreme Fireworks"
+command = ~F, D, DF, a
+
+;======================================;
+;         DASHING AND RECOVERY         ;
+;======================================;
+
+[Command]
+name = "FF" ;Required (do not remove)
+command = F, F
+time = 10
+
+[Command]
+name = "BB" ;Required (do not remove)
+command = B, B
+time = 10
+
+[Command]
+name = "recovery" ;Required (do not remove)
+command = x+y
+time = 1
+
+;======================================;
+;          DIRECTIONAL INPUTS          ;
+;======================================;
+
+[Command]
+name = "holdfwd" ;Required (do not remove)
+command = /$F
+time = 1
+
+[Command]
+name = "holdback" ;Required (do not remove)
+command = /$B
+time = 1
+
+[Command]
+name = "holdup" ;Required (do not remove)
+command = /$U
+time = 1
+
+[Command]
+name = "holddown" ;Required (do not remove)
+command = /$D
+time = 1
+
+;======================================;
+;         BUTTON INPUTS                ;
+;======================================;
+
+[Command]
+name = "x"
+command = x
+time = 1
+
+[Command]
+name = "y"
+command = y
+time = 1
+
+[Command]
+name = "z"
+command = z
+time = 1
+
+[Command]
+name = "a"
+command = a
+time = 1
+
+[Command]
+name = "b"
+command = b
+time = 1
+
+[Command]
+name = "c"
+command = c
+time = 1
+
+[Command]
+name = "s"
+command = s
+time = 1
+
+;======================================;
+
+;StateDef -1
+;Determines what player performed inputs result in.
+;Contains the AI.
+;Order any State Controllers added into -1 as follows.
+;Top to Bottom, Most Important to Least Important.
+
+[StateDef -1]
+
+[State -1, Extreme Fireworks]
+type = ChangeState
+value = 3200
+triggerall = !var(59)
+triggerall = command = "Extreme Fireworks"
+triggerall = power >= 2000
+trigger1 = statetype != A
+trigger1 = ctrl
+trigger2 = (stateno = [200,220]) || (stateno = [400,420])
+trigger2 = movecontact
+trigger3 = (stateno = [1100,1102])
+trigger3 = movecontact
+trigger4 = stateno = 1000 && numhelper(1001)
+trigger4 = helper(1001),var(10)
+trigger5 = stateno = 1200 && numhelper(1202)
+trigger5 = helper(1202),var(10)
+
+[State -1, Cleaning Blaster]
+type = ChangeState
+value = 3100
+triggerall = !var(59)
+triggerall = command = "Cleaning Blaster"
+triggerall = power >= 1000
+trigger1 = statetype != A
+trigger1 = ctrl
+trigger2 = (stateno = [200,220]) || (stateno = [400,420])
+trigger2 = movecontact
+trigger3 = (stateno = [1100,1102])
+trigger3 = movecontact
+trigger4 = stateno = 1000 && numhelper(1001)
+trigger4 = helper(1001),var(10)
+trigger5 = stateno = 1200 && numhelper(1202)
+trigger5 = helper(1202),var(10)
+
+[State -1, Japanese Fucking Weapon]
+type = ChangeState
+value = 3000
+triggerall = !var(59)
+triggerall = command = "Japanese Fucking Weapon"
+triggerall = power >= 1000
+trigger1 = statetype != A
+trigger1 = ctrl
+trigger2 = (stateno = [200,220]) || (stateno = [400,420])
+trigger2 = movecontact
+trigger3 = (stateno = [1100,1102])
+trigger3 = movecontact
+trigger4 = stateno = 1000 && numhelper(1001)
+trigger4 = helper(1001),var(10)
+trigger5 = stateno = 1200 && numhelper(1202)
+trigger5 = helper(1202),var(10)
+
+[State -1, Lagrange Point]
+type = ChangeState
+value = 1200
+triggerall = !var(59)
+triggerall = command = "holddown" && command = "a"
+triggerall = statetype != A
+trigger1 = ctrl
+trigger2 = (stateno = [200,220]) || (stateno = [400,420])
+trigger2 = movecontact
+
+[State -1, Violence Combination]
+type = ChangeState
+value = 1100
+triggerall = !var(59)
+triggerall = command = "holdfwd" && command = "a" || command = "holdback" && command = "a"
+trigger1 = statetype != A
+trigger1 = ctrl
+trigger2 = (stateno = [200,220]) || (stateno = [400,420])
+trigger2 = movecontact
+
+[State -1, Playing with Fire]
+type = ChangeState
+value = 1000
+triggerall = !var(59)
+triggerall = command = "a"
+trigger1 = statetype != A
+trigger1 = ctrl
+trigger2 = (stateno = [200,220]) || (stateno = [400,420])
+trigger2 = movecontact
+
+[State -1, Throw]
+type = ChangeState
+value = 800
+triggerall = !var(59)
+triggerall = command = "holdfwd" || command = "holdback"
+triggerall = command = "b"
+triggerall = statetype != A
+triggerall = stateno != 100
+trigger1 = ctrl
+trigger1 = p2bodydist X < 10
+trigger1 = p2statetype != A && p2movetype != H
+
+[State -1, Air Hard Caress]
+type = ChangeState
+value = 630
+triggerall = !var(59)
+triggerall = command = "holdfwd" && command = "y"
+trigger1 = statetype = A
+trigger1 = ctrl
+trigger2 = (stateno = [600,620])
+trigger2 = movecontact
+
+[State -1, Air Heavy Kick]
+type = ChangeState
+value = 620
+triggerall = !var(59)
+triggerall = command = "b"
+trigger1 = statetype = A
+trigger1 = ctrl
+trigger2 = stateno = 600 || stateno = 610
+trigger2 = movecontact
+
+[State -1, Air Medium Kick]
+type = ChangeState
+value = 610
+triggerall = !var(59)
+triggerall = command = "y"
+trigger1 = statetype = A
+trigger1 = ctrl
+trigger2 = stateno = 600
+trigger2 = movecontact
+
+[State -1, Air Light Punch]
+type = ChangeState
+value = 600
+triggerall = !var(59)
+triggerall = command = "x"
+trigger1 = statetype = A
+trigger1 = ctrl
+trigger2 = stateno = 600
+trigger2 = movecontact
+
+[State -1, Crouch Heavy Punch]
+type = ChangeState
+value = 420
+triggerall = !var(59)
+triggerall = command = "b"
+triggerall = statetype != A && command = "holddown"
+trigger1 = ctrl
+trigger2 = (stateno = [200,220]) || stateno = 400 || stateno = 410
+trigger2 = movecontact
+
+[State -1, Crouch Medium Kick]
+type = ChangeState
+value = 410
+triggerall = !var(59)
+triggerall = command = "y"
+triggerall = statetype != A && command = "holddown"
+trigger1 = ctrl
+trigger2 = stateno = 200 || stateno = 400
+trigger2 = movecontact
+
+[State -1, Crouch Light Punch]
+type = ChangeState
+value = 400
+triggerall = !var(59)
+triggerall = command = "x"
+triggerall = statetype != A && command = "holddown"
+trigger1 = ctrl
+trigger2 = stateno = 200 || stateno = 400
+trigger2 = movecontact
+
+[State -1, Hard Caress]
+type = ChangeState
+value = 230
+triggerall = !var(59)
+triggerall = command = "holdfwd" && command = "y"
+trigger1 = statetype != A && command != "holddown"
+trigger1 = ctrl
+trigger2 = (stateno = [200,220]) || (stateno = [400,420])
+trigger2 = movecontact
+
+[State -1, Heavy Kick]
+type = ChangeState
+value = 220
+triggerall = !var(59)
+triggerall = command = "b"
+triggerall = statetype != A && command != "holddown"
+trigger1 = ctrl
+trigger2 = stateno = 200 || stateno = 210 || stateno = 400 || stateno = 410
+trigger2 = movecontact
+
+[State -1, Medium Kick]
+type = ChangeState
+value = 210
+triggerall = !var(59)
+triggerall = command = "y"
+triggerall = statetype != A && command != "holddown"
+trigger1 = ctrl
+trigger2 = stateno = 200 || stateno = 400
+trigger2 = movecontact
+
+[State -1, Light Punch]
+type = ChangeState
+value = 200
+triggerall = !var(59)
+triggerall = command = "x"
+triggerall = statetype != A && command != "holddown"
+trigger1 = ctrl
+trigger2 = stateno = 200 || stateno = 400
+trigger2 = movecontact
+
+[State -1, Dash Back]
+type = ChangeState
+value = 105
+triggerall = !var(59)
+trigger1 = command = "BB"
+trigger1 = statetype = S
+trigger1 = ctrl
+
+[State -1, Run Fwd]
+type = ChangeState
+value = 100
+triggerall = !var(59)
+trigger1 = command = "FF"
+trigger1 = statetype = S
+trigger1 = ctrl
