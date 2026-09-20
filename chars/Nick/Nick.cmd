@@ -327,15 +327,15 @@ command = ~D, DB, B, z
 time = 20
 [Command]
 name = "Cutdown"
-command = ~F, D, DF, x
+command = ~D,DF,F, x
 time = 25
 [Command]
 name = "Cutdown2"
-command = ~F, D, DF, y
+command = ~D,DF,F, y
 time = 25
 [Command]
 name = "Cutdown3"
-command = ~F, D, DF, z
+command = ~D,DF,F, z
 time = 25
 ;----------------------------------------------------------
 [Command]
