@@ -1,0 +1,585 @@
+;---------------------------------------------------------------------------
+; Jump Start
+[Statedef 40]
+type    = S
+physics = S
+anim = 40
+ctrl = 0
+sprpriority = 1
+
+[State 40, 2]
+type = Turn
+trigger1 = NumEnemy && Time = 0 && (PrevStateNo != [100,101]) && (PrevStateNo != [110,111]) && PrevStateNo != 4100
+trigger1 = (enemynear,Pos X - Pos X) * facing < 0
+
+[State 40, 1]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 40, 2]
+type = VarSet
+trigger1 = command = "holdfwd"
+sysvar(1) = 1
+
+[State 40, 3]
+type = VarSet
+trigger1 = command = "holdback"
+sysvar(1) = -1
+
+[State 40, 4]
+type = VelSet
+trigger1 = AnimTime = 0
+x = ifelse(sysvar(1)=0, const(velocity.jump.neu.x), ifelse(sysvar(1)=1, const(velocity.jump.fwd.x), const(velocity.jump.back.x)))
+y = const(velocity.jump.y)
+
+[State 40, 5]
+type = VelSet
+trigger1 = AnimTime = 0
+trigger1 = prevstateno = 100 ;RUN_FWD
+trigger1 = sysvar(1) = 1
+x = const(velocity.runjump.fwd.x)
+
+[State 40, 6]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 50
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Jump Land
+[Statedef 52]
+type    = S
+physics = S
+ctrl = 0
+anim = 47
+
+[State 52, 1]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 52, 2]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 52, 3]
+type = CtrlSet
+trigger1 = Time = 3
+value = 1
+
+[State 52, 4]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; RUN_FWD
+[Statedef 100]
+type    = S
+physics = S
+anim = 100
+sprpriority = -3
+ctrl = 1
+
+[State 1];????????
+type = NotHitBy
+trigger1 = 1
+value = ,NP
+
+[State 100, PlaySnd]
+type = PlaySnd
+trigger1 = Animelem = 2
+value = S100,0
+channel = 0
+
+[State 100, PlaySnd]
+type = PlaySnd
+trigger1 = Animelem = 2
+value = S0,5
+
+[State 100, 4]
+type = CtrlSet
+trigger1 = time <= 5
+value = 0
+
+[State 200, 4]
+type = CtrlSet
+trigger1 = time > 5
+value = 1
+
+[State 100, 1]
+type = VelSet
+trigger1 = 1
+x = const(velocity.run.fwd.x);+ifelse(PrevStateno=107,0.8,0)
+
+[State 100, 2] ;Prevent run from canceling into walk
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+
+[State 100, 3] ;Prevent from turning
+type = AssertSpecial
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 0, Explod]
+type = Explod
+trigger1 = time = 1
+anim = 6051
+pos = 10,0
+postype = p1
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = -2
+pausemovetime = 0
+sprpriority = 2
+ontop = 1
+ownpal = 1
+
+[State 100, 4]
+type = ChangeState
+trigger1 = animtime = 0 || command != "holdfwd" && !Var(15)
+value = 101
+ctrl = 0
+
+;---------------------------------------------------------------------------
+; RUN_FWD (land)
+[Statedef 101]
+type    = S
+physics = S
+ctrl = 0
+anim = 101
+
+[State 52, ?????]
+type = PlaySnd
+trigger1 = Time = 0
+value = 40,0
+
+[State 106, 1]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 106, 4]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;-----------------------------------------------------------------
+;Dodge Foward
+[Statedef 800]
+type     = S
+movetype = I
+physics  = S
+velset   = 0,0
+anim     = 715
+ctrl     = 0
+
+[State 800, PlaySnd]
+type = PlaySnd
+trigger1 = Time = 1
+value = S2000,4
+
+[State 800, AfterImage]
+type = AfterImage
+trigger1 = !time
+time = 25
+length = 10
+palinvertall = 0
+palcolor = 255
+paladd = 50,50,150
+timegap = 1
+framegap = 5
+trans = add1
+
+[State 800, 2]
+type = PlaySnd
+trigger1 =  AnimElem = 1
+value = 3,3
+channel = 4
+
+[State 800, NotHitBy]
+type = NotHitBy
+trigger1 = Animelem = 7,<= 0
+value =  ,AA,AP
+
+[State 800, VelSet]
+type = VelSet
+trigger1 = AnimElemTime(2) >= 0
+x = 7.7
+
+[State 800, VelSet]
+type = VelSet
+trigger1 = AnimElem = 7, >= 0
+x = 0
+
+[State 800, PlayerPush]
+type = PlayerPush
+trigger1 = AnimElemTime(2) > 0
+value = 0
+
+[State 800, ChangeState]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;------------------------------------------------------------------
+;Dodge Back
+[Statedef 810]
+type     = S
+movetype = I
+physics  = S
+velset   = 0,0
+anim     = 720
+ctrl     = 0
+
+[State 810, PlaySnd]
+type = PlaySnd
+trigger1 = Time = 1
+value = S2000,4
+
+[State 800, AfterImage]
+type = AfterImage
+trigger1 = !time
+time = 25
+length = 10
+palinvertall = 0
+palcolor = 255
+paladd = 50,50,150
+timegap = 1
+framegap = 5
+trans = add1
+
+[State 810, 2]
+type = PlaySnd
+trigger1 =  AnimElem = 1
+value = 3,3
+channel = 4
+
+[State 810, NotHitBy]
+type = NotHitBy
+trigger1 = Animelem = 6,<= 0
+value =  ,AA,AP
+
+[State 810, VelSet]
+type = VelSet
+trigger1 = AnimElemTime(2) > 0
+x = -6.8
+
+[State 810, VelSet]
+type = VelSet
+trigger1 = AnimElem = 7, >= 0
+x = 0
+
+[State 810, PlayerPush]
+type = PlayerPush
+trigger1 = AnimElemTime(7) > 0
+value = 0
+
+[State 810, ChangeState]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;Initialize(at the start of the round)
+[Statedef 5900]
+type=S
+
+[state ];GGキャラ専用勝ち挑発（RAKUSYO）対応ステート
+Type=PowerAdd
+trigger1=roundsexisted>=1&&var(43)=1
+Value=1500
+persistent=0
+
+[state ];GGキャラ専用勝ち挑発（RAKUSYO）解除ステート
+type=Varset
+trigger1=roundsexisted>=1&&var(43)=1
+var(43)=0
+
+[State ]
+type=ChangeState
+trigger1=roundsexisted=0&&teammode=turns
+value=191
+
+[State ]
+type=VarRangeSet
+trigger1=roundsexisted=0&&(TeamMode=single ||TeamMode=simul)
+value=0
+
+[State ]
+type=VarRangeSet
+trigger1=roundsexisted=0&&(TeamMode=single ||TeamMode=simul)
+fvalue=0
+
+[State ];iwakickさん製作キャライントロ対応
+type=ChangeState
+trigger1=prevstateno!=100191&&((teammode=single &&roundno=1)||teammode=turns)&&!(teammode=simul)&&enemy,animexist(18000)&&enemy,stateno!=192&&enemy,stateno!=199&&enemy,authorname="iwakick"
+value=100191
+
+[State ]
+type=ChangeState
+trigger1=roundno=1
+value=190
+
+;---------------------------------------------------------------------------
+; SPECIAL CUSTOM STATES
+
+;---------------------------------------------------------------------------
+; Iwakick Colossus Intro
+[Statedef 100191]
+type=L
+ctrl=0
+velset=0,0
+anim=0
+
+[state ]
+type=varset
+trigger1=enemy,authorname="iwakick"&&(enemy,name="silversamurai"||enemy,name="spiral")&&sysvar(0)=0
+sysvar(0)=1102
+
+[state ]
+type=varset
+trigger1=enemy,authorname="iwakick"&&(enemy,name="silversamurai"||enemy,name="spiral")&&sysvar(1)=0
+sysvar(1)=1
+
+[state ]
+type=varset
+trigger1=enemy,authorname="iwakick"&&(enemy,name="silversamurai"||enemy,name="spiral")&&sysvar(2)=0
+sysvar(2)=2
+
+[State ]
+type=AssertSpecial
+trigger1=1
+flag=Intro
+
+[state ]
+type=hitby
+trigger1=enemy,authorname="iwakick"
+value=S,HT
+
+[State ]
+type=ChangeState
+trigger1=roundno=1&&time=31
+value=190
+
+[State ]
+type=ChangeState
+trigger1=roundno>1&&time=31
+value=5900
+
+[Statedef 100192]
+type=L
+ctrl=0
+velset=0,0
+anim=0
+ 
+[state ]
+type=hitby
+trigger1=enemy,authorname="iwakick"
+value=S,HT
+
+[State ]
+type=AssertSpecial
+trigger1=1
+flag=noshadow
+flag2=invisible
+
+[State ]
+type=destroyself
+trigger1=ishelper&&(roundstate>1||root,alive=0)
+
+;VSシリーズイントロ対応ステート
+[Statedef 100194]
+type=S
+ctrl=0
+velset=0,0
+anim=0
+SprPriority=65
+
+[state ]
+type=assertspecial
+trigger1=enemy,anim!=183
+flag=invisible
+
+[state ]
+type=turn
+trigger1=enemy,var(16)=0&&((root,teamside=1&&facing=-1)||(root,teamside=2&&facing=1))
+
+[state ]
+type=varset
+trigger1=time=0
+var(0)=floor(screenpos y)
+persistent=0
+
+[state ]
+type=posset
+trigger1=time=1
+y=var(0)-var(0)
+
+[state ]
+type=varset
+trigger1=time=2
+var(0)=240-floor(screenpos y)
+persistent=0
+
+[state ]
+type=posset
+trigger1=time=3
+x=-facing*60
+y=-20+var(0)
+
+[state ]
+type=posset
+trigger1=enemy,var(16)
+x=facing*240+(var(1)*facing)
+y=-180+var(0)+var(2)
+persistent=0
+
+[state ]
+type=posadd
+trigger1=enemy,var(16)=[21,50]
+x=-facing*facing*16
+y=-2
+
+[state ]
+type=posset
+trigger1=enemy,var(16)=51
+x=-facing*240+(var(1)*facing)
+y=-240+var(0)+var(2)
+
+[state ]
+type=posadd
+trigger1=enemy,var(16)>80
+x=0.1
+
+[state ]
+type=SprPriority
+trigger1=enemy,var(16)
+value=54
+
+[state ]
+type=changeanim
+trigger1=enemy,anim=183
+value=8000
+persistent=0
+
+[state ]
+type=changeanim
+trigger1=enemy,var(16)
+value=8002
+persistent=0
+
+[State ]
+type=destroyself
+trigger1=ishelper&&(roundstate>1||root,alive=0)
+
+[Statedef 100195]
+type=S
+ctrl=0
+velset=0,0
+anim=0
+sprpriority=65
+
+[State ]
+type=AssertSpecial
+trigger1=enemy,var(16)<1000||(enemy,var(16)=[10000,1000000])
+flag=invisible
+
+[state ]
+type=turn
+trigger1=enemy,var(16)=0&&((root,teamside=1&&facing=-1)||(root,teamside=2&&facing=1))
+
+[state ]
+type=varset
+trigger1=time=1
+var(1)=facing
+
+[state ]
+type=varadd
+trigger1=enemy,numhelper(18060)||enemy,numhelper(18062)
+var(10)=1
+
+[state ]
+type=posset
+trigger1=time=0
+y=0
+
+[state ]
+type=varset
+trigger1=time=0
+var(0)=floor(screenpos y)
+persistent=0
+
+[state ]
+type=varset
+trigger1=time=1
+var(0)=240-floor(screenpos y)
+persistent=0
+
+[state ]
+type=posset
+trigger1=var(10)=23
+x=facing*(-100)
+y=-20+var(0)
+
+[state ]
+type=posset
+trigger1=enemy,var(16)>1000000
+x=(-facing*(enemy,var(0)))+(-facing*var(1))
+y=var(0)+240+var(2)
+persistent=0
+
+[state ]
+type=posadd
+trigger1=enemy,var(16)=[1000000,1000010]
+x=1
+y=-10
+
+[state ]
+type=posadd
+trigger1=enemy,var(16)>1000010
+x=0.05
+y=-0.1
+
+[state ]
+type=SprPriority
+trigger1=1
+value=62
+
+[state ]
+type=changeanim
+trigger1=enemy,var(16)>1000
+value=8000
+persistent=0
+
+[state ]
+type=playsnd
+trigger1=enemy,var(16)>1000
+value=20,2
+channel=1
+persistent=0
+
+[state ]
+type=playsnd
+trigger1=enemy,var(16)>1000000
+value=20,0
+channel=2
+persistent=0
+
+[state ]
+type=changeanim
+trigger1=enemy,var(16)>10000
+value=8003
+persistent=0
+
+[State ]
+type=destroyself
+trigger1=ishelper&&(roundstate>1||root,alive=0||(root,stateno=[1,199])||enemy,stateno=199||enemy,stateno=192)

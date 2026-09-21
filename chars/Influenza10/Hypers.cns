@@ -1,0 +1,487 @@
+;---------------------------------------------------------------------------
+; Tissue Rain
+[Statedef 3000]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 3000
+poweradd = -1000
+
+[State 3000, SuperPause]
+type = SuperPause
+trigger1 = !time
+time = 20
+anim = -1
+sound = S3001,0
+pos = 0,0
+movetime = 0
+darken = 1
+p2defmul = 1
+poweradd = 0
+unhittable = 1
+
+[State 3000, Explod]
+type = Explod
+trigger1 = Animelem = 1
+anim = 7000
+ID = 3000
+pos = 100,450
+postype = Back 
+pausemovetime = 999
+supermovetime = 999
+facing = 1
+bindtime = 1
+scale = 4,4
+removetime = -2
+sprpriority = -10
+ontop = 0
+ownpal = 1
+
+[State 3000, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 3
+trigger2 = animelem = 8
+trigger3 = animelem = 13
+trigger4 = animelem = 18
+trigger5 = animelem = 23
+trigger6 = animelem = 28
+trigger7 = animelem = 33
+trigger8 = animelem = 38
+value = s3,0
+channel = 0
+
+[State 3000, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 5
+trigger2 = animelem = 10
+trigger3 = animelem = 15
+trigger4 = animelem = 20
+trigger5 = animelem = 25
+trigger6 = animelem = 30
+trigger7 = animelem = 35
+trigger8 = animelem = 40
+value = s0,0
+
+[State 3000, Helper]
+type = Helper
+trigger1 = animelem = 5
+trigger2 = animelem = 10
+trigger3 = animelem = 15
+trigger4 = animelem = 20
+trigger5 = animelem = 25
+trigger6 = animelem = 30
+trigger7 = animelem = 35
+trigger8 = animelem = 40
+name = "Tissue"
+ID = 7003
+stateno = 7003
+pos = 30, -80
+postype = p1
+facing = 1
+keyctrl = 0
+ownpal = 1
+
+[State 3000, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Deadly Sneeze
+[Statedef 3001]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 3001
+poweradd = -1000
+
+[State 3001, SuperPause]
+type = SuperPause
+trigger1 = !time
+time = 20
+anim = -1
+sound = S3001,0
+pos = 0,0
+movetime = 0
+darken = 1
+p2defmul = 1
+poweradd = 0
+unhittable = 1
+
+[State 3001, Explod]
+type = Explod
+trigger1 = Animelem = 1
+anim = 7000
+ID = 3000
+pos = 100,450
+postype = Back 
+pausemovetime = 999
+supermovetime = 999
+facing = 1
+bindtime = 1
+scale = 4,4
+removetime = -2
+sprpriority = -10
+ontop = 0
+ownpal = 1
+
+[State 3001, Explod]
+type = Explod
+trigger1 = Animelem = 3
+anim = 6055
+pos = 15,-10
+postype = p1 
+pausemovetime = 999
+supermovetime = 999
+facing = 1
+bindtime = 1
+removetime = -2
+sprpriority = 5
+scale = .8,.8
+ontop = 1
+ownpal = 1
+
+[State 3001, 1]
+type = HitDef
+trigger1 = !Time
+attr = S, HA
+damage = 208,26
+animtype = Back
+guardflag = MA
+hitflag = MAF
+priority = 4, Hit
+pausetime = 14,14
+guard.pausetime = 14,14
+sparkno = s6002
+guard.sparkno = s6012
+sparkxy = -10, -80
+hitsound = s3001,2
+guardsound = s5,1
+ground.type = Trip
+ground.slidetime = 24
+ground.hittime = 24
+ground.velocity = -3,-9
+air.type = Trip
+air.hittime = 12
+air.velocity = -3.5,-7
+airguard.velocity = -4,-1
+ground.cornerpush.veloff = -8
+air.cornerpush.veloff = -8
+p2facing = 1
+yaccel = .5
+fall = 1
+air.fall = 1
+fall.recover = 0
+
+[State 3001, Freeze State]
+type = TargetState
+trigger1 = movehit = 1
+value = 5800
+ignorehitpause = 1
+
+[State 3001, PlaySnd]
+type = PlaySnd
+trigger1 = Animelem = 3
+value = S3000,0
+channel = 0
+
+[State 3001, PlaySnd]
+type = PlaySnd
+trigger1 = Animelem = 3
+value = S3001,1
+
+[State 3001, 3]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;====================<FREEZE STATUS TRANSITION>====================
+;Freeze : Standing Hit Shake
+[Statedef 5800]
+type    = U
+movetype= H
+physics = N
+velset = 0,0
+
+[State 5800, ChangeState]
+type = ChangeState
+trigger1 = !Time
+trigger1 = StateType != S
+value = 5810 + (StateType = A) * 10
+
+[State 5800, StateTypeSet]
+type = StateTypeSet
+trigger1 = !Time
+StateType = S
+
+[State 5800, Hit Anim]
+type = ChangeAnim
+trigger1 = !Time
+value = 5002
+
+[State 5800, Freeze Anim]
+type = ChangeAnim
+trigger1 = Time > 0
+value = Anim
+
+[State 5800, StateTypeSet : Air]
+type = StateTypeSet
+trigger1 = !Time
+trigger1 = GetHitVar(YVel) != 0 || GetHitVar(Fall)
+trigger2 = Pos Y != 0
+statetype = A
+
+[State 5800, ChangeState]
+type = ChangeState
+trigger1 = HitShakeOver
+trigger1 = GetHitVar(YVel) = 0 && !GetHitVar(Fall)
+value = 5801
+
+[State 5800, PalFX]
+type = PalFX
+trigger1 = 1
+time = 1
+add = 255, 255, 255
+mul = 140, 140, 140
+color = 0
+
+[State 5800, ChangeState]
+type = ChangeState
+trigger1 = HitShakeOver
+value = 5830
+
+;Freeze : Standing Slide Shake
+[Statedef 5801]
+type    = S
+movetype= H
+physics = S
+
+[State 5801, ChangeAnim]
+type = ChangeAnim
+trigger1 = !HitOver
+value = Anim
+
+[State 5801, HitVelSet]
+type = HitVelSet
+trigger1 = !Time
+x = 1
+
+[State 5801, VelMul : Stop Sliding]
+type = VelMul
+trigger1 = Time >= GetHitVar(slidetime)
+x = .6
+
+[State 5801, VelSet]
+type = VelSet
+trigger1 = HitOver
+x = 0
+
+[State 5801, DefenceMulSet]
+type = DefenceMulSet
+trigger1 = HitOver
+value = 1
+
+[State 5801, StateTypeSet]
+type = StateTypeSet
+trigger1 = HitOver
+movetype = I 
+
+[State 5801, NotHitBy]
+type = NotHitBy
+trigger1 = HitOver
+value = , AT
+time = 6
+persistent = 0
+
+[State 5801, PalFX]
+type = PalFX
+trigger1 = 1
+time = 1
+add = 255, 255, 255
+mul = 140, 140, 140
+color = 0
+
+[State 5801, SelfState]
+type = SelfState
+trigger1 = HitOver
+value = 0
+ctrl = 1
+
+;Freeze : Crouching Hit Shake
+[Statedef 5810]
+type    = C
+movetype= H
+physics = N
+velset = 0,0
+
+[State 5810, Hit Anim]
+type = ChangeAnim
+trigger1 = !Time
+value = 5022
+
+[State 5810, Freeze Anim]
+type = ChangeAnim
+trigger1 = Time > 0
+value = Anim
+
+[State 5810, StateTypeSet : Air]
+type = StateTypeSet
+trigger1 = !Time
+trigger1 = GetHitVar(yvel) != 0 || GetHitVar(fall)
+trigger2 = Pos Y != 0
+statetype = A
+
+[State 5810, ChangeState]
+type = ChangeState
+trigger1 = HitShakeOver
+trigger1 = GetHitVar(yvel) = 0 && !GetHitVar(fall)
+value = 5811
+
+[State 5810, PalFX]
+type = PalFX
+trigger1 = 1
+time = 1
+add = 255, 255, 255
+mul = 140, 140, 140
+color = 0
+
+[State 5810, ChangeState]
+type = ChangeState
+trigger1 = HitShakeOver
+value = 5830
+
+;Freeze : Crouching Hit Slide
+[Statedef 5811]
+type    = C
+movetype= H
+physics = C
+
+[State 5811, ChangeAnim]
+type = ChangeAnim
+trigger1 = 1
+value = Anim
+
+[State 5811, HitVelSet]
+type = HitVelSet
+trigger1 = !Time
+x = 1
+
+[State 5811, VelMul]
+type = VelMul
+trigger1 = Time >= GetHitVar(slidetime)
+x = .6
+
+[State 5811, VelSet]
+type = VelSet
+trigger1 = HitOver
+x = 0
+
+[State 5811, DefenceMulSet]
+type = DefenceMulSet
+trigger1 = HitOver
+value = 1
+
+[State 5811, StateTypeSet]
+type = StateTypeSet
+trigger1 = HitOver
+movetype = I 
+
+[State 5811, NotHitBy]
+type = NotHitBy
+trigger1 = HitOver
+value = , AT
+time = 6
+persistent = 0
+
+[State 5811, PalFX]
+type = PalFX
+trigger1 = 1
+time = 1
+add = 255, 255, 255
+mul = 140, 140, 140
+color = 0
+
+[State 5811, SelfState]
+type = SelfState
+trigger1 = HitOver
+value = 11
+ctrl = 1
+
+;Freeze : Jumping Hit Shake
+[Statedef 5820]
+type    = A
+movetype= H
+physics = N
+velset = 0,0
+
+[State 5820, Hit Anim]
+type = ChangeAnim
+trigger1 = !Time
+value = 5002
+
+[State 5820, Hit Anim : Gill by GM]
+type = ChangeAnim
+trigger1 = !Time
+trigger1 = AuthorName = "GM" && Name = "Gill"
+value = 5002
+
+[State 5820, Freeze Anim]
+type = ChangeAnim
+trigger1 = Time > 0
+value = Anim
+
+[State 5820, PalFX]
+type = PalFX
+trigger1 = 1
+time = 1
+add = 255, 255, 255
+mul = 140, 140, 140
+color = 0
+
+[State 5820, ChangeState]
+type = ChangeState
+trigger1 = HitShakeOver
+value = 5830
+
+;Freeze : Jumping Hit Lift
+[Statedef 5830]
+type    = A
+movetype= H
+physics = N
+ctrl = 0
+
+[State 5830, ChangeAnim]
+type = ChangeAnim
+trigger1 = 1
+value = Anim
+
+[State 5830, HitVelSet]
+type = HitVelSet
+trigger1 = !Time
+x = 1
+y = 1
+
+[State 5830, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = GetHitVar(YAccel)
+
+[State 5830, PalFX]
+type = PalFX
+trigger1 = 1
+time = 1
+add = 255, 255, 255
+mul = 140, 140, 140
+color = 0
+
+[State 5830, SelfState]
+type = SelfState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 5100

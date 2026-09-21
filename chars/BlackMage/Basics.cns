@@ -1,0 +1,441 @@
+;---------------------------------------------------------------------------
+; Jump Up
+[Statedef 50]
+type    = A
+physics = A
+
+[State 50, 1]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 50, 2]
+type = ChangeAnim
+trigger1 = Time = 0
+value = ifelse((vel x)=0, 41, ifelse((vel x)>0, 42, 43))
+
+[State 50, 3]
+type = ChangeAnim
+trigger1 = Vel y > Const720p(-8)
+trigger1 = SelfAnimExist(anim + 3)
+trigger1 = anim >= 41 && anim <= 43
+persistent = 0
+value = Anim + 3
+
+;---------------------------------------------------------------------------
+; RUN_FWD
+[Statedef 100]
+type = A
+physics = N
+anim = 100
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = !time
+var(15) = 0
+[State 0, VarSet]
+type = VarSet
+trigger1 = !time
+var(16) = 0
+[State 0, VarSet]
+type = VarSet
+trigger1 = command = "holdup"
+var(15) = 1
+[State 0, VarSet]
+type = VarAdd
+trigger1 = var(15)
+var(16) = 1
+
+[State 100, 1]
+type = VelSet
+trigger1 = time > 3
+x = const(velocity.run.fwd.x)
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = var(15) && command = "holdup" && vel y > -5
+y = -0.5
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = var(15) && command != "holdup" && vel y < 0
+y = 1
+
+[State 1000, PlaySnd]
+type = PlaySnd
+trigger1 = animelemtime(2) = 0
+value = 100,0
+channel = 2
+ignorehitpause = 1
+volumescale = 2147483647
+loop = 1
+
+[State 0, StopSnd]
+type = StopSnd
+trigger1 = stateno != 100
+channel = -1
+
+[State 0, Explod]
+type = Explod
+trigger1 = Time = 0
+trigger2 = AnimElem = 3
+trigger3 = AnimTime = 0
+anim = 6020 
+pos = -65,-50
+postype = p1
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = -2
+pausemovetime = 0
+ontop = 1
+ownpal = 1
+
+[State 100, 5]
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+
+[State 100, 3]
+type = ChangeState
+triggerall = time >= 5
+trigger1 = Command != "holdfwd"
+trigger2 = var(16) >= 35 ; the higher the number, the longer she can fly after holding up
+value = 101
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; RUN_FWD
+[Statedef 101]
+type    = A
+physics = A
+anim = 101
+ctrl = 0
+sprpriority = 1
+
+[State 51, 101]
+type = Null
+trigger1 = 1
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = 1
+x = -0.05
+y = 0.1
+
+;---------------------------------------------------------------------------
+; RUN_FWD
+[Statedef 102]
+type    = S
+physics = N
+anim = 102
+ctrl = 0
+sprpriority = 1
+
+[State 100, 1]
+type = VelSet
+trigger1 = time = 0
+x = 0
+y = 0
+
+[State 100, 1]
+type = Velmul
+trigger1 = 1
+x = 0.95
+
+[State 100, 1]
+type = null;VelSet
+trigger1 = animelem = 5
+x = 0
+
+[State 100, 2] ;Prevent run from canceling into walk
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+
+[State 100, 3] ;Prevent from turning
+type = AssertSpecial
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 100, 4]
+type = ChangeState
+trigger1 = command = "holdup"
+value = 40
+;ctrl = 0
+
+[State 100, 4]
+type = ChangeState
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Dash Back
+[Statedef 105]
+type    = A
+physics = N
+ctrl = 0
+anim = 105
+sprpriority = 1
+
+[State 105, 1]
+type = VelMul
+trigger1 = 1
+x = 0.95
+
+[State 105, 2]
+type = NotHitBy
+trigger1 = Time < 4
+value = SCA, NA, SA, HA, NP, SP, HP, NT, ST, HT
+ignorehitpause = 1
+
+[State 105, 3]
+type = VelSet
+trigger1 = Time = 0
+x = const(velocity.run.back.x)
+y = const(velocity.run.back.y)
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = !time
+value = S100,1
+
+[State 0, StateTypeSet]
+type = StateTypeSet
+trigger1 = Animelem = 2
+statetype = A
+physics = A
+
+[State 0, CtrlSet]
+type = CtrlSet
+trigger1 = Animelem = 2
+value = 1
+
+[State 0, ChangeState]
+type = ChangeState
+triggerall = time > 2
+trigger1 = command = "AFF"
+value = 110
+
+[State 0, ChangeState]
+type = ChangeState
+triggerall = time > 2
+trigger1 = command = "BFF"
+value = 115
+
+[State 105, 3]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 106
+
+;---------------------------------------------------------------------------
+; Dash Land
+[Statedef 106]
+type    = S
+physics = S
+ctrl = 0
+anim = 47
+
+[State 106, 1]
+type = VelSet
+trigger1 = !Time
+x = 0
+y = 0
+
+[State 106, 2]
+type = PosSet
+trigger1 = !Time
+y = 0
+
+[State 106, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Fwd AirDash
+[Statedef 110]
+type    = A
+physics = N
+velset = 0,0
+ctrl = 0
+anim = 110
+
+[State 1000, PlaySnd]
+type = PlaySnd
+trigger1 = animelemtime(2) = 0
+value = 100,0
+channel = 2
+ignorehitpause = 1
+volumescale = 2147483647
+loop = 1
+[State 0, Explod]
+type = Explod
+trigger1 = Time = 0
+trigger2 = AnimElem = 3
+trigger3 = AnimTime = 0
+anim = 6020 
+pos = -65,-50
+postype = p1
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = -2
+pausemovetime = 0
+ontop = 1
+ownpal = 1
+
+[State 100, 5]
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = !time
+var(15) = 0
+[State 0, VarSet]
+type = VarSet
+trigger1 = !time
+var(16) = 0
+[State 0, VarSet]
+type = VarSet
+trigger1 = command = "holdup"
+var(15) = 1
+[State 0, VarSet]
+type = VarAdd
+trigger1 = var(15)
+var(16) = 1
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 0
+var(22) = var(22) | floor(exp(1*ln(2)) + 0.5)
+
+[State 0, StateTypeSet]
+type = Velset
+trigger1 = animelem = 2
+x = const(velocity.run.fwd.x)
+y = 0
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = var(15) && command = "holdup" && vel y > -5
+y = -0.5
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = var(15) && command != "holdup" && vel y < 0
+y = 1
+
+[State 0, CtrlSet]
+type = CtrlSet
+trigger1 = time >= 5
+value = 1
+
+[State 100, 3]
+type = ChangeState
+trigger1 = time >= 85 || command != "holdfwd"
+trigger2 = var(16) >= 35 ; the higher the number, the longer she can fly after holding up
+value = 111
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Air Dash Falling 
+[Statedef 111]
+type    = A
+physics = A
+velset = const(velocity.run.fwd.x),-1.1
+ctrl = 1
+anim = 111
+
+[State 0, StopSnd]
+type = StopSnd
+trigger1 = Command != "holdfwd"
+channel = -1
+
+[State 100, 5]
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+
+;---------------------------------------------------------------------------
+; Back AirDash
+[Statedef 115]
+type    = A
+physics = N
+velset = 0,0
+ctrl = 0
+anim = 115
+
+[State 1000, PlaySnd]
+type = PlaySnd
+trigger1 = animelemtime(2) = 0
+value = 100,0
+channel = 2
+ignorehitpause = 1
+volumescale = 2147483647
+loop = 1
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 0
+var(22) = var(22) | floor(exp(1*ln(2)) + 0.5)
+
+[State 0, StateTypeSet]
+type = Velset
+trigger1 = animelem = 2
+x = -const(velocity.run.fwd.x)
+y = 0
+
+[State 0, CtrlSet]
+type = CtrlSet
+trigger1 = time >= 5
+value = 1
+
+[State 100, 3]
+type = ChangeState
+trigger1 = time >= 19
+value = 116
+ctrl = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = Time = 0
+trigger2 = AnimElem = 3
+trigger3 = AnimTime = 0
+anim = 6021
+pos = 65,-50
+postype = p1
+facing = 1
+vfacing = 1
+bindtime = 1
+removetime = -2
+pausemovetime = 0
+ontop = 1
+ownpal = 1
+
+[State 100, 5]
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+
+;---------------------------------------------------------------------------
+; Back Dash Falling 
+[Statedef 116]
+type    = A
+physics = A
+velset = -const(velocity.run.fwd.x),-1.1
+ctrl = 1
+anim = 111
+
+[State 0, StopSnd]
+type = StopSnd
+trigger1 = Command != "holdback"
+channel = -1
+
+[State 100, 5]
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
