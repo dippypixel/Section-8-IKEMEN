@@ -26,6 +26,23 @@ time = 30
 name = "Super"
 command = ~D, F, D, F, a
 time = 30
+[Command]
+name = "Super"
+command = ~D, DF, F, D, DF, F, b
+time = 30
+[Command]
+name = "Super"
+command = ~D, F, D, F, b
+time = 30
+
+[Command]
+name = "Super"
+command = ~D, DF, F, D, DF, F, a+b
+time = 30
+[Command]
+name = "Super"
+command = ~D, F, D, F, a+b
+time = 30
 
 [Command]
 name = "Special2"
