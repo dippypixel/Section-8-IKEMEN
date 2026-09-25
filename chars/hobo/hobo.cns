@@ -4928,7 +4928,7 @@ value = 0
 [State -2, Lilbros Spitball slowdown decrease]
 type = VarAdd
 trigger1 = var(55)
-v = 55
+85
 value = -1
 ignorehitpause = 1
 
@@ -5090,3 +5090,58 @@ trigger1 = enemy,name = "Homero"
 trigger1 = enemy,name = "Homero J. Simpson"
 trigger1 = enemy,name = "Homero Simpson"
 value = 10+random%7
+
+;CREDIT TO POTS FOR PUSH CODE
+[State -3, Corner Push]; Reset
+type= varset
+trigger1= fvar(8)
+trigger1= numtarget
+trigger1= (target, hitover) || (target, gethitvar(hitshaketime) > 0 && target, time <= 0)
+fvar(8)= 0
+
+[State -3, Corner Push]; Get initial velocity
+type= varset
+trigger1= movecontact=1 && numtarget
+fvar(8)= (target, gethitvar(xvel))
+ignorehitpause= 1
+[State 0, Corner Push Activate]
+type = VarSet
+trigger1= target, frontedgebodydist <= abs(target, vel x)
+trigger1= (target, gethitvar(xvel) * target, facing) > 0
+trigger2= target, backedgebodydist <= abs(target, vel x)
+trigger2= (target, gethitvar(xvel) * target, facing) < 0
+fv = 9
+value = 1
+ignorehitpause = 1
+[State 0, Corner Push Deactivate]
+type = VarSet
+trigger1 = abs(fvar(8))<=0.3
+trigger1= !numtarget && movetype !=A 
+trigger2= statetype =A
+fv = 9
+value = 0
+ignorehitpause = 1
+;persistent = 
+[State -3, Corner Push]; Apply corner push
+type= posadd
+triggerall= fvar(8)
+;triggerall= (statetype = S || statetype = C) && numtarget
+triggerall= numtarget
+triggerall= !hitpausetime && (target, gethitvar(hitshaketime) <= 0)
+;triggerall= (target, statetype = S || target, statetype = C) && !(target, gethitvar(yvel)) && !(target, hitfall); See note below
+trigger1= fvar(9)
+x= ifelse(target, frontedgebodydist <= 0, -1, 1) * (target, facing) * fvar(8)
+ignorehitpause= 1
+[State -3, Corner Push]; Apply friction to the velocity
+type= varset
+trigger1= numtarget
+trigger1= target, gethitvar(hitshaketime) <= 0
+fvar(8)= fvar(8) * 0.89 
+
+;Note:  This code was designed for types of gameplay where the attacker doesn't suffer corner push if the opponent is in the air (SF, KOF, so on), if you want to change that aspect you can change the line signaled above with "triggerall= (target, statetype != L)".  There's no guarantee that that change will make it work perfectly, but it will still get the job done.
+
+;One added benefit of using a custom system like this is that you can then reset or disable corner push at any time you want by making that var 0, and you'll want to reset it for instance when a super move's superpause happens. 
+
+
+
+
