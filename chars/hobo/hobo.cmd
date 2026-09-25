@@ -461,8 +461,9 @@ type = ChangeState
 value = 220
 triggerall = !aiLevel && power >500
 triggerall = command = "hold_ab"
+trigger1 = statetype != A
 trigger1 = enemy,moveguarded
-trigger1 = stateno = 130||stateno = 150 ||stateno = 151
+trigger1 = stateno = [130,155]
 
 
 ;---------------------------------------------------------------------------
@@ -601,7 +602,7 @@ value = 200
 triggerall = !aiLevel
 triggerall = command = "a"
 trigger1 = statetype != A && ctrl
-trigger2= movecontact && stateno = 240 && time > 15
+trigger2= movehit && stateno = 240 && time > 15
 ;---------------------------------------------------------------------------
 ;Punch2
 [State -1, Punch2]
