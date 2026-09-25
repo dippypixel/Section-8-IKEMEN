@@ -1089,8 +1089,8 @@ animtype  = Hard
 damage    = 120
 hitflag = MAF
 guardflag = 
-sparkno = S20002
-sparkxy = -10,ceil(-56*const(size.yscale))
+sparkno = S20001
+sparkxy = -10,-80
 hitsound   = s205,10
 guardsound = s150, 0
 ground.type = High
@@ -1104,6 +1104,31 @@ ground.velocity = -12,-4
 air.velocity = -12,-4
 mindist=80,-999
 maxdist=100,999
+
+[State 200, 2]
+type = PlaySnd
+trigger1 = movecontact
+value = 220, 0
+ignorehitpause = 1
+persistent = 0
+
+[State 0, EnvShake]
+type = EnvShake
+trigger1 = movecontact
+time = 10
+freq = 140
+ampl = -12
+phase = 90
+ignorehitpause = 1
+persistent = 0
+
+[State 0, EnvColor]
+type = EnvColor
+trigger1 = uniqHitCount = 1 && movehit = 1
+value = 255,255,255
+time = 1
+under = 1
+ignorehitpause = 1
 
 [State 0, TargetState]
 type = TargetState
@@ -2427,6 +2452,7 @@ trigger1 = vel y > -pos y
 value = 1011
 ctrl = 0
 
+
 ;---------------------------------------------------------------------------
 ; Jump on Opponent - Land
 [Statedef 1011]
@@ -2438,6 +2464,7 @@ ctrl = 0
 anim = 1021
 poweradd = 0
 sprpriority = 2
+movehitpersist = 1
 [State 0, VelSet]
 type = VelSet
 trigger1 = !time
@@ -2524,6 +2551,12 @@ airguard.velocity = -1.25, -2
 yaccel = .6/fvar(20)
 fall=1
 fall.recover=0
+[State 0, CtrlSet]
+type = CtrlSet
+trigger1 = movehit && time > 5
+value = 1
+;ignorehitpause = 
+;persistent = 
 [State 200, 3]
 type = ChangeState
 trigger1 = AnimTime = 0
@@ -3772,6 +3805,219 @@ x = map(airAccel)*map(airAccelBuff)
 type = VelAdd
 trigger1 = !aiLevel && (stateno != [1000, 3999]) && (stateno != [120,155]) && stateno != 55 && statetype = A && physics = A && movetype != H && command = "holdback" && vel x > ifelse(power=powermax,const(velocity.jump.back.x)*map(speedBuff),const(velocity.jump.back.x))
 x = -map(airAccel)*map(airAccelBuff)
+
+; WallCling
+[Statedef 55]
+type    = U
+physics = N
+velset = 0,0
+ctrl=0
+anim=55
+
+[State 0, PlayerPush]
+type = PlayerPush
+trigger1 = 1;enemynear,facing !=facing
+value = 0
+
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 1
+movecamera = 0,1
+ignorehitpause = 1
+
+
+[State 0, Turn]
+type = Turn
+trigger1 = time = 0  && frontedgebodydist <= ceil(map(wallClingOffset)*const(size.xscale))
+;ignorehitpause = 
+;persistent = 
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = ifelse(command ="holddown",0.1,(0.05 + (0.05*time>30) + (0.1*time>60) + (0.30*time>90) + (0.30*time>120)))
+
+
+[State 0, CtrlSet]
+type = CtrlSet
+trigger1 = time = 6
+value = 1
+
+[State 0, Helper]
+type = Helper
+trigger1 = !numhelper(55)
+helpertype = Normal ;Player
+stateno = 56
+ID = 55
+postype= back
+size.ground.front= 24
+size.ground.back=24
+size.height= 999
+
+[State 0, Helper]
+type = Helper
+trigger1 = !numhelper(56)
+helpertype = Normal ;Player
+stateno = 56
+ID = 56
+postype= back
+size.ground.front= 24
+size.ground.back=24
+size.height= 999
+
+[State 0, WallClingDust]
+type = Explod
+trigger1 = time >1
+trigger1 = time%(7/(vel y*.5))=0
+id = 55
+anim = 20120
+pos = -map(wallClingOffset)*const(size.xscale),-110
+postype = P1  ;P2, Front, Back, Left, Right
+facing = 1
+bindtime = 0
+removetime = -2
+scale = 1,1
+sprpriority = 9
+
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = 1
+x = ifelse(facing=1,ceil((-gamewidth/2)+(map(wallClingOffset)*const(size.xscale))),ceil((gamewidth/2)-(map(wallClingOffset)*const(size.xscale))))
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = vel y > 0 && pos y > -vel y
+value =52
+ctrl = 1
+
+[State -2, WallJump Voiceclips]
+type = PlaySnd
+trigger1 = !time
+value = s52,0
+channel = -1
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = !ailevel
+trigger1 = time >= 3 && command != "holdfwd" && command != "holdback"
+trigger2= ailevel && time > 5
+value =57
+ctrl = 0
+;anim =
+;ignorehitpause = 
+;persistent =
+
+ 
+;WallJump Helper
+[Statedef 56]
+type    = U
+physics = N
+velset = 0,0
+ctrl=0
+anim= 551+isHelper(56)
+
+[State 0, PlayerPush]
+type = PlayerPush
+trigger1 = (isHelper(55) && enemynear, facing != facing) || isHelper(56)
+value = 1
+ignorehitpause = 1
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0,0
+ignorehitpause = 1
+
+[State 0, AssertSpecial];IKEMEN PRIVILEGE IKEMEN PRIVILEGE IKEMEN PRIVILEGE IKEMEN PRIVILEGE IKEMEN PRIVILEGE 
+type = AssertSpecial
+trigger1 = 1
+flag = CameraFreeze 
+
+
+[State 0, HitBy]
+type = HitBy
+trigger1 = 1
+value = 
+ignorehitpause = 1
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = 1
+x = ifelse(ishelper(55),(parent,pos x),ifelse(facing =1,(gamewidth/2),(-gamewidth/2)))
+ignorehitpause = 1
+[State 0, VelSet]
+type = VelSet
+trigger1 = ishelper(56)
+x = enemynear,vel X*3
+;ignorehitpause = 
+;persistent = 
+
+
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = parent,stateno !=55
+ignorehitpause = 1 
+
+
+; WallJump
+[Statedef 57]
+type    = U
+physics = A
+ctrl=1
+anim=56
+
+[State 0, RemoveSlideDust]
+type = ModifyExplod
+trigger1 = NumExplod(55)
+ID = 55
+removetime = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = !time
+value = S57,0
+freqmul = 1.0 + ifelse(fvar(22)>6,0.2,0)
+
+[State -2, WallJump Voiceclips]
+type = PlaySnd
+trigger1 = !time
+value = 0,11
+channel = 1
+
+[State 0, VelSet]  ;CHASE momentum retain
+type = VelSet 
+trigger1 = !time
+x = 4
+y = -5
+ignorehitpause = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = !time
+anim = 20060
+pos = -(map(wallClingOffset)*const(size.xscale)),0
+postype = p1  ;p2,front,back,left,right
+facing = 1
+sprpriority = 3
+angle = -90
+ownpal = 1
+
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = !aiLevel && (stateno != [1000, 3999]) && (stateno != [120,155]) && stateno != 55 && statetype = A && physics = A && movetype != H && command = "holdfwd" && vel x < ifelse(power=powermax,const(velocity.jump.fwd.x)*map(speedBuff),const(velocity.jump.fwd.x))
+x = map(airAccel)*map(airAccelBuff)
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = !aiLevel && (stateno != [1000, 3999]) && (stateno != [120,155]) && stateno != 55 && statetype = A && physics = A && movetype != H && command = "holdback" && vel x > ifelse(power=powermax,const(velocity.jump.back.x)*map(speedBuff),const(velocity.jump.back.x))
+x = -map(airAccel)*map(airAccelBuff)
+ 
 
 ;-------------------------------------------------------------
 ; Run Ai

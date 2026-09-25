@@ -176,6 +176,17 @@ name = "hold_ab";Required (do not remove)
 command = /a+b
 time = 1
 
+[Command]
+name = "uf"
+command = UF
+time = 1
+buffer.time = 1
+[Command]
+name = "ub"
+command = UB
+time = 1
+buffer.time = 1
+
 ;---------------------------------------------------------------------------
 [Statedef -1]
 
@@ -431,6 +442,19 @@ triggerall = (p2bodydist x - (enemynear,vel x * 9)) = [47, 69]
 trigger1= 1
 trigger2 =  enemynear,animtime < -11 && !(enemynear,ctrl)&&enemynear,movetype=A
 ;---------------------------------------------------------------------------
+
+[State -1, Wall Jump]
+type = ChangeState
+value = 55
+triggerall = !aiLevel
+triggerall = !var(53)
+triggerall = Pos Y < -const(movement.airjump.height)
+triggerall = stateno != [120,140]
+triggerall = ctrl && stateno != 55 || (stateno = [5200,5210]) || (stateno = 5040)&&time>10|| stateno = 1010 && animelemtime(20)>0 && !movecontact
+trigger1 = (command = "holdfwd" && vel x <= 0)  || (command = "holdback" && command = "ub")
+trigger1 = backedgebodydist <= ceil(95*const(size.xscale)) 
+trigger2 = command = "holdback" && vel x >=0  || (command = "holdfwd" && command = "ub")
+trigger2 = frontedgebodydist <= ceil(95*const(size.xscale)) 
 ;Kick
 [State -1, Counter]
 type = ChangeState
