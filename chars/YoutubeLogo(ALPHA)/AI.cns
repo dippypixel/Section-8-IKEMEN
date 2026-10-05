@@ -1,0 +1,273 @@
+;---------------------------------------------------------------------------
+; Walk Forward AI
+[Statedef 21]
+type    = S
+physics = S
+anim = 20
+ctrl = 0
+sprpriority = 0
+
+[State 21, VelSet]
+type = VelSet
+trigger1 = Anim = 20
+x = const(velocity.walk.fwd.x)
+
+[State 21, ChangeState]
+type = ChangeState
+trigger1 = p2bodydist x <= 20
+trigger2 = p2bodydist x >= 120
+trigger3 = p2movetype = A
+trigger4 = P2StateType = L
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Jump AI
+[Statedef 41]
+type    = S
+physics = S
+anim = 40
+ctrl = 0
+sprpriority = 1
+facep2 = 1
+
+[State 41, 4]
+type = VelSet
+trigger1 = AnimTime = 0
+x = const(velocity.jump.fwd.x)
+y = const(velocity.jump.y)
+
+[State 41, 5]
+type = VelSet
+trigger1 = AnimTime = 0
+trigger1 = prevstateno = 100 ;RUN_FWD
+trigger1 = sysvar(1) = 1
+x = const(velocity.runjump.fwd.x)
+
+[State 41, 6]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 50
+ctrl = 1
+
+;---------------------------------------------------------------------------
+; Run Forward AI
+[Statedef 102]
+type    = S
+physics = S
+anim = 100
+sprpriority = 1
+ctrl = 0
+
+[State 102, 1]
+type = VelSet
+trigger1 = 1
+x = const(velocity.run.fwd.x)
+
+[State 102, 2] ;Prevent run from canceling into walk
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+
+[State 102, 3] ;Prevent from turning
+type = AssertSpecial
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 102, 4]
+type = ChangeState
+trigger1 = p2bodydist x <= 120
+trigger2 = p2movetype = A
+trigger3 = P2StateType = L
+value = 101
+
+;---------------------------------------------------------------------------
+; Run Back AI
+[Statedef 103]
+type    = S
+physics = S
+anim = 105
+sprpriority = 1
+
+[State 103, 1]
+type = VelSet
+trigger1 = 1
+x = const(velocity.run.back.x)
+
+[State 103, 2] ;Prevent run from canceling into walk
+type = AssertSpecial
+trigger1 = 1
+flag = NoWalk
+
+[State 103, 3] ;Prevent from turning
+type = AssertSpecial
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 103, 4]
+type = ChangeState
+trigger1 = p2bodydist x >= 180
+trigger2 = p2movetype = A
+trigger3 = backedgedist <= 30
+value = 0
+
+;---------------------------------------------------------------------------
+;Super Jump AI
+[Statedef 901]
+type = A
+movetype = I
+physics = N
+anim = 900
+velset = 0,-12
+ctrl = 1
+
+[State 901, 0]
+type = VelAdd
+trigger1 = 1
+y = 0.5
+
+[State 901, AfterImage]
+type = AfterImage
+trigger1 = time = 1
+time = 80
+length = 6
+palcolor = 256
+palinvertall = 0
+palbright = 50,50,50
+palcontrast = 120,120,220
+palpostbright = 0,0,0
+palmul = .65,.65,.75
+timegap = 2
+framegap = 1
+trans = Add
+
+[State 901, AfterImageTime]
+type = AfterImageTime
+trigger1 = Pos Y >= 5
+time = 1
+value = 0
+
+[State 901, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = s900, 0
+volumescale = 300
+
+[State 901, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = s900, 1
+
+[State 901, VelAdd]
+type = VelSet
+trigger1 = 1
+x = 4
+
+[State 901, ChangeState]
+type = ChangeState
+trigger1 = Pos Y >= 1
+value = 52
+
+;---------------------------------------------------------------------------
+;Super Jump AI WITHOUT COMBO
+[Statedef 902]
+type = A
+movetype = I
+physics = N
+anim = 900
+velset = 0,-12
+ctrl = 1
+
+[State 902, 0]
+type = VelAdd
+trigger1 = 1
+y = 0.5
+
+[State 902, AfterImage]
+type = AfterImage
+trigger1 = time = 1
+time = 80
+length = 6
+palcolor = 256
+palinvertall = 0
+palbright = 50,50,50
+palcontrast = 120,120,220
+palpostbright = 0,0,0
+palmul = .65,.65,.75
+timegap = 2
+framegap = 1
+trans = Add
+
+[State 902, AfterImageTime]
+type = AfterImageTime
+trigger1 = Pos Y >= 5
+time = 1
+value = 0
+
+[State 902, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = s900, 0
+volumescale = 300
+
+[State 902, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 1
+value = s900, 1
+
+[State 902, VelAdd]
+type = VelSet
+trigger1 = 1
+x = 4
+
+[State 902, ChangeState]
+type = ChangeState
+trigger1 = Pos Y >= 1
+value = 52
+
+;---------------------------------------------------------------------------------
+;PowerCharge
+[Statedef 907]
+type = S
+movetype = I
+physics = S
+velset = 0,0
+anim = 905
+ctrl = 0
+sprpriority = 2
+
+[State 905, PowerAdd]
+type = PowerAdd
+trigger1 = time%2=1
+value = 22
+persistent = 1
+
+[State 905, PlaySnd]
+type = PlaySnd
+trigger1 = AnimElem = 2
+value = s900, 2
+persistent = 1
+loop = 0
+channel = 8
+
+[State 905, Explod]
+type = Explod
+trigger1 = time = 0
+anim = 906
+id = 906
+pos = 0,0
+postype = P1  ;P2, Front, Back, Left, Right
+bindtime = -1
+removetime = -1
+sprpriority = 1
+ownpal = 1
+removeongethit = 1
+
+[State 905, End]
+type = changestate
+trigger1 = P2BodyDist x <= 135
+trigger2 = power = powermax
+trigger3 = P2MoveType = A
+trigger4 = RoundState = 3
+value = 906
+ctrl = 1

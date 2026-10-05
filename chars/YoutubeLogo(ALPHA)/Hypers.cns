@@ -11,57 +11,6 @@ velset = 0,0
 anim = 3000
 sprpriority = 2
 
-[State 3000, HitDef]
-type = HitDef
-trigger1 = (AnimElem = 55 || AnimElem = 57 || AnimElem = 59)
-attr = S,HA
-hitflag = MAF
-guardflag = MA
-animtype = Hard
-damage = 20,5
-pausetime = 0,0
-sparkno = -1
-sparkxy = 0,0
-hitsound = S0,1
-guardsound = S0,4
-ground.type = High      ;Low, Trip, None
-ground.slidetime = 3
-ground.hittime = 100
-air.hittime = 100
-guard.hittime = 20
-guard.slidetime = 3
-ground.velocity = -4,0
-air.velocity = -4,-2
-air.fall = 1
-fall.recover = 0
-ignorehitpause = 1
-p2facing = 1
-
-[State 3000, HitDef]
-type = HitDef
-trigger1 = AnimElem = 61
-attr = S,HA
-hitflag = MAF
-guardflag = MA
-animtype = Hard
-damage = 100,10
-pausetime = 0,0
-sparkno = -1
-sparkxy = 0,0
-hitsound = S0,1
-guardsound = S0,4
-ground.type = High      ;Low, Trip, None
-ground.slidetime = 0
-ground.hittime = 50
-air.hittime = 50
-guard.hittime = 20
-guard.slidetime = 3
-ground.velocity = -8,-8
-air.velocity = -8,-8
-fall = 1
-ignorehitpause = 1
-p2facing = 1
-
 [State 3000, Hyper Portrait]
 type = Explod
 trigger1 = !time
@@ -76,6 +25,16 @@ scale = 0.2,0.2
 supermovetime = 9999
 pausemovetime = 9999
 sprpriority = -3
+ownpal = 1
+
+[State 3000, Helper]
+type = Helper
+trigger1 = AnimElem = 55
+helpertype = Normal ;Player
+name = "Kaboom"
+stateno = 3001
+pos = 80,0
+postype = P1    ;P2, Front, Back, Left, Right
 ownpal = 1
 
 [State 3000, SuperPause]
@@ -95,17 +54,110 @@ trigger1 = !Time
 value = S3000,0
 channel = 0
 
-[State 3000, PlaySnd]
-type = PlaySnd
-trigger1 = AnimElem = 55
-value = S3000,1
-channel = 0
-
 [State 3000, ChangeState]
 type = ChangeState
 trigger1 = AnimTime = 0
-value = 0
+value = 3002
 ctrl = 1
+
+;---------------------------------------------------------------------------
+; Explosion hitbox
+[StateDef 3001]   
+type = S          ; SCA
+movetype = A      ; AIHU
+physics = N       ; SCANU
+anim = 3001          ;refers to the .Air file
+juggle = 0
+
+[State 3001, PlaySnd]
+type = PlaySnd
+trigger1 = !Time
+value = S3000,1
+
+[State 3001, PlaySnd]
+type = PlaySnd
+trigger1 = !Time
+value = S3000,5
+volumescale = 400
+
+[State 3001, HitDef]
+type = HitDef
+trigger1 = !Time
+attr = S,HA
+hitflag = MAFD
+guardflag = MA
+animtype = DiagUp
+damage = 300,10
+pausetime = 5,5
+sparkno = -1
+ground.type = High
+guard.slidetime = 15
+guard.velocity = -4
+p2stateno = 3002
+fall = 1
+fall.recover = 0
+
+[State 3001, DestroySelf]
+type = DestroySelf
+trigger1 = AnimTime = 0
+
+;---------------------------------------------------------------------------
+; Borrowed Nick Hooper Code
+[StateDef 3002]   
+type = A          ; SCA
+movetype = H      ; AIHU
+physics = N       ; SCANU
+ctrl = 0
+velset = -20, -13
+
+[State 3002, ChangeAnim]
+type = ChangeAnim
+trigger1 = time = 0
+trigger1 = !selfanimexist(5052)
+value = 5050
+
+[State 3002, ChangeAnim]
+type = ChangeAnim
+trigger1 = time = 0
+trigger1 = selfanimexist(5052)
+value = 5052
+
+[State 3002, Gravity]
+type = Gravity
+trigger1 = 1
+
+[State 3002, Velset]
+Type = VelSet
+Trigger1 = BackEdgeBodyDist <= 5
+X = 1
+Y = -7
+
+[State 3002, PlaySnd]
+type = PlaySnd
+trigger1 = BackEdgeBodyDIst <= 5
+value = S3000,4
+
+[State 3002, Turn]
+type = Turn
+trigger1 = BackEdgeBodyDist <= 5
+
+[State 3002, Explod]
+Type = Explod
+Trigger1 = BackEdgeBodyDist <= 5
+Anim = F72
+Pos = 0,-6
+PosType = P1
+Facing = 1
+BindTime = 1
+RemoveTime = -2
+SprPriority = 5
+IgnoreHitPause = 1
+Persistent = 0
+
+[State 3002, SelfState]
+Type = SelfState
+Trigger1 = Vel Y >= 0 && Pos Y>=0
+Value = 5100
 
 ;---------------------------------------------------------------------------
 ; HE DOESNT KNOW THE WAE
@@ -114,7 +166,7 @@ type    = S
 movetype= A
 physics = N
 juggle  = 0
-poweradd= -1500
+poweradd= -2000
 ctrl = 0
 velset = 0,0
 anim = 3005
@@ -231,7 +283,7 @@ type = HitDef
 trigger1 = Time = 0
 attr = A, HA
 animtype  = DiagUp
-damage    = 320, 20
+damage    = 400, 20
 hitflag = MAFD
 guardflag = MA
 pausetime = 0,0
@@ -245,7 +297,7 @@ ground.hittime  = 20
 ground.velocity = -1,-15
 air.velocity = -1,-15
 fall = 1
-fall.recover = 0
+fall.recovertime = 45
 p2facing = 1
 
 [State 3006, DestroySelf]
