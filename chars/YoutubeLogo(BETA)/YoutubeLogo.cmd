@@ -289,8 +289,8 @@ value= 1001
 [State -1, Jump AI]
 type = ChangeState
 triggerall = Var(59)>0
+triggerall = !StateType = A
 trigger1 = Ctrl
-trigger1 = !StateType = A
 trigger1 = P2StateType != L
 trigger1 = P2MoveType != A
 trigger1 = Random < 400
@@ -336,8 +336,8 @@ value = 3005
 type = ChangeState
 triggerall = var(59)>0
 triggerall = Power >= 1000
-trigger1 = !Statetype = A
-trigger1 = Stateno = 1020 && MoveContact
+triggerall = !Statetype = A
+trigger1 = Stateno = 1020 && MoveHit
 trigger1 = Time = 5
 trigger1 = Random < 900
 trigger1 = Ctrl = 0
