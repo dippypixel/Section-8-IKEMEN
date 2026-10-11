@@ -622,7 +622,7 @@ triggerall = command = "b"
 trigger1 = statetype != A && ctrl
 trigger2 = stateno = [200,201]
 trigger2 = movecontact
-
+trigger3= movehit && stateno = 240 && time > 15
 ;---------------------------------------------------------------------------
 ;AirAttack
 [State -1, AirAttack]
