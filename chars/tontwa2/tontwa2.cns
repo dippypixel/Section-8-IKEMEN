@@ -1,0 +1,619 @@
+;---------------------------------------------------------------------------
+
+; Tontwa Constants
+
+;---------------------------------------------------------------------------
+
+[Data]
+life = 1000
+attack = 100
+defence = 100
+fall.defence_up = 50
+liedown.time = 60
+airjuggle = 13
+sparkno = s7100+random%6
+guard.sparkno = 40
+KO.echo = 1
+volume = 100
+IntPersistIndex = 60
+FloatPersistIndex = 40
+
+[Size]
+xscale = .7           ;Horizontal scaling factor.
+yscale = .7          ;Vertical scaling factor.
+ground.back = 15     ;Player width (back, ground)
+ground.front = 16    ;Player width (front, ground)
+air.back = 12        ;Player width (back, air)
+air.front = 12       ;Player width (front, air)
+height = 60          ;Height of player (for opponent to jump over)
+attack.dist = 160    ;Default attack distance
+proj.attack.dist = 90 ;Default attack distance for projectiles
+proj.doscale = 0     ;Set to 1 to scale projectiles too
+head.pos = -5, -90   ;Approximate position of head
+mid.pos = -5, -60    ;Approximate position of midsection
+shadowoffset = 0     ;Number of pixels to vertically offset the shadow
+draw.offset = 0,0    ;Player drawing offset in pixels (x, y). Recommended 0,0
+
+[Velocity]
+walk.fwd  = 2.4      ;Walk (Shoto) forward
+walk.back = -2.2     ;Walk (Shoto) backward
+run.fwd  = 6, 0    ;Run forward (x, y)
+run.back = -6.5 	 ;These notes are fucking annoying.
+jump.neu = 0,-10    ;Neutral jumping velocity (x, y)
+jump.back = -3    ;Jump back Speed (x, y)
+jump.fwd = 3       ;Jump forward Speed (x, y)
+runjump.back = -2.55,-8.1 ;Running jump speeds (opt)
+runjump.fwd = 4,-8.1      ;.
+airjump.neu = 0,-8.1      ;.
+airjump.back = -2.55      ;Air jump speeds (opt)
+airjump.fwd = 2.5         ;.
+air.gethit.groundrecover = -.15,-3.5  ;Velocity for ground recovery state (x, y) **MUGEN 1.0**
+air.gethit.airrecover.mul = .5,.2     ;Multiplier for air recovery velocity (x, y) **MUGEN 1.0**
+air.gethit.airrecover.add = 0,-4.5    ;Velocity offset for air recovery (x, y) **MUGEN 1.0**
+air.gethit.airrecover.back = -1       ;Extra x-velocity for holding back during air recovery **MUGEN 1.0**
+air.gethit.airrecover.fwd = 0         ;Extra x-velocity for holding forward during air recovery **MUGEN 1.0**
+air.gethit.airrecover.up = -2         ;Extra y-velocity for holding up during air recovery **MUGEN 1.0**
+air.gethit.airrecover.down = 1.5      ;Extra y-velocity for holding down during air recovery **MUGEN 1.0**
+
+[Movement]
+airjump.height = 35   ;Minimum distance from ground before you can air jump (opt)
+yaccel = .6          ;Vertical acceleration
+stand.friction = .9  ;Friction coefficient when standing
+crouch.friction = .82 ;Friction coefficient when crouching
+stand.friction.threshold = 2          ;If player's speed drops below this threshold while standing, stop his movement **MUGEN 1.0**
+crouch.friction.threshold = .05       ;If player's speed drops below this threshold while crouching, stop his movement **MUGEN 1.0**
+air.gethit.groundlevel = 25           ;Y-position at which a falling player is considered to hit the ground **MUGEN 1.0**
+air.gethit.groundrecover.ground.threshold = -20 ;Y-position below which falling player can use the recovery command **MUGEN 1.0**
+air.gethit.groundrecover.groundlevel = 10   ;Y-position at which player in the ground recovery state touches the ground **MUGEN 1.0**
+air.gethit.airrecover.threshold = -1  ;Y-velocity above which player may use the air recovery command **MUGEN 1.0**
+air.gethit.airrecover.yaccel = .35    ;Vertical acceleration for player in the air recovery state **MUGEN 1.0**
+air.gethit.trip.groundlevel = 15      ;Y-position at which player in the tripped state touches the ground **MUGEN 1.0**
+down.bounce.offset = 0, 20            ;Offset for player bouncing off the ground (x, y) **MUGEN 1.0**
+down.bounce.yaccel = .4               ;Vertical acceleration for player bouncing off the ground **MUGEN 1.0**
+down.bounce.groundlevel = 12          ;Y-position at which player bouncing off the ground touches the ground again **MUGEN 1.0**
+down.friction.threshold = .05         ;If the player's speed drops below this threshold while lying down, stop his movement **MUGEN 1.0**
+
+;---------------------------------------------------------------------------
+; Variable usage:
+; This is a record of the variables that KFM uses. Keeping a record of your
+; variable usage helps you avoid careless mistakes later.
+; var(1)  - Used in kfm.cmd for combo condition (updated every tick)
+; var(2)  - Used in Kung Fu Throw (state 800) to remember if fwd was being
+;           held (remembered from state 800 through state 810).
+
+;---------------------------------------------------------------------------
+; Unique Tontwa variables:
+; var(3)	- Stance switch
+; var(4)  - I'll find a use for you.
+; var(5)	- Chill Time Traveler decider (Time Over state)
+; var(8)	- Hood irony special number.
+; var(10)	- Combo Meal Thangalang
+; var(12) - Hadouken special number.
+; var(15) - Dancer spawn decider (Winpose 193)
+; var(18) - Super BG remover switch (FOOT SUPER)
+; var(19) - Clone special number.
+; var(23) - BANG special number.
+; var(30) - UROTB Crowd person number.
+; var(34) - UROTB Random charpicker (For optimization purposes)
+; var(35) - Temp. variable #1
+
+;---------------------------------------------------------------------------
+; Special Cooldown variables:
+; var(22) - Shove Cooldown timer
+; var(21) - Shove EX Cooldown timer
+; var(23) - BANG special number.
+; var(25) - BANG Cooldown timer
+; var(26) - BANG EX Cooldown timer
+
+;---------------------------------------------------------------------------
+; Unique Tontwa float variables:
+; fvar(6)	- Spin super Acceleration shizz (fwd)
+; fvar(7)	- Spin super Acceleration shizz (back)
+; fvar(9) - Spin super velocity is kept for the finishing move!
+
+;---------------------------------------------------------------------------
+; Other miscellaneous systemic shit
+; channel = 2 - This is for audio in the intro states that are meant to stop when skipped in State 0.
+; channel = 4 - Getup snd. Used for state 5120, ended in state -2
+; channel = 5 - Hobo scream (UROTB Super)
+
+
+
+;---------------------------------------------------------------------------
+;Default language victory quotes (optional).  **MUGEN 1.0**
+;If this section is included, the default language victory quotes must be in English.
+[Quotes]
+; Up to 100 victory quotes can be specified per language (victory0 - victory99)
+; 100 victory quotes? Who would think of such a thing?! Couldn't be me!
+victory0 = "WHAT'S IS that guys even his PROBLEM?"
+victory1 = "I am vomit."
+victory2 = "*Insert a really agitated and pretentious meta victory quote about character standards here*"
+victory3 = "ouchouchouchouchouchouchouchouchouchouchouchouchouchouchouchouchouchouchouchouchouchouchouchouchouchouchouchouch"
+victory4 = "I'm gonna go play Battle Balls and flicker goon in my bedroom."
+victory5 = "Sounds like someone's passionate about the meta."
+victory6 = "Conan O'Brien is the best talk show host." ;dont make me laugh
+victory7 = "What's MUGEN?!"
+victory8 = "Alright, scrapheap. Give me one good reason we shouldn't toss you into the canal!"
+victory9 = "The M.U.G.E.N. Self Insert Community Situation Just Got WORSE"
+victory10 = "Yes! Yes! More bullshit!"
+victory11 = "I wonder if the person who made VSync is swimming in gold coins or if they're making $0 like the person who made the Fidget Spinners."
+victory12 = "This song makes me think of my ex-girlfriend, and I HAAAAATE her! >:(" ;Vagueposting
+victory13 = "i wanna play with my spongebob toy"
+victory14 = "YOU GONNA PICK MY WAY OR THE HIGHWAY, BITCH?"
+victory15 = "Do not bash my character! Do not bash my character! Do not bash my character!"
+victory16 = "Do I add smartpalettes today or another winquote? You decide!"
+victory17 = "STOP STOP STOP JUST STOP JUST FUCKING STOP IT PLEASE STOP IT ENOUGH STOP STOP STOOOOP PLEASE QUIT STOP DOING THAT TO ME STOP IT STOP I CAN'T TAKE IT STOP IT STOP STOP STOP ITTT"
+victory18 = "I LAUGHED. MYSELF. TO SLEEEEP"
+victory19 = "You we're goin' Nuts in that fight!"
+victory20 = "If you scare me like that again, I'm going to kick you in the balls!"
+victory21 = "EW"
+victory22 = "I'm going to piss myself to sleep tonight."
+victory23 = "Dude, what if we age by leveling up? Oh god, how old am I?!"
+victory24 = "Can we go? I have to jack my swag..."
+victory25 = "The Oneyplays Allegations Are a Mess"
+victory26 = "He Walks Into Church Claiming to Be Jesus... Chaos Erupts"
+victory27 = "FUCK YOU BURGER KING ALWAYS FUCKING UP MY GODDAMN FUCKING MOTHERFUCKING ASS ORDER" ;I know like 3 people who actually talk like this.
+victory28 = "Welp. Glad thing i won. :/"
+victory29 = "Judge Judy does NOT play around"
+victory30 = "Youre Face is Forever burned in My Mind......."
+victory31 = "whoever in human evolution evolved so we all have canker sores in our mouths i hope ur burning in hell"
+victory32 = "WHAT? YOU'RE HAPPY!? FUCK YOU!"
+victory33 = "im never going to escape the Amateur and Child Arts trenches ;_;"
+victory34 = "At some point I gotta get down to the BOTTOM OF THIS TACO SALAD!!!"
+
+
+; vs Anthony (aka OLD TONTWA)
+victory35 = "I just know you eat the dead skin off your dry chap lips" ;Especially if he's much too comfortable putting his hands inside shoes like a fucking moron.
+victory36 = "A true marvel of the human mind"
+
+; vs TONTWA
+victory37 = "rot."
+victory38 = "HAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA"
+victory39 = "I look funny in unflattering angles."
+victory40 = "Wat ta fukc ?"
+
+; vs CHASE
+victory41 = "Can I have your shoes?"
+victory42 = "To become Wacky, Phineas... is not to be... wacky at all..."
+victory43 = "Chase! How dare You shove Me in the Locker. That's It. You are Grounded Grounded Grounded Grounded Grounded Grounded Grounded Grounded Grounded Grounded Grounded Grounded for 3985473980572438973598037509823750983275934750927923485732985 Years. Go To Your Room Right Now."
+
+; vs NICK HOOPER
+victory44 = "I like your neck"
+
+; vs StinkyPeteFan
+victory45 = "Ahh!"
+victory46 = "The Quick Brown Fox Jumps Over The Lazy Dog"
+
+; vs Hobo-standalone
+victory47 = "scary firewokr :("
+
+; vs YKun
+victory48 = "If only you knew the positive significance you've had on the lives of many today... *smokes a conspicuously-placed pipe that's sitting on the night stand*"
+
+; vs Jade
+victory49 = "STOP TOUCHING MY FOOOOOOOOOOD"
+
+; vs THE KIDS OF THE MUGEN
+victory50 = "Keep trying."
+victory51 = "GET OWNED KID"
+victory52 = "I HAAAAAAATE the kids of MUGEN!!! MUGEN IS FOR THE BIG STRONG MASCULINE MEN NOT THOSE PESKY WANNABE AUTHORS!!!! I swear I'm not gay"
+victory53 = "GET BASHED! GO BACK TO KICKING ROCKS BITCH"
+victory54 = "advice or not ur chars will always be shitty lmao"
+
+; EBM Palette
+victory55 = "My fearsome teeth are stronger then you!"
+victory56 = "Adrian has nothing on me."
+victory57 = "Nice finger speed!  Do you whack off a lot to give your fingers excersize?"
+victory58 = "A safety plan for color has been denied."
+victory59 = "OMG LIEK I M UBER 1337 5AUC3!!  U R N00B!  HAHAAHAHAAHA!!11"
+victory60 = "Eat your wheatcakes!!"
+victory61 = "Conan O'Brien is the best talk show host!"
+
+; vs KFM
+victory63 = "Hello Kung Fu Man please give me your ass i am going to spank it so hard"
+
+; vs JoeyTheTricky
+;Context is that he's EXTREEEEMELY homophobic and transphobic!
+victory64 = "ur a faggot"
+
+
+;JAPANESE QUOTES BELOW! 
+;THEY'RE JUICY, I TELL YOU~!
+[ja.Quotes]
+victory0 = "HI"
+victory1 = "place - meh. \nplace (Tokyo, Japan) - WOAH";I wonder if the \n command even works in MUGEN 1.1.. I've only ever seen it used in VibinVendetta...
+
+
+;---------------------------------------------------------------------------
+; Override common states (use same number to override) :
+;---------------------------------------------------------------------------
+
+;---------------------------------------------------------------------------
+; States that are always executed (use statedef -2)
+;---------------------------------------------------------------------------
+
+;[Statedef -2]
+
+;ICON SYSTEM
+;Programmed by Mozaico!!! Permission given.
+;[STATE -2, HIT START]
+;TYPE = MAPSET
+;TRIGGER1 = MOVETYPE = H && TIME = 0
+;MAP = "HITPORTRAITEND"
+;VALUE = FIGHTTIME + 25
+;IGNOREHITPAUSE = 1
+;[STATE -2, HIT ON]
+;TYPE = REMAPSPRITE
+;TRIGGER1 = MOVETYPE = H && TIME = 0
+;SOURCE = 9000,0
+;DEST = 9001,0
+;IGNOREHITPAUSE = 1
+;[STATE -2, HIT OFF]
+;TYPE = REMAPSPRITE
+;TRIGGER1 = MAP(HITPORTRAITEND) > 0 && FIGHTTIME >= MAP(HITPORTRAITEND)
+;SOURCE = 9000,0
+;DEST = 9000,0
+;IGNOREHITPAUSE = 1
+;[STATE -2, HIT END]
+;TYPE = MAPSET
+;TRIGGER1 = MAP(HITPORTRAITEND) > 0 && FIGHTTIME >= MAP(HITPORTRAITEND)
+;MAP = "HITPORTRAITEND"
+;VALUE = 0
+;IGNOREHITPAUSE = 1
+
+;---------------------------------------------------------------------------
+;ModeHud
+;The code to make these work is active, but I made the anim numbers different so they're visually hidden. 
+;This is simply bc I plan to rework how mode indication works another day.
+;[StateDef 10000]   
+;movetype = U      ; AIHU
+;physics = N       ; SCANU          ;refers to the .Air file
+;sprpriority = 9    ; Stand behind everything 
+;anim = 666
+;
+;[State 0, PalFXWiz]
+;type = PalFX
+;trigger1 = time = 0
+;time = 5
+;add = 255,255,255
+;mul = 256,256,256
+;sinadd = 0,0,0,1
+;invertall = 0
+;color = 256
+;
+;[State 0, SHOTO Mode Indicator, PLAYER1 SIDE]
+;type = Explod
+;triggerall = teamside = 1
+;trigger1= root,var(3)=0
+;trigger1 = !NumExplod(10000)
+;anim = 10000
+;ID = 10000
+;pos = 0,(ScreenHeight-100)
+;postype = left  ;P2, Front, Back, Left, Right
+;bindtime = -1
+;removetime = -1
+;sprpriority = 9
+;ontop = 1
+;scale=0.5,0.5
+;ownpal = 1
+;
+;[State 0, RUSH Mode Indicator, PLAYER1 SIDE]
+;type = Explod
+;triggerall = teamside = 1
+;trigger1= root,var(3)=1
+;trigger1 = !NumExplod(10001)
+;anim = 10001
+;ID = 10001
+;pos = 0,(ScreenHeight-100)
+;postype = left  ;P2, Front, Back, Left, Right
+;bindtime = -1
+;removetime = -1
+;sprpriority = 9
+;ontop = 1
+;scale=0.5,0.5
+;ownpal = 1
+;
+;[State 0, SHOTO Mode Indicator, PLAYER2 SIDE]
+;type = Explod
+;triggerall = teamside = 2
+;trigger1= root,var(3)=0
+;trigger1 = !NumExplod(10000)
+;anim = 10000
+;ID = 10000
+;pos = -52,(ScreenHeight-100)
+;postype = right  ;P2, Front, Back, Left, Right
+;bindtime = -1
+;removetime = -1
+;sprpriority = 9
+;ontop = 1
+;scale=0.5,0.5
+;ownpal = 1
+;
+;[State 0, RUSH Mode Indicator, PLAYER2 SIDE]
+;type = Explod
+;triggerall = teamside = 2
+;trigger1= root,var(3)=1
+;trigger1 = !NumExplod(10001)
+;anim = 10001
+;ID = 10001
+;pos = -52,(ScreenHeight-100)
+;postype = right  ;P2, Front, Back, Left, Right
+;bindtime = -1
+;removetime = -1
+;sprpriority = 9
+;ontop = 1
+;scale=0.5,0.5
+;ownpal = 1
+
+
+;=====================================================================
+;---------------------------------------------------------------------
+[Statedef -2]
+;---------------------------------------------------------------------
+;=====================================================================
+
+[State 0, DisplayToClipboard]
+type = DisplayToClipboard
+trigger1 = 1
+text = "var(3) = %d, var(25) = %d var(21) = %d var(23) = %d var(34) = %d"
+params = var(3), var(25), var(21), var(23), var(34)
+ignorehitpause = 1
+
+
+;[State -2, ENOUGH.]
+;type = stopsnd
+;trigger1 = (stateno = 5000 || stateno = 5010 || stateno = 5020 || stateno = 5070 || stateno = 5080)
+;trigger2 = time = 20
+;channel = 16
+
+
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1 = numexplod(19500)
+trigger1 = (stateno!=[3000,3002])
+trigger1 = (stateno!=[6000,6003])
+trigger1 = (stateno!=[7000,7002])
+id = 19500
+
+[state unlock the wall bounce after a certain period of time]
+type = varset
+triggerall = var(34) = 1
+trigger1 = time = 45
+v = 34
+value = 0
+
+
+;CONDITIONAL WINQUOTE SHIZZ
+; REGULAR QUOTES!!!
+
+[State -2, WinQuoteSet]
+type = VictoryQuote
+trigger1 = 1
+value = 1+random%34
+
+; ANTHONY
+[state -2, winquoteset]
+type = victoryquote
+triggerall = numenemy
+triggerall = enemy, authorname = "AnarchyAxel/AwesomeBlue/Giko/year2000k/BakonArmy" || enemy, authorname = "anthony240/SkyScaper24/chaosCreation/year2000k/BakonArmy" || enemy, authorname = "AnarchyAxel/SkyScaper24/chaosCreation/year2000k/BakonArmy"
+trigger1 = enemy, name = "Anthony" || enemy, name = "Anthony Small Final Update"
+value = 35+random%2
+
+; Tontwa. a.k.a. The actual character himself.
+[state -2, WinQuoteSet]
+type = VictoryQuote
+triggerall = numenemy
+trigger1 = enemy, name = "Tontwa"
+trigger2 = enemy, authorname = "arikirao"
+value = 37+random%3
+
+; CHASE
+[state -2, WinQuoteSet]
+type = victoryquote
+triggerall = numenemy
+trigger1 = enemy, name = "CHASE"
+trigger2 = enemy, authorname = "Chase2006"
+value = 41+random%2
+
+; NICK
+[state -2, WinQuoteSet]
+type = victoryquote
+triggerall = numenemy
+trigger1 = enemy, name = "Nick Hooper"
+trigger2 = enemy, authorname = "DarkDonald1"
+value = 43
+
+; HOBO (With this char not being released, this is just an estimate of what I assume that this character's name and authorname is...)
+[state -2, WinQuoteSet]
+type = victoryquote
+triggerall = numenemy
+trigger1 = enemy, name = "Hobo"
+trigger2 = enemy, authorname = "Usher11"
+value = 46
+
+; YKUN
+[state -2, WinQuoteSet]
+type = victoryquote
+triggerall = numenemy
+trigger1 = enemy, name = "YKun"
+trigger2 = enemy, authorname = "skbyun3599"
+value = 47
+
+; JAED
+[state -2, WinQuoteSet]
+type = victoryquote
+triggerall = numenemy
+trigger1 = enemy, name = "Jaed"
+trigger2 = enemy, authorname = "guymbagoomba"
+value = 48
+
+; If Tontwa with the EBM palette in use.
+[state -2, WinQuoteSet]
+type = victoryquote
+triggerall = numenemy
+trigger1 = palno = 6
+value = 53+random%7
+
+; Kung Fu Man
+[state -2, WinQuoteSet]
+type = victoryquote
+triggerall = numenemy
+trigger1 = enemy, name = "Kung Fu Man"
+trigger2 = enemy, authorname = "Elecbyte"
+value = 60
+
+
+;[State 0, ModeHud Activate]
+;type = Helper
+;trigger1 =  !numhelper(10000) 
+;helpertype = Normal 
+;name = "ModeHud"
+;ID = 10000
+;stateno = 10000
+;pos = 0,0
+;postype = p1    ;P2, Front, Back, Left, Right
+;keyctrl = 0
+;sprpriority = -32
+
+[State 0, PalFX]
+type = PalFX
+trigger1 = var(3)=1
+time = 1
+add = 90,50,50
+mul = 256,256,256
+invertall = 0
+color = 210
+ignorehitpause = 1
+;persistent = 
+
+
+[State 0, Turn]
+type = Turn
+trigger1 = prevstateno=220 && p2dist x < 0
+trigger2 = prevstateno=221 && p2dist x < 0
+;ignorehitpause = 
+;persistent = 
+[State 0, Turn]
+type = velmul
+trigger1 = prevstateno=220 && movetype=A
+x=.5
+
+[State -2, StopSnd]
+type = StopSnd
+trigger1 = stateno != 0
+trigger1 = stateno != [10,12]
+trigger1 = stateno != 20
+trigger1 = stateno != 40
+trigger1 = stateno != 45
+trigger1 = stateno != [50,52]
+trigger1 = stateno != 5120
+channel = 4
+
+
+;Thanks for fixing ts, Chase!!!
+
+[State 0, Bang Cooldown]
+type = Varset
+trigger1 = var(25)&& stateno!=8000&&!numtarget
+v = 25    ;fv = 10
+value = 0
+ignorehitpause=1
+
+[State 0, Bang EX Cooldown]
+type = Varadd
+trigger1 = var(26)>0&& stateno!=8100
+v = 26    ;fv = 10
+value = -1
+ignorehitpause=1
+
+[State 0, Shove Cooldown]
+type = Varadd
+trigger1 = var(22)>0&& stateno!=6760
+v = 22    ;fv = 10
+value = -1
+ignorehitpause=1
+
+[State 0, Shove EX Cooldown]
+type = Varadd
+trigger1 = var(21)>0&& stateno!=6770
+v = 21    ;fv = 1
+value = -1
+ignorehitpause=1
+
+[State 0, Bang Cooldown]
+type = Varset
+trigger1 = stateno!=221 && !numtarget
+v = 23    ;fv = 10
+value = 0
+ignorehitpause=1
+
+[State 0, VarSet]
+type = Varadd
+trigger1 = stateno=250&&time=1
+v = 3
+value = 1
+
+[State 0, VarSet]
+type = Varset
+trigger1 = 1
+v = 3
+value = var(3)%2
+
+[State 0, VarSet]
+type = Varset
+trigger1 = !numtarget && stateno!=220
+v = 20    ;fv = 10
+value = 0
+
+
+[State -2, Get Hit Sounds]
+type = PlaySnd
+triggerall = alive && time = 2
+trigger1 = (stateno = 5000 || stateno = 5010 || stateno = 5020 || stateno = 5070 || stateno = 5080)
+trigger1 = enemynear,hitdefattr = SCA,NA,SA,HA
+value = S5000,0+(random%10)
+;channel = 16 ;Chase, you were right! The channel does not go up to 5000. What a concept!
+volume = 255
+
+;=====================================================================
+;---------------------------------------------------------------------
+; SPECIAL COOLDOWNS
+;---------------------------------------------------------------------
+;=====================================================================
+
+;SHOVE
+[State -2, VarAdd]
+type = VarAdd
+trigger1 = var(22) > 0
+v = 22
+value = -1
+
+;SHOVE EX
+[State -2, VarAdd]
+type = VarAdd
+trigger1 = var(21) > 0
+v = 21
+value = -1
+
+;BANG EX
+[State -2, VarAdd]
+type = VarAdd
+trigger1 = var(26) > 0
+v = 26
+value = -1
+
+
+;---------------------------------------------------------------------------
+; States that are executed when in self's state file (use statedef -3)
+;---------------------------------------------------------------------------
+
+[Statedef -3]
+
+;This controller plays a sound everytime KFM lands from a jump, or
+;from his back-dash.
+[State -3, Landing Sound]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 52 ;Jump land
+trigger2 = stateno = 106 ;Run-back land
+value = 40, 0
