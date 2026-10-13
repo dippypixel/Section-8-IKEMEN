@@ -1,0 +1,4012 @@
+;---------------------- Integer variable list ----------------------
+
+;ZM Universal Variables (KEEP THESE WHEN DESIGNING CHARACTER FOR ZMR.)
+;Var(0) - KO Messages / Hyper Combo Finish
+;Var(1) - Pause Menu Detector
+;Var(2) - Pause Menu Cursor
+;Var(3) - Universal Damage Dampener
+;Var(4) - Launcher Detector
+;Var(5) - Command List Cursor
+;Var(6) - Health Tracker (For First Attack Text)
+;Var(7) - Counter Tracker (For Counter Text
+;Var(8) - Throw Facing
+;Var(9) - Projectile Type
+;Var(10) - Air Parry Punish Tracker
+;Var(11) - Movement Tracker
+;Var(12) - Corndog Spear Hitcounter
+;Var(21) - Character Detector
+;Var(22) - White Parry Checker
+
+;Hitspark Variables
+;var(40)=HitPauseTime
+;var(41)=Spark X
+;var(42)=Spark Y
+;var(43)=Spark Type(-1 or lower=Guard FX,0 or higher=Hit FX)
+;var(44)=Enemy,ID
+
+;Channels
+;Channel 0 - Voice
+;Channel 1 - Announcer
+;Channels 2 to 4 - Intro
+
+;--------------------------------------------------------
+;Stats
+;--------------------------------------------------------
+[Data]
+life = 900             ;Amount of life to start with
+attack = 100           ;attack power (more is stronger)
+defence = 100          ;defensive power (more is stronger)
+power = 1000           ;for hypers, launcher and etc. (1000 by default)
+fall.defence_up = 0    ;Unused in ZMR. Percentage to increase defense everytime player is knocked down
+liedown.time = 60      ;this is left unused for ZMR, as it uses its own system to keep track of liedown time which is 60 ticks for all characters, the same as here. 
+airjuggle = 12         ;Number of points for juggling
+sparkno = s823100      ;Default hit spark number for HitDefs
+guard.sparkno = s823600;Default guard spark number
+KO.echo = 0            ;Always Unused. don't bother lol
+volume = 255           ;Volume offset (negative for softer)
+;--------------------------------------------------------
+;if numbers for both Indexes are lower than 59, for example
+;first ones at 39, the numbers 40-59 won't reset during rounds
+;being able to be kepted consistent unaffected by the game.
+;same applies to Float Index as well. anything beyond the number
+;you put in that isn't 59-60 for Int or 39-40 would keep it 
+;persistent between rounds
+IntPersistIndex = 39
+FloatPersistIndex = 7
+;--------------------------------------------------------
+[Size]
+xscale = .8           ;Horizontal scaling factor.
+yscale = .8           ;Vertical scaling factor.
+ground.back = 30      ;Player width (back, ground)
+ground.front = 30     ;Player width (front, ground)
+air.back = 30         ;Player width (back, air)
+air.front = 30        ;Player width (front, air)
+height = 60           ;Height of player (for opponent to jump over)
+attack.dist = 75      ;Default attack distance
+proj.attack.dist = 75 ;Default attack distance for projectiles
+proj.doscale = 0      ;Set to 1 to scale projectiles too
+head.pos = 0, -60    ;Approximate position of head
+mid.pos = 0, -60     ;Approximate position of midsection
+shadowoffset = 0      ;Number of pixels to vertically offset the shadow
+draw.offset = 0,0     ;Player drawing offset in pixels (x, y)
+
+[Velocity]
+walk.fwd  = 2.8      ;Walk forward
+walk.back = -2.6      ;Walk backward
+run.fwd  = 6.8, 0     ;Run forward (x, y)
+run.back = -6.8,-5.8  ;Hop backward (x, y)
+jump.neu = 0,-9.4     ;Neutral jumping velocity (x, y)
+jump.back = -3.55     ;Jump back Speed (x, y)
+jump.fwd = 3.5        ;Jump forward Speed (x, y)
+runjump.back = -2.55,-8.1 ;Running jump speeds (opt)
+runjump.fwd = 5,-8.1      ;.
+airjump.neu = 0,-8.1      ;.
+airjump.back = -2.55      ;Air jump speeds (opt)
+airjump.fwd = 2.5         ;.
+
+[Movement]
+airjump.num = 0       ;Unused
+airjump.height = 35   ;Minimum distance from ground before you can air jump (opt)
+yaccel = .55          ;Vertical acceleration
+stand.friction = .85  ;Friction coefficient when standing
+crouch.friction = .82 ;Friction coefficient when crouching
+
+; Up to 100 victory quotes can be specified per language (victory0 - victory99)
+[Quotes]
+victory1 = "*Jazz Music Intensifies*"
+victory2 = "*proceeds to listen to Le Lis*"
+victory3 = "*http://Corndogoncorndog.com*"
+victory4 = "*spins like a beyblade*"
+victory5 = "*wonders how to get back to its online domain*"
+victory6 = "*listens to Billy Cobham music*"
+victory7 = "*turns into a real plate*"
+victory8 = "*preforms a sick drum solo*"
+victory9 = "*rolls away*"
+victory10 = "*goes back to The Useless Web*"
+victory11 = "Dev Note: the plate doesn't talk you dumbass lol"
+victory12 = "*wants to tell the player to go to Corndogoncorndog.com, but can't speak*"
+;---------------------------------------------------------------------------
+; Lose by Time Over
+[Statedef 170]
+type = S
+ctrl = 0
+anim = 170
+velset = 0,0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = !time
+value = S100,15
+channel = 0
+
+[State 0, Offset]
+type = Offset
+trigger1 = 1
+y = -sin((gametime-(pi/180))*0.09)*1.2
+ignorehitpause = 1
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+;---------------------------------------------------------------------------
+; PREINTRO
+[Statedef 190]
+type = S
+ctrl = 0
+velset = 0,0
+
+[State 190, 2] ;Go straight to intro.
+type = ChangeState
+trigger1 = Time = 0
+value = 191+random%3
+
+;---------------------------------------------------------------------------
+; Win state decider
+[Statedef 180]
+type = S
+
+[State 180, 1] ;Win Poses are added here. KFM only has one but you can have as many as you want (3 is preferred in ZMR)
+type = ChangeState
+trigger1 = Time = 0
+value = 181+random%3
+
+;---------------------------------------------------------------------------
+; Win pose 1 - Teleport
+[Statedef 181]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = !time
+value = S100,11
+channel = 0
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 155
+value = S0,24
+
+[State 0, Offset]
+type = Offset
+trigger1 = time >= 0
+y = -sin((gametime-(pi/180))*0.09)*1.2
+ignorehitpause = 1
+
+[State Roundnotover]
+type = AssertSpecial
+trigger1 = time = [0,230]
+flag = roundnotover
+flag2 = nomusic
+
+[state ]
+type=angledraw
+triggerall=!ishelper
+trigger1=time > 154
+scale=sin((time-(pi/5))*0.0921),1
+value=0
+ignorehitpause=1
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = time > 171
+flag = noshadow
+flag2 = invisible
+ignorehitpause=1
+
+[State 181, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+;=========================================
+;Announcer Stuff. Keep these in win poses
+;if its for ZMR. remove if not
+;=========================================
+[State YOU WIN (Regular Version)] ;this is flipped upside down, but the code will flip things rightside up as a workaround
+type = Explod
+triggerall = !var(59)
+triggerall = numenemy
+triggerall = !numpartner
+trigger1 = !time
+bindtime = -1
+pausemovetime = - 1
+removetime = -2
+postype = Left
+pos = 155,100
+anim = 185
+id = 185
+sprpriority = 23333338
+ontop = 1
+OwnPal = 1
+scale = 0,0
+ignorehitpause = 0
+supermovetime = 999999999
+pausemovetime = 999999999
+
+[State YOU WIN (Regular Version)] 
+type = ModifyExplod
+triggerall = !var(59)
+triggerall = numenemy
+triggerall = !numpartner
+trigger1 = (time = [0,42])
+anim = 185
+ID = 185
+;pos = 158,75
+scale = -0.388-(0.0135*(Time-23)), -0.388-(0.0135*(Time-23))
+
+[State Perfect! (Regular Version)]
+type = Explod
+triggerall = !var(59)
+triggerall = numenemy
+triggerall = !numpartner
+triggerall = var(6)=0
+trigger1 = time = 80
+bindtime = -1
+pausemovetime = - 1
+removetime = -2
+postype = Left
+pos = 155,140
+anim = 186
+id = 186
+sprpriority = 23333338
+ontop = 1
+OwnPal = 1
+scale = 0.5,0.5
+ignorehitpause = 0
+supermovetime = 999999999
+pausemovetime = 999999999
+
+[State Character Win (Regular Version Boss)]
+type = PlaySnd
+;-------------------------------------------------
+;Disabled for Bosses
+triggerall = enemynear,name="CorndogOfLightV2"||enemynear,name="PizzaRollOfDarknessV2" 
+;-------------------------------------------------
+triggerall = !var(59)
+triggerall = numenemy
+triggerall = !numpartner
+trigger1 = !time
+value = S9999,20
+ignorehitpause = 1
+[State Character Win (Regular Version)]
+type = PlaySnd
+;-------------------------------------------------
+;Disabled for Bosses
+triggerall = enemynear,name!="CorndogOfLightV2"
+triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
+;-------------------------------------------------
+triggerall = !var(59)
+triggerall = numenemy
+triggerall = !numpartner
+trigger1 = !time
+value = S9999,ifelse(teamside=2,26,24)
+ignorehitpause = 1
+
+[State Perfect (Regular Version)]
+type = PlaySnd
+triggerall = !var(59)
+triggerall = var(6)=0
+triggerall = numenemy 
+triggerall = !numpartner
+trigger1= time = 80
+value = S9999,22
+ignorehitpause = 1
+;===================================================
+;Team Variant (detects if there is a partner on your side)
+
+[State YOU WIN (Team Version)] ;this is flipped upside down, but the code will flip things rightside up as a workaround
+type = Explod
+triggerall = !var(59)
+triggerall = numpartner
+triggerall = numenemy
+triggerall = !time
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+bindtime = -1
+pausemovetime = - 1
+removetime = -2
+postype = Left
+pos = 155,100
+anim = 185
+id = 185
+sprpriority = 23333338
+ontop = 1
+OwnPal = 1
+scale = 0,0
+ignorehitpause = 0
+supermovetime = 999999999
+pausemovetime = 999999999
+
+[State YOU WIN (Team Version)] 
+type = ModifyExplod
+triggerall = !var(59)
+triggerall = numpartner
+triggerall = numenemy
+triggerall = (time = [0,42])
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+anim = 185
+ID = 185
+;pos = 158,75
+scale = -0.388-(0.0135*(Time-23)), -0.388-(0.0135*(Time-23))
+
+[State Perfect! (Team Version)]
+type = Explod
+triggerall = !var(59)
+triggerall = numpartner
+triggerall = numenemy
+triggerall = var(6)=0
+triggerall = time = 80
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+bindtime = -1
+pausemovetime = - 1
+removetime = -2
+postype = Left
+pos = 155,140
+anim = 186
+id = 186
+sprpriority = 23333338
+ontop = 1
+OwnPal = 1
+scale = 0.5,0.5
+ignorehitpause = 0
+supermovetime = 999999999
+pausemovetime = 999999999
+
+[State Character Win (Team Version)]
+type = PlaySnd
+;-------------------------------------------------
+;Disabled for Bosses
+triggerall = enemynear,name!="CorndogOfLightV2"
+triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
+;-------------------------------------------------
+triggerall = !var(59)
+triggerall = numpartner
+triggerall = numenemy
+triggerall = !time
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+value = S9999,ifelse(teamside=2,27,25)
+ignorehitpause = 1
+
+[State Character Win (Team Version Boss)]
+type = PlaySnd
+;-------------------------------------------------
+;Disabled for Bosses
+triggerall = enemynear,name="CorndogOfLightV2"
+triggerall = enemynear,name="PizzaRollOfDarknessV2" 
+;-------------------------------------------------
+triggerall = !var(59)
+triggerall = numpartner
+triggerall = numenemy
+triggerall = !time
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+value = S9999,20
+ignorehitpause = 1
+
+[State Perfect (Team Version)]
+type = PlaySnd
+triggerall = !var(59)
+triggerall = var(6)=0
+triggerall = numpartner
+triggerall = numenemy
+triggerall = time = 80
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+value = S9999,22
+ignorehitpause = 1
+
+;---------------------------------------------------------------------------
+; Win pose 2 - Drum Solo
+[Statedef 182]
+type = S
+physics = N
+ctrl = 0
+anim = 180
+velset = 0,-7.3
+sprpriority = 0
+
+[State Knocked Down]
+type = PlaySnd
+trigger1 = animelemtime(1)=40
+value = s0,25
+loop = 1
+
+[State Drum]
+type = Helper
+trigger1 = animelem=1
+helpertype = Normal ;Player
+name = "Drums"
+size.xscale = const(size.xscale)
+size.yscale = const(size.yscale)
+ID = 18200
+stateno = 18200
+pos = 0,0
+postype = P1
+ownpal = 1
+
+[State Drum]
+type = Helper
+trigger1 = animelemtime(1)=15
+helpertype = Normal ;Player
+name = "Band"
+size.xscale = const(size.xscale)
+size.yscale = const(size.yscale)
+ID = 18201
+stateno = 18201
+pos = 0,0
+postype = P1
+ownpal = 1
+[State Drum]
+type = Helper
+trigger1 = animelemtime(1)=40
+helpertype = Normal ;Player
+name = "Sticks"
+size.xscale = const(size.xscale)
+size.yscale = const(size.yscale)
+ID = 18202
+stateno = 18202
+pos = 50,-60
+postype = P1
+ownpal = 1
+[State Drum]
+type = Helper
+trigger1 = animelemtime(1)=40
+helpertype = Normal ;Player
+name = "Sticks"
+size.xscale = const(size.xscale)
+size.yscale = const(size.yscale)
+ID = 18203
+stateno = 18202
+pos = -50,-60
+postype = P1
+ownpal = 1
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 1
+movecamera = 1,0
+
+[State 0, VelMul]
+type = VelMul
+trigger1 = 1
+y = .80
+
+[State Roundnotover]
+type = AssertSpecial
+trigger1 = time = [0,335]
+flag = roundnotover
+
+[State 181, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+;=========================================
+;Announcer Stuff. Keep these in win poses
+;if its for ZMR. remove if not
+;=========================================
+[State YOU WIN (Regular Version)] ;this is flipped upside down, but the code will flip things rightside up as a workaround
+type = Explod
+triggerall = !var(59)
+triggerall = numenemy
+triggerall = !numpartner
+trigger1 = !time
+bindtime = -1
+pausemovetime = - 1
+removetime = -2
+postype = Left
+pos = 155,100
+anim = 185
+id = 185
+sprpriority = 23333338
+ontop = 1
+OwnPal = 1
+scale = 0,0
+ignorehitpause = 0
+supermovetime = 999999999
+pausemovetime = 999999999
+
+[State YOU WIN (Regular Version)] 
+type = ModifyExplod
+triggerall = !var(59)
+triggerall = numenemy
+triggerall = !numpartner
+trigger1 = (time = [0,42])
+anim = 185
+ID = 185
+;pos = 158,75
+scale = -0.388-(0.0135*(Time-23)), -0.388-(0.0135*(Time-23))
+
+[State Perfect! (Regular Version)]
+type = Explod
+triggerall = !var(59)
+triggerall = numenemy
+triggerall = !numpartner
+triggerall = var(6)=0
+trigger1 = time = 80
+bindtime = -1
+pausemovetime = - 1
+removetime = -2
+postype = Left
+pos = 155,140
+anim = 186
+id = 186
+sprpriority = 23333338
+ontop = 1
+OwnPal = 1
+scale = 0.5,0.5
+ignorehitpause = 0
+supermovetime = 999999999
+pausemovetime = 999999999
+
+[State Character Win (Regular Version Boss)]
+type = PlaySnd
+;-------------------------------------------------
+;Disabled for Bosses
+triggerall = enemynear,name="CorndogOfLightV2"||enemynear,name="PizzaRollOfDarknessV2" 
+;-------------------------------------------------
+triggerall = !var(59)
+triggerall = numenemy
+triggerall = !numpartner
+trigger1 = !time
+value = S9999,20
+ignorehitpause = 1
+[State Character Win (Regular Version)]
+type = PlaySnd
+;-------------------------------------------------
+;Disabled for Bosses
+triggerall = enemynear,name!="CorndogOfLightV2"
+triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
+;-------------------------------------------------
+triggerall = !var(59)
+triggerall = numenemy
+triggerall = !numpartner
+trigger1 = !time
+value = S9999,ifelse(teamside=2,26,24)
+ignorehitpause = 1
+
+[State Perfect (Regular Version)]
+type = PlaySnd
+triggerall = !var(59)
+triggerall = var(6)=0
+triggerall = numenemy 
+triggerall = !numpartner
+trigger1= time = 80
+value = S9999,22
+ignorehitpause = 1
+;===================================================
+;Team Variant (detects if there is a partner on your side)
+
+[State YOU WIN (Team Version)] ;this is flipped upside down, but the code will flip things rightside up as a workaround
+type = Explod
+triggerall = !var(59)
+triggerall = numpartner
+triggerall = numenemy
+triggerall = !time
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+bindtime = -1
+pausemovetime = - 1
+removetime = -2
+postype = Left
+pos = 155,100
+anim = 185
+id = 185
+sprpriority = 23333338
+ontop = 1
+OwnPal = 1
+scale = 0,0
+ignorehitpause = 0
+supermovetime = 999999999
+pausemovetime = 999999999
+
+[State YOU WIN (Team Version)] 
+type = ModifyExplod
+triggerall = !var(59)
+triggerall = numpartner
+triggerall = numenemy
+triggerall = (time = [0,42])
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+anim = 185
+ID = 185
+;pos = 158,75
+scale = -0.388-(0.0135*(Time-23)), -0.388-(0.0135*(Time-23))
+
+[State Perfect! (Team Version)]
+type = Explod
+triggerall = !var(59)
+triggerall = numpartner
+triggerall = numenemy
+triggerall = var(6)=0
+triggerall = time = 80
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+bindtime = -1
+pausemovetime = - 1
+removetime = -2
+postype = Left
+pos = 155,140
+anim = 186
+id = 186
+sprpriority = 23333338
+ontop = 1
+OwnPal = 1
+scale = 0.5,0.5
+ignorehitpause = 0
+supermovetime = 999999999
+pausemovetime = 999999999
+
+[State Character Win (Team Version)]
+type = PlaySnd
+;-------------------------------------------------
+;Disabled for Bosses
+triggerall = enemynear,name!="CorndogOfLightV2"
+triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
+;-------------------------------------------------
+triggerall = !var(59)
+triggerall = numpartner
+triggerall = numenemy
+triggerall = !time
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+value = S9999,ifelse(teamside=2,27,25)
+ignorehitpause = 1
+
+[State Character Win (Team Version Boss)]
+type = PlaySnd
+;-------------------------------------------------
+;Disabled for Bosses
+triggerall = enemynear,name="CorndogOfLightV2"
+triggerall = enemynear,name="PizzaRollOfDarknessV2" 
+;-------------------------------------------------
+triggerall = !var(59)
+triggerall = numpartner
+triggerall = numenemy
+triggerall = !time
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+value = S9999,20
+ignorehitpause = 1
+
+[State Perfect (Team Version)]
+type = PlaySnd
+triggerall = !var(59)
+triggerall = var(6)=0
+triggerall = numpartner
+triggerall = numenemy
+triggerall = time = 80
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+value = S9999,22
+ignorehitpause = 1
+
+;---------------------------------------------------------------------------
+; Win pose 3 - Spin Dash
+[Statedef 183]
+type = S
+ctrl = 0
+anim = 181
+velset = 0,0
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = time > 65
+value = 0
+movecamera = 0,0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelemtime(5)=0
+value = S0,26
+
+[State Roundnotover]
+type = AssertSpecial
+trigger1 = time = [0,240]
+flag = roundnotover
+
+[State Back Dash]
+type = Explod
+triggerall = time < 86
+triggerall=animelemtime(5)>=0
+trigger1 = time%8=0
+anim = 107
+ID = 106
+pos = -10,5
+facing=1
+accel=0.08,0
+postype = P1
+supermovetime = 999999
+pausemovetime = 999999
+scale =0.25,0.2
+sprpriority = 5
+ownpal = 1
+ignorehitpause = 1
+
+[State Back Dash]
+type = Explod
+triggerall = time < 86
+triggerall=animelemtime(5)>=0
+trigger1 = time%8=0
+anim = 107
+ID = 106
+pos = -5,5
+facing=1
+accel=0.08,0
+postype = P1
+trans = sub
+supermovetime = 999999
+pausemovetime = 999999
+scale =0.25,0.2
+sprpriority = 5
+ownpal = 1
+ignorehitpause = 1
+
+[State 0, AngleDraw]
+type = AngleDraw
+trigger1 = animelemtime(5)>=0
+ignorehitpause = 1
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = time = 86
+x = 55
+
+[State 0, AngleAdd]
+type = AngleAdd
+trigger1 = animelemtime(5)>=0
+value = -time*1.2
+ignorehitpause = 1
+
+[State 181, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+;=========================================
+;Announcer Stuff. Keep these in win poses
+;if its for ZMR. remove if not
+;=========================================
+[State YOU WIN (Regular Version)] ;this is flipped upside down, but the code will flip things rightside up as a workaround
+type = Explod
+triggerall = !var(59)
+triggerall = numenemy
+triggerall = !numpartner
+trigger1 = !time
+bindtime = -1
+pausemovetime = - 1
+removetime = -2
+postype = Left
+pos = 155,100
+anim = 185
+id = 185
+sprpriority = 23333338
+ontop = 1
+OwnPal = 1
+scale = 0,0
+ignorehitpause = 0
+supermovetime = 999999999
+pausemovetime = 999999999
+
+[State YOU WIN (Regular Version)] 
+type = ModifyExplod
+triggerall = !var(59)
+triggerall = numenemy
+triggerall = !numpartner
+trigger1 = (time = [0,42])
+anim = 185
+ID = 185
+;pos = 158,75
+scale = -0.388-(0.0135*(Time-23)), -0.388-(0.0135*(Time-23))
+
+[State Perfect! (Regular Version)]
+type = Explod
+triggerall = !var(59)
+triggerall = numenemy
+triggerall = !numpartner
+triggerall = var(6)=0
+trigger1 = time = 80
+bindtime = -1
+pausemovetime = - 1
+removetime = -2
+postype = Left
+pos = 155,140
+anim = 186
+id = 186
+sprpriority = 23333338
+ontop = 1
+OwnPal = 1
+scale = 0.5,0.5
+ignorehitpause = 0
+supermovetime = 999999999
+pausemovetime = 999999999
+
+[State Character Win (Regular Version Boss)]
+type = PlaySnd
+;-------------------------------------------------
+;Disabled for Bosses
+triggerall = enemynear,name="CorndogOfLightV2"||enemynear,name="PizzaRollOfDarknessV2" 
+;-------------------------------------------------
+triggerall = !var(59)
+triggerall = numenemy
+triggerall = !numpartner
+trigger1 = !time
+value = S9999,20
+ignorehitpause = 1
+[State Character Win (Regular Version)]
+type = PlaySnd
+;-------------------------------------------------
+;Disabled for Bosses
+triggerall = enemynear,name!="CorndogOfLightV2"
+triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
+;-------------------------------------------------
+triggerall = !var(59)
+triggerall = numenemy
+triggerall = !numpartner
+trigger1 = !time
+value = S9999,ifelse(teamside=2,26,24)
+ignorehitpause = 1
+
+[State Perfect (Regular Version)]
+type = PlaySnd
+triggerall = !var(59)
+triggerall = var(6)=0
+triggerall = numenemy 
+triggerall = !numpartner
+trigger1= time = 80
+value = S9999,22
+ignorehitpause = 1
+;===================================================
+;Team Variant (detects if there is a partner on your side)
+
+[State YOU WIN (Team Version)] ;this is flipped upside down, but the code will flip things rightside up as a workaround
+type = Explod
+triggerall = !var(59)
+triggerall = numpartner
+triggerall = numenemy
+triggerall = !time
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+bindtime = -1
+pausemovetime = - 1
+removetime = -2
+postype = Left
+pos = 155,100
+anim = 185
+id = 185
+sprpriority = 23333338
+ontop = 1
+OwnPal = 1
+scale = 0,0
+ignorehitpause = 0
+supermovetime = 999999999
+pausemovetime = 999999999
+
+[State YOU WIN (Team Version)] 
+type = ModifyExplod
+triggerall = !var(59)
+triggerall = numpartner
+triggerall = numenemy
+triggerall = (time = [0,42])
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+anim = 185
+ID = 185
+;pos = 158,75
+scale = -0.388-(0.0135*(Time-23)), -0.388-(0.0135*(Time-23))
+
+[State Perfect! (Team Version)]
+type = Explod
+triggerall = !var(59)
+triggerall = numpartner
+triggerall = numenemy
+triggerall = var(6)=0
+triggerall = time = 80
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+bindtime = -1
+pausemovetime = - 1
+removetime = -2
+postype = Left
+pos = 155,140
+anim = 186
+id = 186
+sprpriority = 23333338
+ontop = 1
+OwnPal = 1
+scale = 0.5,0.5
+ignorehitpause = 0
+supermovetime = 999999999
+pausemovetime = 999999999
+
+[State Character Win (Team Version)]
+type = PlaySnd
+;-------------------------------------------------
+;Disabled for Bosses
+triggerall = enemynear,name!="CorndogOfLightV2"
+triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
+;-------------------------------------------------
+triggerall = !var(59)
+triggerall = numpartner
+triggerall = numenemy
+triggerall = !time
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+value = S9999,ifelse(teamside=2,27,25)
+ignorehitpause = 1
+
+[State Character Win (Team Version Boss)]
+type = PlaySnd
+;-------------------------------------------------
+;Disabled for Bosses
+triggerall = enemynear,name="CorndogOfLightV2"
+triggerall = enemynear,name="PizzaRollOfDarknessV2" 
+;-------------------------------------------------
+triggerall = !var(59)
+triggerall = numpartner
+triggerall = numenemy
+triggerall = !time
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+value = S9999,20
+ignorehitpause = 1
+
+[State Perfect (Team Version)]
+type = PlaySnd
+triggerall = !var(59)
+triggerall = var(6)=0
+triggerall = numpartner
+triggerall = numenemy
+triggerall = time = 80
+trigger1=teamside=1
+trigger1=ID > Partner,ID && teammode = simul
+trigger2=teamside=2 
+trigger2=ID < Partner,ID && teammode = simul
+trigger3=var(48)=0
+value = S9999,22
+ignorehitpause = 1
+;----------------------------------------------------------------------------------------
+;Drumset
+[Statedef 18200]
+type    = U                    
+movetype= I                     
+physics = N                    
+juggle  = 0                                     
+ctrl = 0
+poweradd = 0    
+anim = 18000
+sprpriority = 3
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = !time
+y = 9
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = !time
+y = -318
+
+[State 1203]
+type=NotHitBy
+trigger1=time>=0
+value=SCA
+
+[State 0, VelMul]
+type = Veladd
+trigger1 = time < 18
+y = .77
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = time > 18
+y = 0
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = time > 18
+y = 0
+
+[State Knocked Down]
+type = Explod
+trigger1 = time = 18
+anim = 1002
+ID = 1002
+pos = 0,0
+postype = P1
+supermovetime = 999999
+pausemovetime = 999999
+trans=add
+scale = 0.45,0.45
+sprpriority = -31
+ownpal = 1
+[State Knocked Down]
+type = Explod
+trigger1 = time = 18
+anim = 1002
+ID = 1002
+pos = 0,0
+postype = P1
+supermovetime = 999999
+pausemovetime = 999999
+trans=sub
+scale = 0.5,0.5
+sprpriority = -31
+ownpal = 1
+[State Knocked Down]
+type = PlaySnd
+trigger1 = time = 18
+value = s1,11
+
+[State 0, EnvShake]
+type = EnvShake
+trigger1 = time = 18
+time = 5
+freq = 70
+ampl = -4
+ignorehitpause = 1
+;----------------------------------------------------------------------------------------
+;Headband
+[Statedef 18201]
+type    = U                    
+movetype= I                     
+physics = N                    
+juggle  = 0                                     
+ctrl = 0
+poweradd = 0    
+anim = 18001
+sprpriority = 1
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = !time
+y = 6
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = !time
+y = -318
+
+[State 1203]
+type=NotHitBy
+trigger1=time>=0
+value=SCA
+
+[State 0, VelMul]
+type = Veladd
+trigger1 = time < 18
+y = .33
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = time > 18
+y = 0
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = time > 18
+y = -132
+
+[State 0, Turn]
+type = Turn
+trigger1 = parent,animelemtime(3)=1
+trigger2 = parent,animelemtime(4)=1
+;----------------------------------------------------------------------------------------
+;Drumset
+[Statedef 18202]
+type    = U                    
+movetype= I                     
+physics = N                    
+juggle  = 0                                     
+ctrl = 0
+poweradd = 0    
+anim = 18002
+sprpriority = 2
+
+[State 1203]
+type=NotHitBy
+trigger1=time>=0
+value=SCA
+
+[State 0, AngleDraw]
+type = AngleDraw
+trigger1 = 1
+ignorehitpause = 1
+
+[State 0, AngleAdd]
+type = AngleAdd
+trigger1 = ishelper(18202)
+value = -15*sin((gametime-(pi/150))*0.45)
+ignorehitpause = 1
+[State 0, AngleAdd]
+type = AngleAdd
+trigger1 = ishelper(18203)
+value = 15*sin((gametime-(pi/150))*0.45)
+ignorehitpause = 1
+
+
+[State 0, Trans]
+type = Trans
+trigger1 = time < 52
+trans = addalpha
+alpha = 0+(time*6),255-(time*6)
+ignorehitpause = 1
+;---------------------------------------------------------------------------
+;Beyond The Screen
+[Statedef 191]
+type = S
+physics = N
+ctrl = 0
+anim = 19000
+velset = 0,0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 1
+value = S190,0
+channel = 4
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 86
+value = S190,1
+channel = 5
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 1
+movecamera = 1,0
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = !time
+y = -40
+
+[State Laptop Helper]
+type = Helper
+trigger1 = animelem=1
+helpertype = Normal ;Player
+name = "Laptop"
+size.xscale = 0.64
+size.yscale = 0.64
+ID = 19100
+stateno = 19100
+pos = 0,0
+postype = P1
+ownpal = 1
+
+[State 0, Offset]
+type = Offset
+triggerall = anim = 19000
+trigger1 = animelemtime(1)>=50&&animelemtime(1)<=80
+x = -sin(time*8)*0.1
+ignorehitpause = 1
+
+[State 0, AngleSet]
+type = AngleSet
+trigger1 = 1
+
+[State 0, AngleDraw]
+type = AngleDraw
+triggerall = anim = 19000
+trigger1 = animelemtime(2)>=0&&animelemtime(2)<=27
+value = 0
+scale = (1.9 - time*0.0272),(1.9 - time*0.0272)
+
+[State 0, ChangeAnim]
+type = ChangeState
+trigger1 = animelemtime(2)=28
+value = 19001
+
+[State 0, power]
+type = powerset
+trigger1 = roundsexisted = 0
+trigger1 = !time
+trigger1 = power < 500
+value = 500
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = anim = 19000
+flag = noshadow
+
+;Teleport In
+[Statedef 192]
+type = S
+ctrl = 0
+;anim = 181
+velset = 0,0
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 18
+value = S100,14
+channel = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 171
+value = S0,24
+
+[State 0, Offset]
+type = Offset
+trigger1 = time >= 0
+y = -sin((gametime-(pi/180))*0.09)*1.2
+ignorehitpause = 1
+
+[state ]
+type=angledraw
+triggerall=!ishelper
+trigger1=time > 154 && time < 188
+scale=-sin((time-(pi/5))*0.0921),1
+value=0
+ignorehitpause=1
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = time < 171
+flag = noshadow
+flag2 = invisible
+ignorehitpause=1
+
+[State 0, power]
+type = powerset
+trigger1 = roundsexisted = 0
+trigger1 = !time
+trigger1 = power < 500
+value = 500
+
+[State 181, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 0, ChangeAnim]
+type = ChangeState
+trigger1 = time = 230
+value = 0
+;---------------------------------------------------------------------------------------------------------
+;Assemble
+[Statedef 193]
+type = S
+ctrl = 0
+anim = 191
+velset = 0,0
+sprpriority = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 17
+value = S100,16
+channel = 5
+
+[State 0, Explod]
+type = Explod
+trigger1 = !time
+anim = 19100
+ID = 19100
+pos = 0,-967;487
+postype = p1  ;p2,front,back,left,right
+bindtime = 1
+removetime = -2
+vel = 0,14
+scale = const(size.xscale),const(size.yscale)
+ownpal = 1
+sprpriority = 1
+
+[State Knocked Down]
+type = Explod
+trigger1 = animelemtime(2)=0
+anim = 1002
+ID = 1002
+pos = 5,-8
+postype = P1
+supermovetime = 999999
+pausemovetime = 999999
+trans=add
+scale = 0.45,0.45
+sprpriority = -31
+ownpal = 1
+
+[State Knocked Down]
+type = Explod
+trigger1 = animelemtime(2)=0
+anim = 1002
+ID = 1002
+pos = 5,-8
+postype = P1
+supermovetime = 999999
+pausemovetime = 999999
+trans=sub
+scale = 0.5,0.5
+sprpriority = -31
+ownpal = 1
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 0, power]
+type = powerset
+trigger1 = roundsexisted = 0
+trigger1 = !time
+trigger1 = power < 500
+value = 500
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelemtime(4)=0
+value = S0,14
+channel = 4
+
+[State 0, EnvColor]
+type = EnvColor
+trigger1 = animelemtime(2)=0
+value = 255,255,255
+time = 1
+
+[State 0, EnvShake]
+type = EnvShake
+trigger1 = animelemtime(2)=0
+time = 12
+freq = 130
+ampl = -7
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelemtime(2)=0
+value = S190,2
+
+[State 181, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 0, ChangeAnim]
+type = ChangeState
+trigger1 = !animtime
+value = 0
+;---------------------------------------------------------------------------
+;Beyond The Screen
+[Statedef 19001]
+type = A
+physics = N
+ctrl = 0
+anim = 19001
+velset = 0,0
+
+[State 0, EnvColor]
+type = EnvColor
+trigger1 = !time
+value = 255,255,255
+time = 1
+
+[State 0, EnvShake]
+type = EnvShake
+trigger1 = !time
+time = 12
+freq = 130
+ampl = -7
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S190,2
+channel = 4
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 1
+movecamera = 1,0
+
+[State 0, VelAdd]
+type = VelAdd
+triggerall = anim = 19001
+trigger1 = !time
+y = -7
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = anim = 19001
+y = .24
+
+[State 0, AngleDraw]
+type = AngleDraw
+trigger1 = anim = 19001
+ignorehitpause = 1
+
+[State 0, AngleAdd]
+type = AngleAdd
+trigger1 = anim = 19001
+value = -13
+ignorehitpause = 1
+
+[State 191, 2] 
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 192]
+type = ChangeAnim
+triggerall = anim = 19001
+trigger1 = Vel Y > 0 && Pos Y >=-55
+value = 1013
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = anim = 1013
+y = 0
+
+[State 0, VelAdd]
+type = Velset
+trigger1 = anim = 1013
+y = 0
+
+[State 0, AngleDraw]
+type = Angleset
+trigger1 = anim = 1013
+value = 0
+ignorehitpause = 1
+
+[State 0, ChangeState]
+type = ChangeState
+triggerall = anim = 1013
+trigger1 = animtime = 0
+value = 0
+
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = anim = 1013
+trigger1 = animelemtime(1)=1
+value = S100,0
+channel = 0
+
+[State Land SFX]
+type = PlaySnd
+triggerall = anim = 1013
+trigger1 = animelemtime(1)=1
+value = S0,2
+
+[State Land FX]
+type = Explod
+triggerall = anim = 1013
+trigger1 = animelemtime(1)=1
+anim = 633
+ID = 630
+pos = 0,0
+postype = P1
+supermovetime = 999999
+pausemovetime = 999999
+scale =0.5,0.5
+sprpriority = 5
+ownpal = 1
+ignorehitpause = 1
+
+[State Land FX]
+type = Explod
+triggerall = anim = 1013
+trigger1 = animelemtime(1)=1
+anim = 633
+ID = 630
+pos = 5,0
+postype = P1
+trans = sub
+supermovetime = 999999
+pausemovetime = 999999
+scale =0.4,0.5
+sprpriority = 4
+ownpal = 1
+ignorehitpause = 1
+;----------------------------------------------------------------------------------------
+;Laptop
+[Statedef 19100]
+type    = U                    
+movetype= I                     
+physics = N                    
+juggle  = 0                                     
+ctrl = 0
+poweradd = 0    
+velset = 0,0  
+anim = 190  
+sprpriority = -1
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = !time
+y = 0
+
+[State 1203]
+type=NotHitBy
+trigger1=time>=0
+value=SCA
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = time = 107
+x = -9
+
+[State 0, VelMul]
+type = VelMul
+trigger1 = 1
+x = .84
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+triggerall = time > 150
+trigger1 = (time%5)=2
+flag = invisible
+
+[State 1203]
+type=destroyself
+trigger1 = time = 200
+;==============================================
+;DanTDM!?
+[StateDef 195]
+type = A
+movetype = I
+physics = N
+velSet = 0,0
+poweradd = 0
+anim = 9999
+
+[State Lanky Kong]
+type = ChangeState
+triggerall = roundstate = 3 && parent,win
+trigger1 = !time
+value = 197
+
+[State Yukuno]
+type = ChangeState
+triggerall =  roundstate = 2 && enemynear,statetype=L
+trigger1 = !time
+value = 196
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = nomusic
+ignorehitpause = 1
+
+[State Corndogs!]
+type = PlaySnd
+trigger1 = time = 10
+value = S100,5
+ignorehitpause = 1
+
+[State 6998]
+type = explod
+trigger1 = !numexplod(6998)
+anim = 195
+ID = 6998
+ontop = 0
+sprpriority = 9999
+postype = back
+bindtime = -1
+pausemovetime = -1
+supermovetime = -1
+removetime = 80
+scale = 0.5,0.5
+ownpal = 1
+
+[State 6998]
+type = modifyexplod
+trigger1 = numexplod(6998) && time < 20
+ID = 6998
+postype = back
+pos = -120 + ceil(6 * time), 240
+scale = 0.35,0.35
+[State 6998]
+type = modifyexplod
+trigger1 = numexplod(6998) && (time = [20, 60])
+ID = 6998
+postype = back
+pos = 0, 240
+scale = 0.35,0.35
+[State 6998]
+type = modifyexplod
+trigger1 = numexplod(6998) && time >= 60
+ID = 6998
+postype = back
+pos = -ceil(6 * (time -60)), 240
+scale = 0.35,0.35
+
+[State 6998, End]
+type = removeexplod
+trigger1 = time >= 80
+trigger2 = numhelper(9999)
+[State 6998, End]
+type = destroyself
+trigger1 = time >= 80
+trigger2 = numhelper(9999)
+;==============================================
+;Yuyuko 
+[StateDef 196]
+type = A
+movetype = I
+physics = N
+velSet = 0,0
+poweradd = 0
+anim = 9999
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = nomusic
+ignorehitpause = 1
+
+[State Corndogs!]
+type = PlaySnd
+trigger1 = time = 10
+value = S100,12
+ignorehitpause = 1
+
+[State 6998]
+type = explod
+trigger1 = !numexplod(6998)
+anim = 196
+ID = 6998
+ontop = 0
+sprpriority = 9999
+postype = back
+bindtime = -1
+pausemovetime = -1
+supermovetime = -1
+removetime = 80
+scale = 0.5,0.5
+ownpal = 1
+
+[State 6998]
+type = modifyexplod
+trigger1 = numexplod(6998) && time < 20
+ID = 6998
+postype = back
+pos = -120 + ceil(6 * time), 240
+scale = 0.35,0.35
+[State 6998]
+type = modifyexplod
+trigger1 = numexplod(6998) && (time = [20, 60])
+ID = 6998
+postype = back
+pos = 0, 240
+scale = 0.35,0.35
+[State 6998]
+type = modifyexplod
+trigger1 = numexplod(6998) && time >= 60
+ID = 6998
+postype = back
+pos = -ceil(6 * (time -60)), 240
+scale = 0.35,0.35
+
+[State 6998, End]
+type = removeexplod
+trigger1 = time >= 80
+trigger2 = numhelper(9999)
+[State 6998, End]
+type = destroyself
+trigger1 = time >= 80
+trigger2 = numhelper(9999)
+;==============================================
+;Lanky Kong
+[StateDef 197]
+type = A
+movetype = I
+physics = N
+velSet = 0,0
+poweradd = 0
+anim = 9999
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = nomusic
+ignorehitpause = 1
+
+[State Corndogs!]
+type = PlaySnd
+trigger1 = time = 10
+value = S100,13
+ignorehitpause = 1
+
+[State 6998]
+type = explod
+trigger1 = !numexplod(6998)
+anim = 197
+ID = 6998
+ontop = 0
+sprpriority = 9999
+postype = back
+bindtime = -1
+pausemovetime = -1
+supermovetime = -1
+removetime = 80
+scale = 0.5,0.5
+ownpal = 1
+
+[State 6998]
+type = modifyexplod
+trigger1 = numexplod(6998) && time < 20
+ID = 6998
+postype = back
+pos = -120 + ceil(6 * time), 240
+scale = 0.35,0.35
+[State 6998]
+type = modifyexplod
+trigger1 = numexplod(6998) && (time = [20, 60])
+ID = 6998
+postype = back
+pos = 0, 240
+scale = 0.35,0.35
+[State 6998]
+type = modifyexplod
+trigger1 = numexplod(6998) && time >= 60
+ID = 6998
+postype = back
+pos = -ceil(6 * (time -60)), 240
+scale = 0.35,0.35
+
+[State 6998, End]
+type = removeexplod
+trigger1 = time >= 80
+trigger2 = numhelper(9999)
+[State 6998, End]
+type = destroyself
+trigger1 = time >= 80
+trigger2 = numhelper(9999)
+
+;Corndog Orb Install
+[Statedef 19500]
+type = S
+ctrl = 0
+anim = 160
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+[State Drum]
+type = Helper
+trigger1 = !time
+helpertype = Normal ;Player
+name = "Band"
+size.xscale = const(size.xscale)
+size.yscale = const(size.yscale)
+ID = 18201
+stateno = 19502
+pos = 0,0
+postype = P1
+ownpal = 1
+pausemovetime = 99999
+supermovetime = 99999
+
+;=====================================
+;CINEMATIC ZOOMS (1.1 ONLY)
+[State 3000, Reset]
+type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            =varset
+type=null
+trigger1 = !time
+fvar(12) = 0
+ignorehitpause = 1
+[State 3000, Zoom In]
+type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            =varadd
+type=null
+trigger1 = time = [1,5]
+fvar(12) = 0.1*0.95
+ignorehitpause = 1
+
+[State 3000, Zoom In]
+type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            =varadd
+type=null
+trigger1 = time = [6,10]
+fvar(12) = 0.05*0.15
+ignorehitpause = 1
+
+[State 3000, Zoom Out]
+type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            =varadd
+type=null
+trigger1 = time  = [17,20]
+fvar(12) = -0.1*0.95
+ignorehitpause = 1
+
+[State 3000, Zoom]
+type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            =zoom
+type=null
+trigger1 = time = [1,20]
+scale = 1+fvar(12)
+pos = (Pos X/2)+(fvar(12)*8),0-(fvar(12)*4)
+ignorehitpause = 1
+;=========================================
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = !time
+value = S100,2
+channel = 0
+
+[state ]
+type=superpause
+trigger1=time=0
+time=20
+movetime=20
+anim=-1
+darken=0
+sound=s3000,1
+unhittable=1
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 12
+
+[State Guard Cancel?]
+type = PowerAdd
+triggerall = power >= 1000
+trigger1 = (prevstateno = [150,153])
+value = -1000
+persistent = 0 
+
+[state CD ORB READY]
+type=varset
+trigger1=time=0
+fvar(9)=1
+
+[State 0, PalFX]
+type = PalFX
+trigger1 = time=0
+time = 20
+add = 0,0,150
+mul = 256,256,256
+sinadd = 80,80,80,5
+color = 256
+ignorehitpause = 1
+
+[State 0, BGPalFX]
+type = BGPalFX
+trigger1 = time=0
+time = 10
+mul = 256,256,256
+sinadd = -50,-50,-50,20
+color = 256
+[State 0, Explod]
+type = Explod
+trigger1 = time=0
+anim = 6100
+ID = 6100
+pos = 0,-60
+postype = P1
+scale = 1,1
+supermovetime=999999
+sprpriority = 15
+ownpal = 1
+[State 0, Explod]
+type = Explod
+trigger1 = time=0
+anim = 6101
+ID = 6100
+pos = 0,-60
+postype = P1
+scale = 1*1.015,1*1.015
+supermovetime=999999
+sprpriority = -5
+ownpal = 1
+
+[state ]
+type=changeanim
+trigger1=animelemtime(3)>=0
+value=anim
+elem=3
+
+[State 195, 2]
+type = ChangeState
+trigger1 = time=20
+value = 0
+ctrl = 1
+;-----------------------------------------------------------------
+;Corndog Orb Install
+[Statedef 19501]
+type = S
+ctrl = 0
+anim = 160
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+[state ]
+type=superpause
+trigger1=time=0
+time=10
+movetime=10
+anim=-1
+darken=0
+sound=-1
+unhittable=1
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time=0
+value = S3000,1
+freqmul = 1.1
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = !time
+value = S100,2
+channel = 0
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[state ]
+type=varadd
+triggerall=floor(fvar(8))>0
+trigger1=time=1
+fvar(8)=-1
+ignorehitpause=1
+
+[state CD ORB READY] ;a flag that enables the corndog orb install
+type=varset
+trigger1=time=0
+fvar(9)=1
+
+[State 0, PalFX]
+type = PalFX
+trigger1 = time=0
+time = 10
+add = 0,0,150
+mul = 256,256,256
+sinadd = 80,80,80,5
+color = 256
+ignorehitpause = 1
+
+[State 0, BGPalFX]
+type = BGPalFX
+trigger1 = time=0
+time = 10
+mul = 256,256,256
+sinadd = -50,-50,-50,20
+color = 256
+[State 0, Explod]
+type = Explod
+trigger1 = time=0
+anim = 6100
+ID = 6100
+pos = 10,-63
+postype = P1
+scale = 1,1
+supermovetime=999999
+sprpriority = 15
+ownpal = 1
+[State 0, Explod]
+type = Explod
+trigger1 = time=0
+anim = 6101
+ID = 6100
+pos = 10,-63
+postype = P1
+scale = 1*1.015,1*1.015
+supermovetime=999999
+sprpriority = -5
+ownpal = 1
+
+[state ]
+type=changeanim
+trigger1=animelemtime(3)>=0
+value=anim
+elem=3
+
+[State 195, 2]
+type = ChangeState
+trigger1 = time=10
+value = 0
+ctrl = 1
+;----------------------------------------------------------------------------------------
+;Headband
+[Statedef 19502]
+type    = U                    
+movetype= I                     
+physics = N                    
+juggle  = 0                                     
+ctrl = 0
+poweradd = 0    
+anim = 18001
+sprpriority = 3
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = !time
+y = 7
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = !time
+y = -196
+
+[State 1203]
+type=NotHitBy
+trigger1=time>=0
+value=SCA
+
+[State 0, VelMul]
+type = Veladd
+trigger1 = time < 10
+y = .33
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = time > 10
+y = 0
+
+[State 0, Turn]
+type = Changestate
+trigger1 = parent,stateno != 19500
+value = 1036
+;---------------------------------------------------------------------------
+;Always Executed
+[Statedef -2]
+
+;==================================================================
+;Option
+[state AILevel(Winmugen only)]
+type                                                                                                                                                                                                                                                           =null
+type=varset
+trigger1=1
+var(50)=8 ;Low:1-High:8
+ignorehitpause=1
+
+[state AI Always On]
+type=varset
+triggerall=!var(59)
+trigger1=roundstate=0
+var(59)=0 ;0=Off,1=On
+ignorehitpause=1
+
+[state Tag mode detector]
+type=varset
+trigger1=!ishelper
+var(49)=0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       +(teammode=tag)
+ignorehitpause=1
+[state Tag mode detector (Endless CPU)]
+type=varset
+triggerall = var(59)
+triggerall = numpartner
+triggerall = numenemy
+triggerall = teammode = turns
+trigger1 = enemynear,name = "ZMR_Template" && enemynear,authorname = "Alexander Cooper 19 and Viola" ;KFM/Kung Fu Man
+trigger2 = enemynear,name = "ZanderCooper_ZMR" && enemynear,authorname = "Alexander Cooper 19"
+trigger3 = enemynear,name = "CorndogPlate_ZMR" && enemynear,authorname = "Alexander Cooper 19"
+trigger4 = enemynear,name = "Totino_ZMR" && enemynear,authorname = "Alexander Cooper 19"
+trigger5 = enemynear,name = "ChickenGuy_ZMR" && enemynear,authorname = "Viola"
+trigger6 = enemynear,name = "ExpandDong_ZMR" && enemynear,authorname = "Alexander Cooper 19"
+trigger7 = enemynear,name = "Bamberly_ZMR" && enemynear,authorname = "Alexander Cooper 19"
+trigger8 = enemynear,name = "AlexanderCooper_ZMR" && enemynear,authorname = "Alexander Cooper 19"
+trigger9 = enemynear,name = "Khan_ZMR" && enemynear,authorname = "Alexander Cooper 19"
+var(49)=1
+ignorehitpause=1
+
+[State -2, Custom KO Animation]
+type = SelfState
+triggerall = numenemy ;added Numenemy so results screen doesn't break corndog plate in Ikemen Go.
+triggerall = StateNo != 5150
+triggerall = StateNo != 5151
+trigger1 = !alive
+value = 5151
+ignorehitpause = 1
+
+[State Knockdown Remove Push] ;idk where to put it, but this should prevent characters from being able to move lied down opponents.
+type = PlayerPush
+trigger1 = statetype = L
+value = 0
+ignorehitpause = 1
+
+;==================================================================
+
+[State -2, Hurt Voice]
+type = PlaySnd
+triggerall = alive
+triggerall = random < 500
+triggerall = Time = 1
+trigger1 = stateno = 5000
+trigger2 = stateno = 5010
+trigger3 = stateno = 5020
+trigger4 = stateno = 5070
+trigger5 = stateno = 5072
+value = 5000,0+random%2
+channel = 0
+
+[State Wake Up]
+type = PlaySnd
+trigger1 = stateno = 5120
+trigger1 = time = 1
+trigger1 = random < 500
+trigger1 = roundstate < 3
+value = s100,3
+channel = 0
+
+[State Dizzy]
+type = PlaySnd
+trigger1 = anim = 5300
+trigger1 = time = 1
+value = s100,4
+channel = 0
+loop = 1
+
+[State -3, Stop Snd If Intro Is Skiped]
+type= stopsnd
+trigger1=stateno!= [190,199]
+trigger1=stateno!=19001
+channel=4
+persistent=0
+[State -3, Stop Snd If Intro Is Skiped]
+type= stopsnd
+trigger1=stateno!= [190,199]
+trigger1=stateno!=19001
+channel=5
+persistent=0
+;==================================================================
+;Dizzy
+
+[state ]
+type=angledraw
+triggerall=!ishelper
+trigger1=anim=5300
+scale=sin((gametime-(pi/180))*0.2),1
+value=0
+ignorehitpause=1
+
+[State 0, Offset]
+type = Offset
+triggerall=!ishelper
+trigger1=anim=5300
+y = -sin((gametime-(pi/180))*0.09)*1.2
+ignorehitpause = 1
+;==================================================================
+;Announcer 
+
+;Both of these track if you land a hit first or counter an opponents attack
+;with your own moves, if requirements are meant they will show up where hitsparks
+;are.
+
+;unsure on who made these codes, but credit goes to them. thank you
+
+[State -2, Counter FX]
+type = Helper
+triggerall = stateno != [900000,930000]
+triggerall = numhelper(8290)=0
+triggerall = var(10)!=1
+triggerall = enemynear,stateno = [5000,5999]
+triggerall = NumEnemy && var(7)
+triggerall = enemynear,statetype != A
+triggerall = !(HitDefAttr = SCA, AT) && (EnemyNear, MoveReversed != 1)
+;-------------------------------------------------
+;Disabled for Bosses
+triggerall = enemynear,name!="CorndogOfLightV2"
+triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
+;-------------------------------------------------
+trigger1 = MoveHit = 1
+helperType = Normal
+stateNo = 8290
+ID = 8290
+name = "Counter FX"
+postype = P1
+pos = 0,0
+ownPal = 1
+sprpriority = 9999
+pauseMoveTime = 255
+superMoveTime = 255
+ignoreHitPause = 1
+
+[State -2, Counter FX Anti-Air Version] ;This Code Co-Exists with the original code to be able to detect Anti-Airs, as normal helper isn't able to.
+type = Helper
+triggerall = stateno != [900000,930000]
+triggerall = numhelper(8290)=0
+triggerall = var(10)!=1
+triggerall = NumEnemy && var(7)
+triggerall = enemynear,statetype = A
+triggerall = enemynear,stateno = [5000,5999]
+;triggerall = statetype != A
+triggerall = !(HitDefAttr = SCA, AT) && (EnemyNear, MoveReversed != 1)
+;-------------------------------------------------
+;Disabled for Bosses
+triggerall = enemynear,name!="CorndogOfLightV2"
+triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
+;-------------------------------------------------
+trigger1 = MoveHit = 1
+helperType = Normal
+stateNo = 8290
+ID = 8290
+name = "Counter FX"
+postype = P1
+pos = 0,0
+ownPal = 1
+sprpriority = 9999
+pauseMoveTime = 255
+superMoveTime = 255
+ignoreHitPause = 1
+
+;these variables do all the tracking for the First Attack and Counter helpers
+[State -2, Counter Flag]
+type = VarSet
+trigger1 = NumEnemy
+var(7) = (EnemyNear, MoveType = A)
+ignoreHitPause = 1
+
+[State -2, Air-To-Air Counter Tracker] ;This is for fixing the weird bugs with counter text during Air-To-Airs hopefully. 
+type = VarSet
+triggerall = numenemy
+triggerall = enemynear,statetype = A
+triggerall = enemynear,movetype = A
+trigger1 = stateno != 160
+var(10) = ifelse(movetype=H,0,1)
+ignoreHitPause = 1
+
+[State Turn On White Parry] ;this checks to see if you are guarding or not so that parry can change its visuals to White Parry
+type = Varset
+triggerall = !var(59)
+triggerall = stateno != 160
+trigger1 = (stateno = [15000,15300])
+var(22) = 1
+ignorehitpause = 1
+
+[State Turn Off White Parry] ;this checks to see if you are guarding or not so that parry can change its visuals to White Parry
+type = Varset
+triggerall = !var(59)
+triggerall = stateno != 160
+trigger1 = (stateno != [15000,15300])
+var(22) = 0
+ignorehitpause = 1
+
+[State Turn On White Parry (CPU)] ;this checks to see if you are guarding or not so that parry can change its visuals to White Parry
+type = Varset
+triggerall = var(59)
+triggerall = stateno != 160
+trigger1 = (stateno = [150,153])
+var(22) = 1
+ignorehitpause = 1
+
+[State Turn Off White Parry (CPU)] ;this checks to see if you are guarding or not so that parry can change its visuals to White Parry
+type = Varset
+triggerall = var(59)
+triggerall = stateno != 160
+trigger1 = (stateno != [150,153])
+var(22) = 0
+ignorehitpause = 1
+
+[State ZMR Debug Info (Player)] ;Both Clipboards are for tracking certain variables in the Debug Menu, accessed by pressing Ctrl+D on your keyboard.
+type = DisplayToClipboard
+trigger1 = !var(59)
+text = "- Air Counter: %d | Aerial Rave: %d | Sucking Ass: %d | Inside ZMR?: %d"
+params = var(10),Var(4),var(6),var(21)
+
+[State ZMR Debug Info (Player)]
+type = AppendToClipboard
+trigger1 = !var(59)
+text = "| Enemy Pos X: %d | Enemy Pos Y: %d"
+params = p2bodydist x,p2bodydist y
+
+[State -2, First Attack FX] ;checks if you land an attack on opponent at the start of the match, when activated will only appear once until the next round.
+type = Helper
+triggerall = roundno = 1
+triggerall = stateno != [900000,930000]
+triggerall = var(48)=0 ;tagged in
+;-------------------------------------------------
+;Disabled for Bosses
+triggerall = enemynear,name!="CorndogOfLightV2"
+triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
+;-------------------------------------------------
+triggerall=!ishelper
+triggerall = roundstate = 2
+triggerall = var(6) = 0
+triggerall = numhelper(8291)=0
+triggerall = enemynear,life = enemynear,lifemax
+trigger1 = enemynear,stateno = [5000,5300]
+helperType = Normal
+stateNo = 8291
+ID = 8291
+name = "First Attack FX"
+postype = P1
+pos = 0,0
+ownPal = 1
+sprpriority = 9999
+pauseMoveTime = 255
+superMoveTime = 255
+ignoreHitPause = 1
+persistent = 0
+
+;If you successfully preform an Aerial Rave
+;the game checks to see if you have successfully did one. when
+;you do it displays the message.
+[State -2, Aerial Rave FX]
+type = Helper
+triggerall = numenemy
+triggerall = var(48)=0 ;tagged out detector
+triggerall = movetype = A
+;-------------------------------------------------
+;Disabled for Bosses
+triggerall = enemynear,name!="CorndogOfLightV2"
+triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
+;-------------------------------------------------
+trigger1 = enemy,stateno = 51001 && enemy,time = 1
+helperType = Normal
+stateNo = 8292
+ID = 8292
+name = "Aerial Rave FX"
+postype = P1
+pos = 0,0
+ownPal = 1
+pauseMoveTime = 255
+superMoveTime = 255
+ignoreHitPause = 1
+
+[State -2, Parry Tracker] ;for announcer messages acting weird after a move is parried and countered with an air normal
+type = VarSet
+triggerall = stateno != 160
+trigger1 = stateno != [600,630]
+var(10) = 0
+ignoreHitPause = 1
+
+[State Life Tracker] ;tracks your health for perfects. if you lose any health it gets set to 1
+type = VarSet
+trigger1 = life != lifemax
+var(6) = 1   
+
+;This trigger controls the announcers KO, You Win and Hyper Combo Finish states
+;in ZMR, the announcer gets more control over the game depending on what state 
+;you're in. more information is in statedef 9980-9982 located in Common1_ZMR.cns
+[State Roundstate 3 KO/Hyper Combo Finish]
+type = Helper
+triggerall = var(48) = 0
+triggerall = stateno != [900000,930000]
+triggerall=!ishelper
+triggerall = winko && roundstate = 3 && alive
+trigger1 = NumHelper(9980)=0
+name = "Announcer"
+ID = 9980
+StateNo = 9980
+ignorehitpause = 1
+persistent = 0
+ownpal = 1
+supermovetime = 65
+pausemovetime = 65
+
+;=================================================
+;Codes for Launcher to ignore juggle points during aerial raves.
+;that and air guard isn't a thing in ZMR to make parries more valuable
+;3rd code is to make sure opponents don't get hit before roundstate 2
+
+[State Launcher Detector] ;if detected doesn't count juggle points during aerial rave
+type = AssertSpecial
+trigger1 = var(4)=1
+flag = nojugglecheck
+ignorehitpause =1
+
+[State NO AIR GUARD] ;it stinks and sucks lol
+type = AssertSpecial
+trigger1 = 1
+flag = noairguard
+ignorehitpause=1
+
+[State NO GUARD FOR TAG MEMBERS] ;to fix any potentional issues with tag team assist
+type = AssertSpecial
+triggerall = var(49)=1 ;tag team detector
+trigger1 = var(48)=1 ;tagged out detector
+flag = noairguard
+flag2 = nostandguard
+flag3 = nocrouchguard
+ignorehitpause=1
+
+[State Immune to all Strikes outside roundstate 2] ;self explainatory
+type = NotHitBy
+triggerall = GameTime && stateno !=[5000,5999]
+trigger1 = !ctrl && RoundState != 2 
+trigger2 = !Alive
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+ignorehitpause = 1
+
+[State Tag Team Infinite Prevention]
+type = Nothitby
+triggerall = var(49)=1
+trigger1 = !alive && roundstate = 2
+value = SCA
+ignorehitpause = 1
+
+[State Immune to Strikes when Boss is defeated] ;self explainatory
+type = NotHitBy
+triggerall = alive && roundstate = 2
+trigger1 = enemynear,name="CorndogOfLightV2"
+trigger1 = enemynear,stateno = 6969 ;&& enemynear,movetype = H
+trigger2 = enemynear,name="PizzaRollOfDarknessV2" 
+trigger2 = enemynear,stateno = 555000 ;&& enemynear,movetype = H
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+ignorehitpause = 1
+;---------------------------------------------------------------------------------------------
+;Knocked Down Effects
+
+;these are put here to fix an issue with aerial raves against characters that aren't from ZMR.
+;they would have been in their respective states otherwise but liberties need to be made.
+
+[State Knocked Down]
+type = Explod
+triggerall = time=1 ;&& !SysVar(0)
+triggerall = BackEdgeDist > -80 ;ringout
+triggerall = FrontEdgeDist > -80 ;ringout
+trigger1 = stateno = 5100
+trigger2 = stateno = 5110
+trigger3 = stateno = 5111
+trigger4 = stateno = 51001
+trigger5 = stateno = 51101
+anim = 1002
+ID = 1002
+pos = 0,0
+postype = P1
+supermovetime = 999999
+pausemovetime = 999999
+trans=add
+scale = 0.45,0.45
+sprpriority = -31
+ownpal = 1
+
+[State Knocked Down]
+type = Explod
+triggerall = time=1 ;&& !SysVar(0)
+triggerall = BackEdgeDist > -80 ;ringout
+triggerall = FrontEdgeDist > -80 ;ringout
+trigger1 = stateno = 5100
+trigger2 = stateno = 5110
+trigger3 = stateno = 5111
+trigger4 = stateno = 51001
+trigger5 = stateno = 51101
+anim = 1002
+ID = 1002
+pos = 0,0
+postype = P1
+supermovetime = 999999
+pausemovetime = 999999
+trans=sub
+scale = 0.5,0.5
+sprpriority = -31
+ownpal = 1
+
+[State Knocked Down]
+type = EnvShake
+triggerall = time=1 ;&& !SysVar(0)
+triggerall = BackEdgeDist > -80 ;ringout
+triggerall = FrontEdgeDist > -80 ;ringout
+trigger1 = stateno = 5100
+trigger2 = stateno = 5110
+trigger3 = stateno = 5111
+trigger4 = stateno = 51001
+trigger5 = stateno = 51101
+time = 7
+freq = 120
+ampl = -4
+
+[State Knocked Down]
+type = PlaySnd
+triggerall = time=1 ;&& !SysVar(0)
+triggerall = BackEdgeDist > -80 ;ringout
+triggerall = FrontEdgeDist > -80 ;ringout
+trigger1 = stateno = 5100
+trigger2 = stateno = 5110
+trigger3 = stateno = 5111
+trigger4 = stateno = 51001
+trigger5 = stateno = 51101
+value = s1,10
+
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = time=1 ;&& !SysVar(0)
+trigger1 = stateno = 5100
+trigger2 = stateno = 5110
+trigger3 = stateno = 5111
+trigger4 = stateno = 51001
+trigger5 = stateno = 51101
+value = S0,13+random%2
+;---------------------------------------------------------------------------------------------
+;HitSparks
+
+;ZMR Hitsparks are all coded into here for easier access. there is a Null trigger in all attack states
+;that keep track of what kind of hitsparks they use and their positions. 
+
+;[State HitSpark]
+;type=null
+;;
+;;Spark X
+;trigger1=1||var(41):=0
+;;
+;;Spark Y
+;trigger1=1||var(42):=-76
+;;
+;;Spark Type
+;;
+;;0=Normal Light
+;;1=Normal Medium
+;;2=Normal Hard
+;;10=Slash Light
+;;11=Slash Medium
+;;12=Slash Hard
+;;
+;trigger1=1||var(43):=0
+;ignorehitpause=1
+
+;if you see something like this in attack states, thats what its for. the rest
+;you don't need to mess with, just the null trigger in attack states
+
+[State 0, EnvColor]
+type = EnvColor
+triggerall=stateno=3000
+triggerall = animelemtime(6)>=0
+triggerall=hitpausetime=var(40)
+trigger1=movehit=1
+value = 255,255,255
+time = 1
+ignorehitpause = 1
+
+[state Target,ID]
+type=varset
+triggerall=var(40)<0
+triggerall=numenemy=1
+trigger1=roundstate=0
+trigger2=numtarget!=1
+var(44)=enemynear,id
+ignorehitpause=1
+[state Target,ID]
+type=varset
+triggerall=var(40)<0
+triggerall=numenemy>1
+trigger1=roundstate=0
+trigger2=numtarget!=1
+var(44)=ifelse(enemynear(0),alive,enemynear(0),id,enemynear(1),id)
+ignorehitpause=1
+[state Target,ID]
+type=varset
+triggerall = enemynear,name != "CorndogOfLightV2" || enemynear,name != "PizzaRollOfDarknessV2"
+triggerall=var(40)<0
+trigger1=movecontact=1
+trigger1=numtarget=1
+var(44)=target,id
+ignorehitpause=1
+[state Target,ID]
+type=varset
+triggerall = enemynear,name != "CorndogOfLightV2" || enemynear,name != "PizzaRollOfDarknessV2"
+triggerall=var(40)<0
+trigger1=movecontact=1
+trigger1=!numtarget
+var(44)=-1
+ignorehitpause=1
+[state HitPause]
+type=varset
+triggerall=var(40)<0
+trigger1=movecontact=1
+var(40)=hitpausetime
+ignorehitpause=1
+
+[state Disable Spark]
+type=varset
+triggerall=var(43)>0
+trigger1=stateno=0||stateno=10||stateno=20||stateno=40||stateno=50
+trigger2=movetype=h
+trigger3=roundstate<2
+var(43)=-1
+ignorehitpause=1
+
+[State HitSpark FX]
+type = Helper
+triggerall = enemynear,name != "CorndogOfLightV2" || enemynear,name != "PizzaRollOfDarknessV2"
+triggerall=playeridexist(var(44))
+triggerall=hitpausetime=var(40)
+triggerall=var(43)>=0
+trigger1 = movehit=1
+helpertype = Normal
+name = "HitSpark"
+ID = 823000
+stateno = 823000
+pos = (ceil(playerid(var(44)),pos x-pos x)*facing)+var(41),var(42)
+postype = P1
+ownpal = 1
+supermovetime = 99999999
+pausemovetime = 99999999
+size.shadowoffset=100+var(43)
+ignorehitpause = 1
+
+[State HitSpark FX (FOR BOSSES ONLY)]
+type = Helper
+triggerall = teammode = single || teammode = turns || var(49)=1
+triggerall = enemynear,name = "CorndogOfLightV2" || enemynear,name = "PizzaRollOfDarknessV2"
+triggerall=hitpausetime=var(40)
+triggerall=var(43)>=0
+trigger1 = movehit=1
+helpertype = Normal
+name = "HitSpark"
+ID = 823000
+stateno = 823000
+pos = p2dist x+var(41),var(42)
+postype = P1
+ownpal = 1
+supermovetime = 99999999
+pausemovetime = 99999999
+size.shadowoffset=100+var(43)
+ignorehitpause = 1
+
+[State GuardSpark FX]
+type = Helper
+triggerall=playeridexist(var(44))
+triggerall=hitpausetime=var(40)
+triggerall=var(43)>=0
+trigger1 = moveguarded=1
+helpertype = Normal
+name = "GuardSpark"
+ID = 823000
+stateno = 823001
+pos = (ceil(playerid(var(44)),pos x-pos x)*facing)+var(41),var(42)
+postype = P1
+ownpal = 1
+supermovetime = 99999999
+pausemovetime = 99999999
+size.shadowoffset=100+var(43)
+ignorehitpause = 1
+
+;;Projhit or guarded if you needed
+;[State HitSpark FX Proj]
+;type = Helper
+;triggerall=playeridexist(var(44))
+;trigger1 = projhit=1 ;projhitXXXX=1
+;helpertype = Normal
+;name = "HitSpark"
+;ID = 823000
+;stateno = 823000
+;pos = (ceil(playerid(var(44)),pos x-pos x)*facing),playerid(var(44)),const(size.mid.pos.y)
+;postype = P1
+;ownpal = 1
+;supermovetime = 99999999
+;pausemovetime = 99999999
+;size.shadowoffset=100+var(43)
+;ignorehitpause = 1
+
+;[State GuardSpark FX]
+;type = Helper
+;triggerall=playeridexist(var(44))
+;trigger1 = projguarded=1 ;projguardedXXXX=1
+;helpertype = Normal
+;name = "GuardSpark"
+;ID = 823000
+;stateno = 823001
+;pos = (ceil(playerid(var(44)),pos x-pos x)*facing),playerid(var(44)),const(size.mid.pos.y)
+;postype = P1
+;ownpal = 1
+;supermovetime = 99999999
+;pausemovetime = 99999999
+;size.shadowoffset=100+var(43)
+;ignorehitpause = 1
+
+[state Reset HitPause]
+type=varset
+trigger1=1
+var(40)=-1
+
+;===========================================================================
+;Small Jumps
+
+;these allow you to lightly tap up to have a smaller jump, useful for jump-ins
+;where you'd like to be closer to the ground after landing an aerial or if you
+;need to reposition
+
+;credits to Viola for the code.
+
+[state Jump reset]
+type=varset
+triggerall=var(59)
+trigger1=movetype=h
+trigger2=stateno=52
+trigger3=roundstate=0
+var(52)=0
+ignorehitpause=1
+
+[state Small Jump]
+type=varset
+triggerall=var(4)=0
+triggerall=!var(59)||(var(59)&&(var(50)=1))
+trigger1=command!="holdup"
+trigger2=var(59)
+trigger2=(var(52)=[4,6])||var(52)=8||(var(52)=[10,11])
+var(35)=-1
+
+[state Normal Jump]
+type=varset
+triggerall=var(4)=0
+triggerall=!var(59)||(var(59)&&(var(50)=1))
+trigger1=command="holdup"
+trigger2=stateno=52
+trigger3=var(59)&&var(50)!=1
+trigger3=(var(52)!=[4,6])&&var(52)!=8&&(var(52)!=[10,11])
+var(35)=0
+
+[State AI Cooldown(Plate Bash)]
+type = Explod
+triggerall=var(59)>0
+triggerall=!numexplod(1001000)
+;trigger1 = stateno=[1000,1003]
+;trigger1=animtime=0
+trigger1=prevstateno=[1000,1002]
+trigger1=time<2
+anim = 9999
+ID = 1001000
+pos = 0,500
+postype = P1
+removetime = 45
+scale = 0,0
+ignorehitpause = 1
+
+;---------------------------------------------------------------------------
+; States that are executed when in self's state file (use statedef -3)
+;---------------------------------------------------------------------------
+[Statedef -3]
+
+;==================================================================
+;Variable Height System (coded by Jesuszilla)
+
+;this system changes character height via code to make certain actions easier
+;like cross-ups and jump-ins.
+
+[State -2, JZ Variable Height]
+type = PlayerPush
+triggerall = StateType = A && NumEnemy
+triggerall = P2Dist Y - Vel Y >= (EnemyNear(0), Const(Size.Height) - 35)
+triggerall = (StateNo = [40,50]) || (StateNo = [600,620]) || stateno = 3100
+trigger1 = P2StateType = S
+trigger1 = P2Dist Y - Vel Y >= (EnemyNear(0), Const(Size.Height) - 35)
+trigger2 = P2StateType = C
+trigger2 = P2Dist Y - Vel Y >= (floor(EnemyNear(0), Const(Size.Height)*0.825) - 35) ;That's the ratio
+value = 0
+
+;==================================================================
+;Air Juggle Gravity System (ZMR VS ZMR Only, doesn't apply outside of ZMR)
+
+;this system only takes place if the characters are both in ZMR (through Var(21) detection)
+;if they are then this new system takes priority over old 12 juggle points system.
+;it makes it so that more combo hits in the air outside of aerial raves will increase the
+;opponents gravity on each hit, to the point it becomes impossible to do juggles if it takes
+;to long.
+
+;Gravity thingy thing
+[State -3, Reset]
+type = VarSet
+triggerall = Var(21)
+trigger1 = StateType != A
+trigger2 = (enemynear,stateno = [3000,3999]) ;detect hyper moves
+trigger3 = ((enemynear,name = "Totino_ZMR") && enemynear,stateno = 1023) ;detect Pizza Roll Punch
+fvar(15) = 0
+ignorehitpause = 1
+
+[State -3, Count up]
+type = VarAdd
+trigger1 = Var(21)
+trigger1 = StateType = A
+trigger1 = (GetHitVar(Damage))
+fvar(15) = 0.04
+ignorehitpause = 0
+persistent = 0
+
+[State -3, Affect gravity]
+type = VelAdd
+trigger1 = Var(21)
+trigger1 = HitShakeOver
+trigger1 = StateType = A
+trigger1 = MoveType = H
+trigger1 = fvar(15) != 0
+y = fvar(15)
+ignorehitpause = 0
+
+[State -3 turn off juggle if ZMR Character VS ZMR Character is detected]
+type = AssertSpecial
+trigger1 = var(21)
+flag = nojugglecheck
+ignorehitpause = 1
+
+;==================================================================
+;Character Detector
+
+;this will try and detect if a ZMR Characters is fighting another ZMR Character.
+;if not will disable some ZMR exclusive UI elements or certain functions that are hard coded into these characters.
+;note that future releases won't be compatible with characters with the "_DemoVersion" folder label.
+
+[State ZMR Character Detector]
+type = VarSet
+triggerall = numenemy
+;--------------------------------------------------------------------------------------------------------
+;Demo Base Game Roster
+trigger1 = enemynear,name = "ZMR_Template" && enemynear,authorname = "Alexander Cooper 19 and Viola" ;KFM/Kung Fu Man
+trigger2 = enemynear,name = "ZanderCooper_ZMR" && enemynear,authorname = "Alexander Cooper 19"
+trigger3 = enemynear,name = "CorndogPlate_ZMR" && enemynear,authorname = "Alexander Cooper 19"
+trigger4 = enemynear,name = "Totino_ZMR" && enemynear,authorname = "Alexander Cooper 19"
+trigger5 = enemynear,name = "ChickenGuy_ZMR" && enemynear,authorname = "Viola"
+trigger6 = enemynear,name = "ExpandDong_ZMR" && enemynear,authorname = "Alexander Cooper 19"
+trigger7 = enemynear,name = "Bamberly_ZMR" && enemynear,authorname = "Alexander Cooper 19"
+trigger8 = enemynear,name = "AlexanderCooper_ZMR" && enemynear,authorname = "Alexander Cooper 19"
+trigger9 = enemynear,name = "Khan_ZMR" && enemynear,authorname = "Alexander Cooper 19"
+;--------------------------------------------------------------------------------------------------------
+v = 21
+value = 1
+ignorehitpause = 1
+;==============================================================
+;Universal Damage Dampener
+
+;made to insure that if you have a long combo going, it doesn't do to much
+;damage. this is a no brainer I don't need to explain much on why Its here lol
+
+;although, if you ever go into liedown state or do aerial raves, this resets the
+;damage dampener.
+
+[State -3, Attack Scale]
+type = AttackMulSet
+trigger1 = 1
+value = fvar(3)
+ignorehitpause = 1
+[State -3, Variable Scale]
+type = varset
+trigger1 = numenemy
+fvar(3) = fvar(3)*(0.9985**(enemynear(0),gethitvar(hitcount)))
+ignorehitpause = 1
+[State -3, Reset var when the opponent recovers]
+type = Varset
+trigger1 = numenemy
+trigger1 = (enemynear,movetype!=H)
+trigger2 = !numenemy
+fvar(3) = 1
+ignorehitpause = 1
+;==============================================================
+;Universal Launcher Detector
+
+;this checks the variable for Aerial Raves. if you successfully preform 
+;input for launcher jump after a launcher hit this keeps track of it and gives
+;you no damage scaling with less overall damage output. 
+
+;if you get hit or leave the air this variable gets set to 0, turning off
+;aerial rave state.
+
+[State Launcher Detector]
+type = VarSet
+triggerall = stateno != 40 || stateno != 52
+trigger1 = statetype != A
+trigger2 = movetype = H
+v = 4 
+value = 0
+ignorehitpause = 1
+;==============================================================
+;SFX and FX are coded into statedef -3, depending on the characters animations or how big they weigh you can modify these as
+;you please. extra triggers can be added in to for other animations and state numbers
+
+;SFX
+[State Jump SFX]
+type = PlaySnd
+trigger1 = anim = 40 && stateno != 105 || anim = 40110 || anim = 105 ;Pre-Jumps
+trigger1 = animelemtime(1)=1
+;-------------------------------
+;Extras can be added here.
+
+;trigger2 = anim = 40
+;trigger2 = animelemtime(1) = 1
+;-------------------------------
+value = S0,ifelse(anim=105,1,27)
+
+[State Land SFX]
+type = PlaySnd
+trigger1 = anim = 47 || anim = 106 ;Lands
+trigger1 = animelemtime(1)=1
+;-------------------------------
+;Extras can be added here.
+
+;trigger2 = anim = 40
+;trigger2 = animelemtime(1) = 1
+;-------------------------------
+value = S0,2
+
+
+[State Run SFX]
+type = PlaySnd
+trigger1 = anim = 100 || anim = 110 ;Running
+trigger1 = time = 3
+;-------------------------------
+;Extras can be added here.
+
+;trigger2 = anim = 40
+;trigger2 = animelemtime(1) = 1
+;-------------------------------
+value = S0,0
+persistent = 0
+
+;[State Run Steps SFX]
+;type = PlaySnd
+;trigger1 = anim = 100 || anim = 110 ;Running
+;trigger1 = animelemtime(3)=1 || animelemtime(6)=1
+;;-------------------------------
+;;Extras can be added here.
+;
+;;trigger2 = anim = 40
+;;trigger2 = animelemtime(1) = 1
+;;-------------------------------
+;value = S0,3+random%4
+;channel = 4
+;persistent = 0
+
+[State Dash Stop SFX]
+type = PlaySnd
+trigger1 = anim = 101 || anim = 111 ;Dash Stop
+trigger1 = animelemtime(1)=1 
+;-------------------------------
+;Extras can be added here.
+
+;trigger2 = anim = 40
+;trigger2 = animelemtime(1) = 1
+;-------------------------------
+value = S0,7
+persistent = 0
+
+[State Static Noises]
+type = PlaySnd
+triggerall = movetype = H
+trigger1 = anim = 5000 && stateno = 5000
+trigger1 = time = 1
+trigger2 = anim = 5001 && stateno = 5000 
+trigger2 = time = 1
+trigger3 = anim = 5010 && stateno = 5000
+trigger3 = time = 1
+trigger4 = anim = 5011 && stateno = 5000 
+trigger4 = time = 1
+trigger5 = anim = 5012 && stateno = 5000
+trigger5 = time = 1
+trigger6 = anim = 5020 && stateno = 5010
+trigger6 = time = 1
+trigger7 = anim = 5021 && stateno = 5010 
+trigger7 = time = 1
+trigger8 = anim = 5022 && stateno = 5010
+trigger8 = time = 1
+trigger9 = anim = 5030 && stateno = 5030
+trigger9 = animelemtime(1)=1
+value = S5000,2
+ignorehitpause = 1
+;---------------------------------------------------------------------------------------------
+;FX
+
+;[State Jump FX]
+;type = Explod
+;trigger1 = anim = 40 && stateno != 105 || anim = 40110 ;Pre-Jumps
+;trigger1 = time = 1
+;anim = 480
+;ID = 480
+;pos = 0,0
+;postype = P1
+;supermovetime = 999999
+;pausemovetime = 999999
+;scale =0.35,0.35
+;trans=add
+;sprpriority = -4
+;ownpal = 1
+;ignorehitpause = 1
+;
+;[State Jump FX]
+;type = Explod
+;trigger1 = anim = 40 && stateno != 105 || anim = 40110 ;Pre-Jumps
+;trigger1 = time = 1
+;anim = 480
+;ID = 480
+;pos = 0,0
+;postype = P1
+;supermovetime = 999999
+;pausemovetime = 999999
+;scale =0.45,0.45
+;trans=sub
+;sprpriority = -5
+;ownpal = 1
+;ignorehitpause = 1
+
+[State Land FX]
+type = Explod
+triggerall=time=1
+trigger1 = anim = 47 || anim = 106 ;Lands
+anim = 633
+ID = 630
+pos = 0,0
+postype = P1
+supermovetime = 999999
+pausemovetime = 999999
+scale =0.5,0.5
+sprpriority = 5
+ownpal = 1
+ignorehitpause = 1
+
+[State Land FX]
+type = Explod
+triggerall=time=1
+trigger1 = anim = 47 || anim = 106 ;Lands
+anim = 633
+ID = 630
+pos = 5,0
+postype = P1
+trans = sub
+supermovetime = 999999
+pausemovetime = 999999
+scale =0.4,0.5
+sprpriority = 4
+ownpal = 1
+ignorehitpause = 1
+
+[State Run FX]
+type = Explod
+triggerall=time=3
+trigger1 = stateno=100&&anim!=101 
+trigger2 = stateno=101&&anim!=111 
+anim = 104
+ID = 103
+pos = 10,-50
+vel=-2,0
+accel=0.08,0
+postype = P1
+supermovetime = 999999
+pausemovetime = 999999
+scale =0.35,0.35
+sprpriority = 5
+ownpal = 1
+facing = ifelse(anim=110,-1,1)
+trans=add
+ignorehitpause = 1
+
+[State Run FX]
+type = Explod
+triggerall=time=3
+trigger1 = stateno=100&&anim!=101 
+trigger2 = stateno=101&&anim!=111 
+anim = 104
+ID = 103
+pos = 10,-50
+vel=-2,0
+accel=0.08,0
+postype = P1
+supermovetime = 999999
+pausemovetime = 999999
+scale =0.4,0.4
+sprpriority = 4
+ownpal = 1
+facing = ifelse(anim=110,-1,1)
+trans=sub
+ignorehitpause = 1
+
+[State Back Dash]
+type = Explod
+triggerall=time=1
+trigger1 = stateno=105
+anim = 107
+ID = 106
+pos = -10,5
+facing=-1
+accel=0.08,0
+postype = P1
+supermovetime = 999999
+pausemovetime = 999999
+scale =0.25,0.2
+sprpriority = 5
+ownpal = 1
+ignorehitpause = 1
+
+[State Back Dash]
+type = Explod
+triggerall=time=1
+trigger1 = stateno=105
+anim = 107
+ID = 106
+pos = -5,5
+facing=-1
+accel=0.08,0
+postype = P1
+trans = sub
+supermovetime = 999999
+pausemovetime = 999999
+scale =0.25,0.2
+sprpriority = 5
+ownpal = 1
+ignorehitpause = 1
+
+;--------------------------------------------------------------------------------------
+;Corndog Orbs
+
+;in ZMR by landing counter attacks you can obtain Corndog Orbs, special orbs that help
+;you out in battle as little strikers for your characters that can give combo extensions.
+;1 counter gives you an orb, when it maxes out at 3 orbs is when you can unleash one.
+
+[State -3, Corndog Orb Meter]
+type = Helper
+triggerall = var(49)=0
+triggerall = fvar(8)!=-1 ;turn off if it detects Time Attack (aka. Blitz Mode) via ZSS.
+;-------------------------------------------------
+;Disabled for Bosses && Hyper KO's
+triggerall = enemynear,name!="CorndogOfLightV2"
+triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
+triggerall = !numhelper(9980)
+triggerall = var(21) = 1 ;detects if the opponent is a ZMR character before activating the helper.
+;-------------------------------------------------
+triggerall = !numhelper(9999)
+triggerall = !NumHelper(8400)
+trigger1 = !var(59) && teammode = single                      ;activates on single only for player
+trigger2 = var(59) && teammode = single                       ;activates on single only for CPU
+trigger3 = var(59) && teammode = turns && numpartner!=1       ;activates on endless only for CPU if they are not in tag team.
+trigger3 = enemynear,var(59)!=0 && teammode != turns          ;checks if the other player CPU in turns is fighting is CPU in turns, if requirements are meant meter gets turned off.
+helpertype = normal
+name = "Corndog Orb Meter"
+ID = 8400
+stateno = 8400
+pos = 0, 250
+postype = back
+facing = facing * ifelse(teamside = 1, 1, -1)
+keyctrl = 0
+ownpal = 1
+supermovetime=999999
+pausemovetime=999999
+size.xscale = 0.5
+size.yscale = 0.5
+ignorehitpause = 1
+
+[State Training Mode Detected (For Orbs)] ;credits to Brergrsart for code in Statedef 0.
+type = varset
+triggerall = !var(59) ;for player only
+triggerall = teammode = single && roundno = 1
+triggerall = power = const(data.power)
+triggerall = numhelper(50783)
+trigger1 = !numhelper(840000)
+fvar(8) = 3
+ignorehitpause = 1
+persistent = 1
+
+[State Other Modes Detected] ;sets to 3 on modes that don't use orbs to fix some issues.
+type = varset
+triggerall = !var(59) ;for player only
+triggerall = roundstate = 2 && roundno = 1
+trigger1 = teammode = simul
+trigger2 = teammode = turns
+trigger3 = var(49) ;tag detector
+fvar(8) = 3
+ignorehitpause = 1
+persistent = 1
+
+;[State Guard Crush] ;left unused, might use it in the future for certain unblockables.
+;type = ChangeState
+;triggerall = var(21) = 1
+;triggerall = FVar(8) <= 0 && StateNo != 5350
+;trigger1 = StateNo = 150
+;trigger2 = StateNo = 152
+;value = 5350
+;ctrl = 0
+;===========================================================================
+;AI
+
+;used vars
+;
+;v59=Activation
+;v58=StateNo
+;v57=Total Enemy,NumProj before round starts
+;v52=Jump type
+;v51=enemy,id
+;v50=AILevel
+;
+
+;[State Yuyuko Corndog(Edits doesn't count)]
+;type = Projectile
+;triggerall=!ishelper
+;triggerall=var(59)
+;triggerall = !numprojid(210446)
+;trigger1=enemynear,name="Yuyuko_Saigyouji"
+;trigger2=enemynear,name="Yuyuko Saigyouji"
+;trigger3=enemynear,name="yuyu"
+;trigger4=enemynear,name="Yuyuko_RP"
+;trigger5=enemynear,name="Yuyuko_Saigyouzi"
+;trigger6=enemynear,name="saigyouji yuyuko"
+;trigger7=enemynear,name="UMVC_Yuyuko"
+;ProjID =210446
+;projanim =9999
+;projscale = 0,0
+;projremove = 0
+;projremovetime = -1
+;projedgebound = 99999
+;projstagebound = 99999
+;projheightbound = -99999,99999
+;offset = 0,5000
+;postype = p1
+;guard.dist=0
+;ignorehitpause=1
+;[State corndogoncorndog.com]
+;type = Projectile
+;triggerall=!ishelper
+;triggerall=var(59)
+;triggerall = !numprojid(210447)
+;trigger1=enemynear,name="CorndogPlate"||enemynear,name="CorndogPlate_ZMR"
+;trigger2=enemynear,name="Corndog on corndog"
+;trigger3=enemynear,name="Corndog Donald-R"
+;trigger4=enemynear,name="Corndogoncorndog Donald"
+;trigger5=enemynear,name="Corndog Of Light : Boss Character" 
+;trigger6=enemynear,name="CorndogOfLightV2" 
+;ProjID =210447
+;projanim =9999
+;projscale = 0,0
+;projremove = 0
+;projremovetime = -1
+;projedgebound = 99999
+;projstagebound = 99999
+;projheightbound = -99999,99999
+;offset = 0,5000
+;postype = p1
+;guard.dist=0
+;ignorehitpause=1
+
+[State AI Activation]
+Type                                                                                                                                                                                                                                                           =Null
+Type=DisplayToClipBoard
+triggerall=!ishelper
+Trigger1=!var(59)
+Trigger1=Var(59):=1                                                                                                                                                                                                                                            -1+AILevel&&0
+Text="`SX-~DRE-AM~|-9H/>PYEUX+A$PYSX-~SUM-MER~--XX4PZ!j$)J$aTX-~AIR-Key~-+U=/P\\%c%%%%950d4CA"
+Params=195
+IgnoreHitPause=1
+
+[state AILevel]
+type=varset
+trigger1=var(59)
+var(50)=ifelse(var(50)<1,1,ifelse(var(50)>8,8,var(50)))
+ignorehitpause=1
+[state AILevel]
+type                                                                                                                                                                                                                                                           =varset
+type=null
+trigger1=1;var(59)
+var(50)=AILevel
+ignorehitpause=1
+
+[state Enemy,ID]
+type=varset
+trigger1=numenemy=1
+var(51)=enemy,id
+ignorehitpause=1
+
+[state Enemy,ID]
+type=varset
+trigger1=numenemy>1
+var(51)=ifelse(enemy(0),alive,enemynear(0),id,enemynear(1),id)
+ignorehitpause=1
+
+[state Enemy,NumProj]
+type=varset
+triggerall=roundstate<2
+trigger1=numenemy=1
+var(57)=playerid(var(51)),numproj
+ignorehitpause=1
+[state Enemy,NumProj]
+type=varset
+triggerall=roundstate<2
+trigger1=numenemy>1
+var(57)=enemy(0),numproj+enemy(1),numproj
+ignorehitpause=1
+
+[State 0, DisplayToClipboard]
+type = DisplayToClipboard
+trigger1 = var(59)
+text = "p2x:%d,p2y:%d,prev:%d,jumptype:%d,sj:%d"
+params = floor(p2bodydist x),floor(p2bodydist y),var(50),var(52),var(35)
+ignorehitpause = 1
+
+[State Taunt]
+type = Helper
+triggerall = var(59)
+triggerall = numhelper(195)=0
+triggerall = movetype != H
+triggerall = roundstate = [2,3]
+trigger1 = roundstate = 3
+trigger1 = ctrl || (stateno = [200,810])
+trigger2 = (playerid(var(51)),stateno=[5110,5111])&&playerid(var(51)),time=1&&(random<=200||playerid(var(51)),life<=playerid(var(51)),lifemax/7||numprojid(210446))
+trigger3 = ((stateno=810&&time=1)||(stateno=420&&movehit=1)||(stateno=620&&movehit=1&&Var(4)=1))&&(random<=300||numprojid(210447))
+helperType = Normal
+stateNo = 195
+ID = 195
+name = "Taunt Helper"
+postype = P1
+pos = 0,0
+ownPal = 1
+pauseMoveTime = 255
+superMoveTime = 255
+ignoreHitPause = 1
+persistent = 0
+
+[state Recover]
+type=selfstate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=stateno=5050
+triggerall = Vel Y > 0
+triggerall = Pos Y >= -20
+triggerall = CanRecover
+trigger1 = random<=100+var(50)*80
+value = 5200
+[state Recover]
+type=selfstate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=stateno=5050
+triggerall = Vel Y > -1
+triggerall = CanRecover
+trigger1 = random<=100+var(50)*80
+value = 5210
+
+[state Corndog Orbs]
+type=changestate
+triggerall = NumHelper(8400)
+triggerall = var(59)
+triggerall=teammode=single
+triggerall = fvar(8)!=-1
+triggerall=alive&&roundstate=2&&ctrl&&statetype!=a
+triggerall=var(50)>1
+triggerall=var(57)<=0
+triggerall=floor(fvar(8))>=3
+triggerall=(p2bodydist x=[-20,120])&&p2bodydist y>=-20-(playerid(var(51)),vel y>=-1.5)*30
+trigger1=!inguarddist
+trigger1=p2bodydist x>=10
+trigger1=playerid(var(51)),stateno=5120&&var(50)>=7
+trigger1=random<(var(50)-6)*300
+trigger2=playerid(var(51)),movetype=a||(playerid(var(51)),movetype=h&&playerid(var(51)),statetype!=l)
+trigger2=random<((var(50)-5)*70)*ifelse(playerid(var(51)),facing=facing,1.5,1)
+trigger3=(playerid(var(51)),statetype!=l&&var(50)>=4)||var(50)<4
+trigger3=random<(var(50)-1)*20
+trigger4=movecontact=1
+trigger4=random<(var(50)-1)*30
+trigger4=stateno=[200,410]
+trigger5=random<(var(50)-1)*20
+trigger5=power>=1000
+trigger5=stateno=[150,153]
+value=19500
+
+[state Counter(Lv4 to Lv5)]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggeralL=inguarddist||playerid(var(51)),movetype=a
+triggerall=var(50)=[4,5]
+triggerall=statetype!=a
+triggerall=ctrl||stateno=20||stateno=100
+triggerall=p2bodydist x=[-20,70]
+triggerall=random<=(var(50)-3)*100
+;Throw or Light normal
+trigger1=p2bodydist x<=20
+trigger1=random<=var(50)*30
+trigger1=1||var(58):=ifelse(p2bodydist x<=15&&random<=300,800,ifelse(p2bodydist y<=-10,200,400))
+;
+;Any normal
+trigger2=facing=playerid(var(51)),facing
+trigger2=playerid(var(51)),numproj<=var(57)
+trigger2=p2bodydist x<=40
+trigger3=1||var(58):=ifelse(power>=500||random%4=0,420,ifelse(p2bodydist x<=20,ifelse(random<=var(50)*50&&playerid(var(51)),statetype!=a&&playerid(var(51)),movetype!=h,800,400-(p2bodydist y<=-10)*200),410-(p2bodydist y<=-10)*210))
+;
+trigger3=1||var(58):=ifelse(numexplod(1001000),200+(playerid(var(51)),statetype!=a)*200,1000)
+value=var(58)
+
+[state Counter(Lv6 or higher)]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggeralL=inguarddist||playerid(var(51)),movetype=a
+triggerall=var(50)>=6
+triggerall=statetype!=a
+triggerall=ctrl||stateno=20||stateno=100
+triggerall=p2bodydist x=[-20,70]
+triggerall=random<=(50-(facing=playerid(var(51)),facing)*30)+(var(50)-5)*164
+;
+;Triple Palm
+trigger1=power>=1000
+trigger1=p2bodydist x<=105&&p2bodydist y>=-50
+trigger1=random<=var(50)*30
+trigger1=1||var(58):=3000
+;
+trigger2=power>=1000
+trigger2=playerid(var(51)),numproj<=var(57)&&!inguarddist
+trigger2=p2bodydist x>=180-(facing=playerid(var(51)),facing)*80&&p2bodydist y>=-50
+trigger2=random<=var(50)*30
+trigger2=1||var(58):=3200
+;
+;Throw or Light normal
+trigger2=p2bodydist x<=20
+trigger2=random<=var(50)*30
+trigger2=1||var(58):=ifelse(p2bodydist x<=15&&random<=300,800,ifelse(p2bodydist y<=-10,200,400))
+;
+;Any normal
+trigger3=facing=playerid(var(51)),facing
+trigger3=playerid(var(51)),numproj<=var(57)
+trigger3=p2bodydist x<=40
+trigger3=1||var(58):=ifelse(power>=500||random%4=0,420,ifelse(p2bodydist x<=20,ifelse(random<=var(50)*50&&playerid(var(51)),statetype!=a&&playerid(var(51)),movetype!=h,800,400-(p2bodydist y<=-10)*200),410-(p2bodydist y<=-10)*210))
+;
+;Knee
+trigger4=p2bodydist x=[-20,50]
+trigger4=p2bodydist y>=-100&&p2bodydist y<=-20
+trigger4=playerid(var(51)),statetype=a
+trigger4=random<=var(50)*30
+trigger4=1||var(58):=420
+;
+;Palm
+trigger5=1||var(58):=ifelse(numexplod(1001000),200+(playerid(var(51)),statetype!=a)*200,1000)
+value=var(58)
+
+[state Backward]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggeralL=inguarddist||playerid(var(51)),movetype=a
+triggerall=var(50)>=4;[4,8]
+triggerall=statetype!=a
+triggerall=ctrl||stateno=20||stateno=100
+triggerall=random<400-(var(50)-4)*100||((playerid(var(51)),hitdefattr=sca,at)&&var(50)>=7)
+triggerall = enemynear,name!="CorndogOfLightV2"
+triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
+triggerall=p2bodydist x>=-20
+triggerall=backedgebodydist>80
+triggerall=p2bodydist x<=80
+triggerall=(playerid(var(51)),numproj<=var(57)&&var(50)>=6)||var(50)<=5
+trigger1=inguarddist && var(50)>=6
+trigger2=playerid(var(51)),movetype=a && var(50)>=8 ;&&p2bodydist x=[-20,100]
+value=105
+
+[state Dodge]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggeralL=inguarddist||playerid(var(51)),movetype=a
+triggerall=var(50)>=4
+triggerall=statetype!=a
+triggerall=ctrl||stateno=20||stateno=100
+triggerall=random<=(var(50)-4)*150
+triggerall=p2bodydist x>=-20
+triggerall=playerid(var(51)),backedgebodydist>3
+triggerall=p2bodydist x<=180
+trigger1=inguarddist
+trigger1=playerid(var(51)),movetype=a&&playerid(var(51)),time<5
+trigger2=playerid(var(51)),numproj>var(57)
+value=165
+
+[state Guard]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=statetype!=a
+triggerall=(stateno!=[120,155])
+triggerall=ctrl||stateno=20||stateno=52||stateno=100
+triggerall=var(50)>=2
+triggerall=inguarddist
+trigger1=Random<=var(59)*75||var(50)>8
+trigger2=p2bodydist x >90||playerid(var(51)),movetype=a||playerid(var(51)),time>30
+trigger2=random<=500+(var(50)-2)*100||var(50)>8
+trigger3=playerid(var(51)),numproj>var(57)
+trigger3=random<=500+(var(50)-2)*100||var(50)>8
+value=120
+
+[State Turn Off Engine Guard for CPU]
+type = AssertSpecial
+trigger1=var(59)&&alive&&roundstate=2
+flag = nostandguard
+flag2 = nocrouchguard
+flag3 = noairguard
+ignorehitpause = 1
+
+[state Aganist Air]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=playerid(var(51)),movetype!=a&&playerid(var(51)),statetype!=l
+triggerall=playerid(var(51)),numproj<=var(57)
+triggerall=statetype!=a
+triggerall=ctrl||stateno=20||stateno=100
+triggerall=(p2bodydist x=[-20,40+(playerid(var(51)),vel x>1)*20-(playerid(var(51)),vel x<0)*10])
+triggerall=p2bodydist y>=-100+(playerid(var(51)),vel y>1.5)*20&&p2bodydist y<=-40
+triggerall=playerid(var(51)),statetype=a
+triggerall=random<=(var(50)-1)*(90+(var(50)>=4)*20)
+;
+;UpperCut
+trigger1=p2bodydist x=[-10,30]
+trigger1=power>=1000
+trigger1=random<=50+var(50)*30
+trigger1=1||var(58):=3100
+;
+;Knee
+trigger2=1||var(58):=ifelse(numexplod(1001000),420,1011+(p2bodydist x>=50||inguarddist))
+value=var(58)
+
+[state Trap]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=statetype!=a
+;triggerall=stateno!=100
+triggerall = NumHelper(1010) = 0
+triggerall=ctrl||stateno=20||(stateno=100&&playerid(var(51)),statetype=l)
+triggerall=var(50)>=6
+triggerall=!inguarddist
+trigger1=p2bodydist x<=30
+trigger1=playerid(var(51)),statetype=l&&playerid(var(51)),movetype=h
+trigger2=(p2bodydist x=[30,150])||(p2bodydist y<=-120&&playerid(var(51)),vel y<0)
+trigger2=random<=200&&playerid(var(51)),movetype!=a
+trigger3=p2bodydist x>=150||p2bodydist y<=-250
+trigger3=random<=400
+value=1010+random%3
+
+[state Dash Air Heavy]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=(playerid(var(51)),movetype!=a&&playerid(var(51)),statetype!=l&&playerid(var(51)),statetype!=a)||random<=500-var(40)*90
+triggerall=statetype!=a
+triggerall=var(50)>=7
+triggerall=stateno=100
+triggerall=(playerid(var(51)),stateno!=165&&var(50)>=8)||var(50)<8
+triggerall=random<=60+var(50)*20
+trigger1=p2bodydist x=[70,100]
+trigger1=1||var(52):=10
+trigger1=1||var(35):=-1
+value=40
+
+[state Random(Lv3 or lower)]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=statetype!=a
+triggerall=stateno!=100
+triggerall=ctrl
+triggerall=var(50)>1
+triggerall=var(50)<=3
+triggerall=random<=120-(var(50)-1)*40
+;
+;Supers
+trigger1=power>=1000
+trigger1=random<=150
+trigger1=1||var(58):=3000+random%3*100
+;
+;Specials
+trigger2 =!numhelper(1010)
+trigger2=!numexplod(1001000)
+trigger2=random<=100
+trigger2=1||var(58):=ifelse(!numhelper(1035)&&random%2=0,1030,ifelse(random%2=0&&!numhelper(1010),1010,1000))+random%3
+;
+;Normals
+trigger3=random<=100
+trigger3=1||var(58):=(200+random%2*200)+randoM%3*10
+;
+;Non attacks
+trigger4=1||var(52):=1+random%6
+trigger4=1||var(58):=ifelse(random%3=0,40,ifelse(random%2=0&&enemynear,name!="CorndogOfLightV2"&&enemynear,name!="PizzaRollOfDarknessV2",105,100))
+value=var(58)
+
+[state Any Specials or Beam(Lv4 to Lv5)]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=statetype!=a
+triggerall=stateno!=100
+triggerall=ctrl||stateno=20
+triggerall=var(50)=[4,5]
+triggerall=(p2bodydist x>=50)
+;
+;Palm
+trigger1=playerid(var(51)),movetype!=a
+trigger1=playerid(var(51)),numproj<=var(57)
+trigger1=playerid(var(51)),statetype!=l
+trigger1=p2bodydist x<=150+(5-var(50))*25
+trigger1=p2bodydist y>=-30
+trigger1=random<=var(50)*50
+trigger1=!numexplod(1001000)
+trigger1=1||var(58):=1002
+;
+;Proj
+trigger2=playerid(var(51)),movetype!=a||!inguarddist
+trigger2=playerid(var(51)),numproj<=var(57)
+trigger2=(p2bodydist x=[60,70+(5-var(50))*20]);+(playerid(var(51)),vel x>=2)*((playerid(var(51)),vel x)*7)
+trigger2=p2bodydist y>=-40
+trigger2=NumHelper(1035)=0
+trigger2=random<=300+(5-var(50))*-50
+trigger2=1||var(58):=1030
+;Proj
+trigger3=playerid(var(51)),movetype!=a||!inguarddist
+trigger3=playerid(var(51)),numproj<=var(57)
+trigger3=(p2bodydist x=[85,110+(5-var(50))*20])
+trigger3=p2bodydist y>=-40
+trigger3=NumHelper(1035)=0
+trigger3=random<=300+(5-var(50))*-50
+trigger3=1||var(58):=1031
+;Proj
+trigger4=playerid(var(51)),movetype!=a||!inguarddist
+trigger4=playerid(var(51)),numproj<=var(57)
+trigger4=(p2bodydist x=[120,160+(5-var(50))*20])
+trigger4=p2bodydist y>=-40
+trigger4=NumHelper(1035)=0
+trigger4=random<=300+(5-var(50))*-50
+trigger4=1||var(58):=1032
+;Trap
+trigger5=playerid(var(51)),movetype!=a||!inguarddist
+trigger5=playerid(var(51)),numproj<=var(57)
+trigger5=(p2bodydist x>=140-(5-var(50)*40))
+trigger5=NumHelper(1010)=0
+trigger5=random<=30+(5-var(50))*-50
+trigger5=1||var(58):=1012;+random%3
+;
+;Run,Dodge
+trigger6=random<=200+(var(50)-1)*100
+trigger6=1||var(58):=ifelse(random<=500,165,100)
+;
+trigger7=1||var(52):=ifelse(random<=400&&p2bodydist x<=150,2,8)
+trigger7=1||var(58):=40
+value=var(58)
+
+[state Any Specials or Beam(Lv6 or higher)]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=statetype!=a
+triggerall=stateno!=100
+triggerall=ctrl||stateno=20
+triggerall=var(50)>=6
+triggerall=(p2bodydist x>=60)
+;
+;Palm
+trigger1=playerid(var(51)),movetype!=a
+trigger1=playerid(var(51)),numproj<=var(57)
+trigger1=playerid(var(51)),statetype!=l
+trigger1=p2bodydist x<=120
+trigger1=p2bodydist y>=-30
+trigger1=random<=var(50)*50
+trigger1=!numexplod(1001000)
+trigger1=1||var(58):=1002
+;
+;Proj
+trigger2=playerid(var(51)),movetype!=a||!inguarddist
+trigger2=playerid(var(51)),numproj<=var(57)
+trigger2=(p2bodydist x=[60,70]);+(playerid(var(51)),vel x>=2)*((playerid(var(51)),vel x)*7)
+trigger2=p2bodydist y>=0-(playerid(var(51)),pos y<=-10&&playerid(var(51)),vel y>=1)*40
+trigger2=NumHelper(1035)=0
+trigger2=random<=300+(8-var(50))*80||(playerid(var(51)),statetype=l&&var(50)>=8)
+trigger2=1||var(58):=1030
+;Proj
+trigger3=playerid(var(51)),movetype!=a||!inguarddist
+trigger3=playerid(var(51)),numproj<=var(57)
+trigger3=(p2bodydist x=[85,110])
+trigger3=p2bodydist y>=0-(playerid(var(51)),pos y<=-10&&playerid(var(51)),vel y>=1)*40
+trigger3=NumHelper(1035)=0
+trigger3=random<=300+(8-var(50))*80||(playerid(var(51)),statetype=l&&var(50)>=8)
+trigger3=1||var(58):=1031
+;Proj
+trigger4=playerid(var(51)),movetype!=a||!inguarddist
+trigger4=playerid(var(51)),numproj<=var(57)
+trigger4=(p2bodydist x=[120,160])
+trigger4=p2bodydist y>=0-(playerid(var(51)),pos y<=-10&&playerid(var(51)),vel y>=1)*40
+trigger4=NumHelper(1035)=0
+trigger4=random<=300+(8-var(50))*80||(playerid(var(51)),statetype=l&&var(50)>=8)
+trigger4=1||var(58):=1032
+;
+;Beam
+trigger5=playerid(var(51)),statetype!=l||playerid(var(51)),stateno=5120
+trigger5=playerid(var(51)),movetype!=a||!inguarddist
+trigger5=playerid(var(51)),numproj<=var(57)
+trigger5=random<=100+(var(50)-6)*50
+trigger5=p2bodydist x>=150-(playerid(var(51)),movetype=h)*90
+trigger5=p2bodydist y>=-50
+trigger5=power>=1000
+trigger5=1||var(58):=3200
+;
+;Run
+trigger6=1||var(58):=ifelse(var(50)<8&&random<=400,165,100)
+value=var(58)
+
+[state Anti Dodge]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggeralL=!inguarddist&&playerid(var(51)),movetype!=a
+triggerall=statetype!=a
+triggerall=var(50)>=6
+triggerall=playerid(var(51)),numhelper(8900)&&playerid(var(51)),selfanimexist(99980)
+triggeralL=playerid(var(51)),stateno=165
+triggerall=ctrl||stateno=20||stateno=100
+triggerall=random<(var(50)-5)*180
+trigger1=p2bodydist x=[-20,15]
+value=800
+
+[state Air Heavy]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=playerid(var(51)),stateno=5120
+triggerall=var(50)>=7||(var(50)>=5&&random<=(var(50)-4)*200&&playerid(var(51)),time<=3)
+triggerall=statetype!=a
+triggerall=p2bodydist x=[-20,50]
+;triggerall=random<=200
+trigger1=ctrl
+trigger1=1||var(52):=11-(p2bodydist x>=38)
+trigger1=1||var(35):=-1
+value=40
+
+[state Normal(Lv4)]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=!inguarddist&&(playerid(var(51)),statetype!=l||(playerid(var(51)),stateno=5120&&playerid(var(51)),animtime>=-2))
+triggerall = var(50)=4
+triggerall=statetype!=a
+triggerall=ctrl
+triggerall=p2bodydist x=[-20,60-(stateno=100)*30]
+;
+trigger1=p2bodydist x=[-20,15]
+trigger1=playerid(var(51)),statetype=s||playerid(var(51)),statetype=c
+trigger1=playerid(var(51)),movetype!=h
+trigger1=random<=var(50)*50
+trigger1=1||var(58):=800
+;
+trigger2=1||var(58):=ifelse(p2bodydist y>=-5,400+(random%3=0&&p2bodydist x<=10)*10,200+(random%3=0&&p2bodydist x<=15)*10)
+value=var(58)
+
+[state Normal(Lv5+)]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=!inguarddist&&(playerid(var(51)),statetype!=l||(playerid(var(51)),stateno=5120&&playerid(var(51)),animtime>=-2))
+triggerall = var(50)>4
+triggerall=statetype!=a
+triggerall=ctrl
+triggerall=p2bodydist x=[-20,60-(stateno=100)*30]
+;
+trigger1=p2bodydist x=[-20,15]
+trigger1=playerid(var(51)),statetype=s||playerid(var(51)),statetype=c
+trigger1=playerid(var(51)),movetype!=h
+trigger1=playerid(var(51)),stateno!=5120&&playerid(var(51)),prevstateno!=5120
+trigger1=random<=200+(var(50)-6)*150
+trigger1=1||var(58):=800
+;
+trigger2=p2bodydist x=[30,60]
+trigger2=(random<=200&&p2bodydist x<=40)||p2bodydist x>=40
+trigger2=p2bodydist y>=-40
+trigger2=1||var(58):=220
+;
+trigger3=1||var(58):=ifelse(p2bodydist y>=-5,400+(random%3=0&&p2bodydist x<=10)*10,200+(random%3=0&&p2bodydist x<=15)*10)
+value=var(58)
+
+[state Spinner Frenzy]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=!inguarddist&&(playerid(var(51)),statetype!=l)
+triggerall = var(50)>4
+triggerall=statetype=a
+triggerall=ctrl
+triggerall=random<=(var(50)-3)*58
+triggerall=power>=1000
+trigger1=p2bodydist x=[-20,40]
+trigger1=p2bodydist y=[-30,30]
+value=3100
+
+[state Air Heavy]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=!inguarddist&&(playerid(var(51)),statetype!=l||(playerid(var(51)),stateno=5120&&playerid(var(51)),animtime>=-2))
+triggerall = var(50)>4
+triggerall=statetype=a
+triggerall=ctrl
+triggerall=var(52)=[10,11]
+trigger1=p2bodydist x=[-20,70]
+trigger1=p2bodydist y=[-30,100]
+value=610
+
+[state Air normal]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=!inguarddist&&playerid(var(51)),statetype!=l
+triggerall=var(50)>4
+triggerall=statetype=a
+triggerall=ctrl
+triggerall=var(52)!=[10,11]
+triggerall=var(52)!=-1
+trigger1=p2bodydist x=[-20,50+(vel x>=2)*50]
+trigger1=p2bodydist y=[-30,30+(vel y>1.5)*80]
+value=ifelse(var(50)<=2,600+random%3*10,600+random%2*20)
+
+[state Air Light or Medium]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=!inguarddist&&playerid(var(51)),statetype!=l
+triggerall=var(50)>4
+triggerall=statetype=a
+triggerall=ctrl
+triggerall=var(52)!=[10,11]
+trigger1=p2bodydist x=[-20,50]
+trigger1=p2bodydist y=[-30,30]
+value=600+(var(50)<=5&&random<=400)*10
+
+[state AL to AM]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall = var(50)>4
+triggerall=statetype=a
+triggerall=movecontact
+triggerall=stateno=600
+trigger1=var(4)=1
+value=610+(var(50)<=5&&random<=400)*10
+
+[state AM to AH]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall = var(50)>4
+triggerall=statetype=a
+triggerall=movecontact
+triggerall=stateno=610
+triggerall=var(52)!=[10,11]
+trigger1=var(4)=1
+value=620
+
+[state 400 to any]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=statetype!=a
+triggerall=movecontact
+triggerall=var(50)>5
+triggerall=stateno=400
+;
+trigger1=random<=350&&p2bodydist y<=-30&&p2bodydist x<=40
+trigger1=1||var(58):=420
+;
+trigger2=var(50)<6
+trigger2=random<=500-(var(50))*30
+trigger2=p2bodydist x<=20
+trigger2=1||var(58):=410
+;
+trigger3=p2bodydist x<=60||numexplod(1001000)
+trigger3=1||var(58):=ifelse(p2bodydist x>=40,220,ifelse(p2bodydist y>=-25,ifelse(p2bodydist x<=20&&random%2=0&&p2bodydist y>=-5,410,200),210))
+;
+trigger3=1||var(58):=ifelse(playerid(var(51)),statetype=c,1000,1001+(p2bodydist y<=-40))
+value=var(58)
+
+[state 410 to any]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=statetype!=a
+triggerall=movecontact
+triggerall=var(50)>5
+triggerall=stateno=410
+;
+trigger1=random<=var(50)*30||(playerid(var(51)),life<=150&&var(50)>=6)||numexplod(1001000)
+trigger1=power>=1000
+trigger1=1||var(58):=3000
+;
+trigger2=(random<=350)&&p2bodydist x<=60||numexplod(1001000)
+trigger2=1||var(58):=420
+;
+trigger3=1||var(58):=ifelse(playerid(var(51)),statetype=c,1000,1001+(p2bodydist y<=-40))
+value=var(58)
+
+[state CH to Knee or jump]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=statetype!=a
+triggerall = var(50)>4
+triggerall=(movecontact&&var(50)<=6)||(movehit&&var(50)>=7)
+triggerall=stateno=420
+triggerall=!numexplod(1001000)||(power>=500&&numexplod(1001000))
+trigger1=random<=var(50)*100||numexplod(1001000)
+trigger1=power>=500&&!var(4)
+trigger1=1||var(52):=-1
+trigger1=1||var(58):=40
+trigger2=1||var(58):=1002
+value=var(58)
+
+[state 200 to any]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=statetype!=a
+triggerall=movecontact
+triggerall=stateno=200
+triggerall=var(50)>5
+;
+trigger1=random<=350&&p2bodydist y<=-30&&p2bodydist x<=40
+trigger1=1||var(58):=420
+;
+trigger2=p2bodydist x<=60||numexplod(1001000)
+trigger2=1||var(58):=ifelse(p2bodydist x>=40,220,210)
+;
+trigger3=1||var(58):=ifelse(playerid(var(51)),statetype=c,1000,1001+(p2bodydist y<=-40))
+value=var(58)
+
+[state 210 to any]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=statetype!=a
+triggerall=movecontact
+triggerall=stateno=210
+triggerall=var(50)>5
+;
+trigger1=random<=350&&p2bodydist y<=-30&&p2bodydist x<=40
+trigger1=1||var(58):=420
+;
+trigger2=p2bodydist x<=60&&random<=var(50)*150||numexplod(1001000)
+trigger2=1||var(58):=220
+;
+trigger3=1||var(58):=ifelse(playerid(var(51)),statetype=c,1000,1001+(p2bodydist y<=-40))
+value=var(58)
+
+[state 220 to any]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=statetype!=a
+triggerall=movecontact
+triggerall=stateno=220
+triggerall=var(50)>5
+;
+trigger1=random<=var(50)*40||(playerid(var(51)),life<=150&&var(50)>=6)||numexplod(1001000)
+trigger1=power>=1000
+trigger1=1||var(58):=3000
+;
+trigger2=random<=350&&p2bodydist x<=45||numexplod(1001000)
+trigger2=1||var(58):=420
+;
+trigger3=1||var(58):=ifelse(playerid(var(51)),statetype=c,1000,1001+(p2bodydist y<=-40))
+value=var(58)
+
+[state Plate Bash to Spinner Frenzy]
+type=changestate
+triggerall=var(59)&&alive&&roundstate=2
+triggerall=statetype=a
+triggerall=var(50)>5
+triggerall=random<=var(50)*150
+triggerall=(movecontact&&var(50)<=6)||(movehit&&var(50)>6)
+triggerall=power>=1000
+triggerall=stateno=[1000,1002]
+trigger1=p2bodydist x=[-20,20]
+trigger1=p2bodydist y>=-30
+value=3100

@@ -1,0 +1,1626 @@
+;---------------------------------------------------------------------------
+;Partner Jump In
+[Statedef 900000]
+type    = A
+physics = N
+ctrl = 0
+anim = 41
+sprpriority = 1
+
+[State Tag Out Detector]
+type = Varset
+triggerall = roundstate = 2
+trigger1 = !time
+var(48)=0
+
+[State 0, CtrlSet]
+type = CtrlSet
+triggerall = roundstate = 2
+trigger1 = BackEdgeDist > -25
+value = 1
+
+[State 0, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = time < 18
+value = SCA
+
+[State 105, 1]
+type = VelSet
+trigger1 = Time = 0
+x = 8
+y = -4
+
+[State 7005]
+Type = PosSet
+Trigger1 = !time
+X = -300*facing
+Y = -50
+ignorehitpause =1
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = .40
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0+BackEdgeDist > 0,0
+ignorehitpause = 1
+
+[State 105, 3]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 52
+;---------------------------------------------------------------------------
+;Partner Jump In
+[Statedef 900001]
+type    = A
+physics = N
+ctrl = 0
+anim = 41
+sprpriority = 1
+
+[State Tag Out Detector]
+type = Varset
+triggerall = roundstate = 2
+trigger1 = !time
+var(48)=0
+
+[State 0, CtrlSet]
+type = CtrlSet
+triggerall = roundstate = 2
+trigger1 = BackEdgeDist > -25
+value = 1
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = time < 18
+value = SCA
+
+[State 105, 1]
+type = VelSet
+trigger1 = Time = 0
+x = 8
+y = -4
+
+[State 7005]
+Type = PosSet
+Trigger1 = !time
+X = -300*facing
+Y = -50
+ignorehitpause =1
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = .40
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0+BackEdgeDist > 0,0
+ignorehitpause = 1
+
+[State 105, 3]
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 52
+;---------------------------------------------------------------------------
+;Partner Jump Out
+[Statedef 910000]
+type    = A
+physics = N
+ctrl = 0
+anim = 105
+sprpriority = 1
+
+[State Tag Out Detector]
+type = Varset
+trigger1 = !time
+var(48)=1
+
+[State 0, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = !time
+y = 0
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 105, 1]
+type = VelSet
+trigger1 = Time = 0
+x = -16
+y = -7
+
+[State Back Dash]
+type = Explod
+trigger1 = time = 0
+anim = 107
+ID = 106
+pos = -10,10
+facing=-1
+accel=0.08,0
+postype = P1
+supermovetime = 999999
+pausemovetime = 999999
+scale =0.25,0.2
+sprpriority = 5
+ownpal = 1
+ignorehitpause = 1
+
+[State Back Dash]
+type = Explod
+trigger1 = time = 0
+anim = 107
+ID = 106
+pos = -5,10
+facing=-1
+accel=0.08,0
+postype = P1
+trans = sub
+supermovetime = 999999
+pausemovetime = 999999
+scale =0.25,0.2
+sprpriority = 5
+ownpal = 1
+ignorehitpause = 1
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = 1
+y = .40
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0,0
+ignorehitpause = 1
+
+[State 105, 3]
+type = ChangeState
+trigger1 = BackEdgeBodyDist <= -30
+trigger2 = time > 250
+value = ifelse(ID<Partner,ID,920000,920001)
+;---------------------------------------------------------------------------
+;Rest (Player 1 / 2)
+[Statedef 920000]
+type    = U                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= I                      ;Move-type: A-attack, I-idle, H-gethit
+physics = N                      ;Physics: S-stand, C-crouch, A-air
+velset = 0,0                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 9999                       ;Change animation (Def: no change)
+sprpriority = 0                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State Tag Out Detector]
+type = Varset
+trigger1 = !time
+var(48)=1
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0,0
+ignorehitpause = 1
+
+[State 7005]
+Type = PosSet
+Trigger1 = 1
+X = -2000*facing
+Y = 0
+ignorehitpause =1
+
+[State Health Recovery]
+type = Lifeadd
+triggerall = alive
+trigger1 = time%20=0
+value = 1
+
+[State 4512, turn] ; always face the same direction as partner
+type = turn
+trigger1 = facing != partner,facing
+
+[State Switch]
+type = ChangeState
+triggerall = numpartner
+trigger1=partner,stateno = 910000 && roundstate = 2
+trigger2=winko&&enemynear,stateno=5150
+trigger3=partner,stateno = 5150
+trigger4=partner,stateno=920001 ;Failsave
+trigger5=losetime||wintime
+trigger6=drawgame
+value = 900000
+
+[State Cooldown (2 Seconds)]
+type = Explod
+triggerall = !numexplod(930000) ;cooldown timer
+trigger1 = !time
+anim = 9999
+ID = 930000
+pos = 0,0
+postype = P1
+removetime = 120;*6
+supermovetime = 0
+pausemovetime = 0
+scale = 0,0
+ownpal = 1
+ignorehitpause = 1
+
+[State Assist]
+type = ChangeState
+triggerall = numpartner
+triggerall = !numexplod(930000) ;cooldown timer
+trigger1=roundstate=2 && partner,alive && partner,movetype!=H
+trigger1=command = "c" && (partner,stateno != [3000,3900])
+trigger1=partner,stateno != 810
+value = 930000
+;---------------------------------------------------------------------------
+;Rest (Player 3 / 4)
+[Statedef 920001]
+type    = U                      ;State-type: S-stand, C-crouch, A-air, L-liedown
+movetype= I                      ;Move-type: A-attack, I-idle, H-gethit
+physics = N                      ;Physics: S-stand, C-crouch, A-air
+velset = 0,0                     ;Set velocity (x,y) (Def: no change)
+ctrl = 0                         ;Set ctrl (Def: no change)
+anim = 9999                       ;Change animation (Def: no change)
+sprpriority = 0                  ;Set p1's sprite layering priority to 2 (in front)
+
+[State Tag Out Detector]
+type = Varset
+trigger1 = !time
+var(48)=1
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0,0
+ignorehitpause = 1
+
+[State 7005]
+Type = PosSet
+Trigger1 = 1
+X = -2000*facing
+Y = 0
+ignorehitpause =1
+
+[State Health Recovery]
+type = Lifeadd
+triggerall = alive
+trigger1 = time%20=0
+value = 1
+
+[State 4512, turn] ; always face the same direction as partner
+type = turn
+trigger1 = facing != partner,facing
+
+[State Switch]
+type = ChangeState
+triggerall = numpartner
+trigger1=partner,stateno = 910000 && roundstate = 2
+trigger2=winko&&enemynear,stateno=5150
+trigger3=partner,stateno = 5150
+trigger4=partner,stateno=920001 ;Failsave
+trigger5=losetime||wintime
+trigger6=drawgame
+value = 900001
+
+[State Cooldown (2 Seconds)]
+type = Explod
+triggerall = !numexplod(930000) ;cooldown timer
+trigger1 = !time
+anim = 9999
+ID = 930000
+pos = 0,0
+postype = P1
+removetime = 120;*6
+supermovetime = 0
+pausemovetime = 0
+scale = 0,0
+ownpal = 1
+ignorehitpause = 1
+
+[State Assist]
+type = ChangeState
+triggerall = numpartner
+triggerall = !numexplod(930000) ;cooldown timer
+trigger1=roundstate=2 && partner,alive && partner,movetype!=H
+trigger1=command = "c" && (partner,stateno != [3000,3900])
+trigger1=partner,stateno != 810
+value = 930000
+;---------------------------------------------------------------------------
+;Partner Assist
+[Statedef 930000]
+type    = A
+physics = N
+ctrl = 0
+anim = 41
+sprpriority = 1
+
+[State Tag Out Detector]
+type = Varset
+trigger1 = !time
+var(48)=1
+
+[State 0, PlayerPush]
+type = PlayerPush
+trigger1 = 1
+value = 0
+ignorehitpause = 1
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = !time
+value = S3000,3
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = time < 9
+value = SCA
+
+[State 105, 1]
+type = VelSet
+triggerall = anim != 47
+trigger1 = Time = 0
+x = 13
+y = -2.4
+
+[State 7005]
+Type = PosSet
+triggerall = anim != 47
+Trigger1 = !time
+X = -400*facing
+Y = -50
+ignorehitpause =1
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = anim != 47
+y = .40
+
+[State 0, ScreenBound]
+type = ScreenBound
+trigger1 = 1
+value = 0
+movecamera = 0,0
+ignorehitpause = 1
+
+[State 105, 3]
+type = changeanim
+triggerall = anim != 47
+trigger1 = Pos Y >= -5
+value = 47
+
+[State Land FX]
+type = Explod
+triggerall=anim = 47
+trigger1 = animelemtime(1)=1
+anim = 633
+ID = 630
+pos = 0,0
+postype = P1
+supermovetime = 999999
+pausemovetime = 999999
+scale =0.5,0.5
+sprpriority = 5
+ownpal = 1
+ignorehitpause = 1
+
+[State Land FX]
+type = Explod
+triggerall=anim = 47
+trigger1 = animelemtime(1)=1
+anim = 633
+ID = 630
+pos = 5,0
+postype = P1
+trans = sub
+supermovetime = 999999
+pausemovetime = 999999
+scale =0.4,0.5
+sprpriority = 4
+ownpal = 1
+ignorehitpause = 1
+
+[State Land SFX]
+type = PlaySnd
+triggerall=anim = 47
+trigger1 = animelemtime(1)=1
+;-------------------------------
+;Extras can be added here.
+
+;trigger2 = anim = 40
+;trigger2 = animelemtime(1) = 1
+;-------------------------------
+value = S0,2
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = anim = 47
+y = 0
+
+[State 0, StateTypeSet]
+type = StateTypeSet
+trigger1 = anim = 47
+statetype = S       ;S,A,C,L
+movetype = I        ;I,A,H
+physics = S         ;A,C,S,N
+
+[State Attack!]
+type = ChangeState
+triggerall = anim = 47
+trigger1 = !animtime
+value = 1010;insert any attack stateno here (HYPERS ARE FORBIDDEN UNDER ZMR RULES.)
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+;Blazing Fury (Blitz)
+[Statedef 95840390]
+type = S
+ctrl = 0
+anim = 160
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 2
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 4
+value = S9999,5
+volumescale = 255
+
+[State 0, StopSnd]
+type = StopSnd
+trigger1 = time = 1
+channel = 0
+ignorehitpause = 1
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = timerfreeze
+ignorehitpause = 1
+
+[State 0, Helper]
+type = Helper
+trigger1 = time = 0
+helpertype = Normal ;Player
+name = "Blazing Fury Text"
+ID = 95840394
+stateno = 95840394
+pos = -170,-70
+postype = back
+ownpal = 1
+size.xscale=1.2
+size.yscale=1.2
+supermovetime = 9999999
+pausemovetime = 9999999
+[State 0, Helper]
+type = Helper
+trigger1 = time = 3
+helpertype = Normal ;Player
+name = "Blazing Fury BG"
+ID = 95840398
+stateno = 95840398
+pos = -170,-70
+postype = back
+ownpal = 1
+size.xscale=1
+size.yscale=1
+supermovetime = 9999999
+pausemovetime = 9999999
+
+
+[State HitSpark]
+type=null
+;
+;Spark X
+trigger1=1||var(41):=0
+;
+;Spark Y
+trigger1=1||var(42):=floor(playerid(var(44)),pos y+playerid(var(44)),const(size.mid.pos.y))
+;
+;Spark Type
+;
+;0=Normal Light
+;1=Normal Medium
+;2=Normal Hard
+;10=Slash Light
+;11=Slash Medium
+;12=Slash Hard
+;
+trigger1=1||var(43):=2
+ignorehitpause=1
+
+[state ]
+type=changeanim
+trigger1=animelemtime(3)>=0
+value=anim
+elem=3
+
+[state ]
+type=playsnd
+trigger1=time=3
+value=3000,4
+[state ]
+type=playsnd
+trigger1=time=3
+value=3000,5
+
+[State 0, EnvColor]
+type = EnvColor
+trigger1 = time=3
+value = 255,255,255
+time = 1
+[State 0, EnvShake]
+type = EnvShake
+trigger1 = time=3
+time = 10
+ampl = 10
+
+[State 0, PalFX]
+type = PalFX
+trigger1 = time=3
+time = 5
+add = 0,0,0
+mul = 256,256,256
+sinadd = 256,256,256,10
+color = 256
+
+
+
+[state ]
+type=varset
+trigger1=1
+sysvar(0)=random
+[State 0, Explod]
+type = Explod
+trigger1 = time=3
+anim = 6105
+ID = 6105
+facing=ifelse(sysvar(0)%2=0,1,-1)
+pos = 0,const(size.mid.pos.y)
+postype = P1
+pausemovetime=9999999
+supermovetime=9999999
+scale = 0.5,0.5
+sprpriority = -5
+ownpal = 1
+[State 0, Explod]
+type = Explod
+trigger1 = time=3
+anim = 6105+3
+ID = 6105
+facing=ifelse(sysvar(0)%2=0,1,-1)
+pos = 0,const(size.mid.pos.y)
+postype = P1
+pausemovetime=9999999
+supermovetime=9999999
+scale = 0.5*1.05,0.5*1.05
+sprpriority = -5
+ownpal = 1
+
+[State 0, Explod]
+type = Explod
+trigger1 = time=3
+anim = 6106
+ID = 6106
+pos = 0,const(size.mid.pos.y)
+postype = P1
+pausemovetime=9999999
+supermovetime=9999999
+scale = 0.5,0.5
+sprpriority = 5
+ownpal = 1
+[State 0, Explod]
+type = Explod
+trigger1 = time=3
+anim = 6106+3
+ID = 6106
+pos = 0,const(size.mid.pos.y)
+postype = P1
+pausemovetime=9999999
+supermovetime=9999999
+scale = 0.5*1.015,0.5*1.015
+trans=sub
+sprpriority = 5-1
+ownpal = 1
+[State 0, Explod]
+type = Explod
+trigger1 = time=[3,8]
+anim = 840100+random%3
+ID = 840100
+facing=ifelse(random%2=0,1,-1)
+vfacing=ifelse(random%2=0,1,-1)
+pos = 0,const(size.mid.pos.y)
+vel=-10+random%200*0.1,-1-random%50*0.1
+accel=0,0.35
+random=30,30
+postype = P1
+pausemovetime=9999999
+supermovetime=9999999
+scale = 0.8-sysvar(0)%60*0.01,0.8-sysvar(0)%60*0.01
+sprpriority = 5
+ownpal = 1
+[State 0, Explod]
+type = Explod
+trigger1 = time=[3,11]
+anim = 840100+random%3
+ID = 840100
+facing=ifelse(random%2=0,1,-1)
+vfacing=ifelse(random%2=0,1,-1)
+pos = 0,const(size.mid.pos.y)
+vel=-10+random%200*0.1,-10+random%200*0.1
+random=30,30
+postype = P1
+pausemovetime=9999999
+supermovetime=9999999
+scale = 0.8-sysvar(0)%60*0.01,0.8-sysvar(0)%60*0.01
+sprpriority = 5
+ownpal = 1
+
+[State 0, Helper]
+type = Helper
+trigger1 = time=6
+helpertype = Normal ;Player
+name = ""
+ID = 95840391
+stateno = 95840391
+pos = 0,0
+postype = P1
+ownpal = 1
+pausemovetime=9999999
+supermovetime=9999999
+[State 0, Helper]
+type = Helper
+trigger1 = time=3
+helpertype = Normal ;Player
+name = ""
+ID = 95840392
+stateno = 95840392
+pos = 0,const(size.mid.pos.y)
+postype = P1
+ownpal = 1
+size.xscale=1
+size.yscale=1
+pausemovetime=9999999
+supermovetime=9999999
+
+[State 0, BGPalFX]
+type = BGPalFX
+trigger1 = time>=3&&floor((time-3)*15)<256
+time = 3
+mul = floor((time-3)*15),floor((time-3)*15),256
+color = floor((time-3)*15)
+
+[state Enemy,Defence]
+type=varset
+trigger1=numenemy=1
+fvar(0)=enemy,lifemax*(enemy,const(data.defence)*0.01)
+ignorehitpause=1
+[state Enemy,Defence]
+type=varset
+trigger1=numenemy>1
+fvar(0)=playerid(ifelse(enemynear(0),alive,enemynear(0),id,enemynear(1),id)),lifemax*(playerid(ifelse(enemynear(0),alive,enemynear(0),id,enemynear(1),id)),const(data.defence)*0.01)
+ignorehitpause=1
+
+[State 200]
+type = Projectile
+trigger1 = time=3
+attr=SCA,AA,AT,AP
+damage = ceil(fvar(0)*0.200), ceil((fvar(0)*0.200)*.25)
+projanim = 958350
+projhitanim = -1
+projid = 968350
+projremove=1
+projremovetime = 10
+projedgebound=99999
+projstagebound=99999
+projheightbound=-99999,99999
+postype = p1
+priority = 7;, Miss
+offset = 0,0
+velocity=0,0
+hitflag = MAFDP
+guardflag = 
+animtype  = diagup
+getpower = 0,0
+givepower = 0,0
+pausetime = 0,10
+sparkno = -1
+sparkxy=0,0
+hitsound   = s1,6
+guard.sparkno =-1
+guardsound = s1,8
+ground.type = High
+ground.slidetime = 60
+ground.hittime = 60
+ground.velocity = -5,-20
+air.velocity = -5,-20
+fall = 0
+air.fall=0
+guard.dist=0
+id=95840390
+envshake.time=15
+envshake.ampl=15
+p2stateno=95840393
+ignorehitpause=1
+kill = 0
+
+[state ]
+type=varset
+trigger1=projcontact968350=1
+var(44)=target,id
+ignorehitpause=1
+
+[State HitSpark FX]
+type = Helper
+triggerall=var(43)>=0
+trigger1 = projhit968350=1
+helpertype = Normal
+name = "HitSpark"
+ID = 823000
+stateno = 823000
+pos = (ceil(playerid(var(44)),pos x-pos x)*facing)+var(41),var(42)
+postype = P1
+ownpal = 1
+supermovetime = 99999999
+pausemovetime = 99999999
+size.shadowoffset=100+var(43)
+ignorehitpause = 1
+[State GuardSpark FX]
+type = Helper
+triggerall=var(43)>=0
+trigger1 = projguarded968350=1
+helpertype = Normal
+name = "GuardSpark"
+ID = 823000
+stateno = 823001
+pos = (ceil(playerid(var(44)),pos x-pos x)*facing)+var(41),var(42)
+postype = P1
+ownpal = 1
+supermovetime = 99999999
+pausemovetime = 99999999
+size.shadowoffset=100+var(43)
+ignorehitpause = 1
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = !time
+y = -6
+[State 0, VelMul]
+type = VelMul
+trigger1 = anim = 160
+y = .90
+
+[State 0, ChangeAnim]
+type = ChangeAnim
+trigger1 = time=6+19
+value = 41
+
+[State 0, VelAdd]
+type = VelAdd
+trigger1 = anim = 41
+y = .9
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+ignorehitpause = 1
+
+[State 195, 2]
+type = ChangeState
+triggerall = anim = 41
+trigger1 = pos y >= 0
+value = 95840395
+
+;Effects
+[Statedef 95840391]
+type = S
+ctrl = 0
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 5
+
+[state ]
+type=null
+triggerall=!time
+trigger1=1||var(0):=parent,anim
+trigger1=1||var(1):=parent,animelemno(0)
+ignorehitpause=1
+[state ]
+type=nothitby
+trigger1=1
+value=sca,aa,at,ap
+ignorehitpause=1
+[state ]
+type=playerpush
+trigger1=1
+value=0
+ignorehitpause=1
+[state ]
+type=assertspecial
+trigger1=1
+flag=noshadow
+ignorehitpause=1
+
+[state ]
+type=changeanim
+trigger1=1
+value=var(0)
+elem=var(1)
+ignorehitpause=1
+
+[state ]
+type=bindtoparent
+trigger1=1
+pos=0,floor((time)*1.35)
+time=-1
+ignorehitpause=1
+[state ]
+type=trans
+trigger1=1
+trans=addalpha
+alpha=floor(256-(time)*20),floor(128+(256+(time)*20)*0.5)
+ignorehitpause=1
+[state ]
+type=angledraw
+trigger1=1
+scale=1+(time)*0.05,1+(time)*0.05
+ignorehitpause=1
+[state ]
+type=destroyself
+trigger1=(time)*20>=256
+ignorehitpause=1
+
+;Effects
+[Statedef 95840392]
+type = S
+ctrl = 0
+velset = 0,0
+movetype = I
+physics = S
+sprpriority = 5
+
+[state ]
+type=nothitby
+trigger1=1
+value=sca,aa,at,ap
+ignorehitpause=1
+[state ]
+type=playerpush
+trigger1=1
+value=0
+ignorehitpause=1
+[state ]
+type=assertspecial
+trigger1=1
+flag=noshadow
+ignorehitpause=1
+
+[state ]
+type=null
+triggerall=!time
+trigger1=1||var(0):=random
+
+[state ]
+type=changeanim
+trigger1=anim!=6104
+value=6104
+ignorehitpause=1
+
+[state ]
+type=trans
+trigger1=1
+trans=add
+ignorehitpause=1
+[state ]
+type=palfx
+trigger1=time<=5
+mul=256,256,256
+time=1
+ignorehitpause=1
+[state ]
+type=palfx
+trigger1=256-(time-5)*20>0
+mul=floor(256-(time-5)*20),floor(256-(time-5)*20),floor(256-(time-5)*20)
+time=3
+ignorehitpause=1
+[state ]
+type=varset
+trigger1=1
+fvar(0)=fvar(0)+ifelse(time>=7,0.045,0.175)
+[state ]
+type=angledraw
+trigger1=1
+value=var(0)%360+time*-2
+scale=fvar(0),fvar(0);time*0.084,time*0.085
+ignorehitpause=1
+[state ]
+type=destroyself
+trigger1=(time-5)*20>=256
+ignorehitpause=1
+
+;Enemy State
+[Statedef 95840393]
+movetype= H
+type = U
+physics = N
+velset = 0,0
+ctrl = 0
+poweradd = 55
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = ishelper
+
+[State 001, 2]
+type = changeanim2
+trigger1 = !hitshakeover
+value = 9683060
+[state ]
+type=posfreeze
+trigger1=!hitshakeover
+value=1
+
+[State 001, 3]
+type = null;PalFX
+trigger1 = time%1=0
+time = 1
+add = 15,15,0
+invertall = 0
+color = 100
+
+[state ]
+type=velset
+triggerall=time > 10
+trigger1=statetype=a
+y=12
+[state ]
+type=veladd
+triggerall=hitshakeover
+trigger1=statetype=a
+y=0.65
+[state ]
+type=velset
+trigger1=pos y > -5
+y=0
+[state ]
+type=posset
+trigger1=pos y>=0
+y=0
+
+[State 001, 3]
+type = SelfState
+triggerall = statetype = A
+trigger1 = time = 120
+value = 5050
+ctrl = 0
+[State 001, 3]
+type = SelfState
+triggerall = statetype != A
+trigger1 = time = 120
+value = 0
+ctrl = 1
+
+[State 0, StateTypeSet]
+type = StateTypeSet
+trigger1 = !time
+trigger1 = pos y < -5
+statetype = A   
+[State 0, StateTypeSet]
+type = StateTypeSet
+trigger1 = pos y > -5
+statetype = S
+
+;Blazing Fury Text
+[Statedef 95840394]
+type     = U
+movetype = I
+physics  = N
+velset = 0,0
+ctrl     = 0
+anim     = 9999
+sprpriority = -1  
+
+[State 181, Explod]
+type = Explod
+trigger1 = time = 4
+bindtime = -1
+removetime = 60
+postype = Left
+pos = 165,118
+anim = 95840394
+id = 95840394
+sprpriority = 9999
+ontop = 1
+;vel = 5,0
+OwnPal = 1
+scale =0,0
+ignorehitpause =1
+supermovetime = 999999999
+pausemovetime = 999999999
+[State 0, ModifyExplod]
+type = ModifyExplod
+trigger1 = (time = [4,60])
+anim = 95840394
+id = 95840394
+;pos = 158,75
+scale = -0.674-(0.0109*(Time-67)), -0.674-(0.0109*(Time-67))
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = time >= 60
+;---------------------------------------------------------------------------
+;Blazing Attack
+[Statedef 95840395]
+type    = S
+physics = S
+anim = 100
+ctrl=0
+velset = 0,0
+sprpriority = 1
+facep2 = 1
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = timerfreeze
+ignorehitpause = 1
+
+[State Run FX]
+type = Explod
+trigger1 = anim = 100
+trigger1 = animelemtime(2)=0
+anim = 104
+ID = 103
+pos = 10,-50
+vel=-2,0
+accel=0.08,0
+postype = P1
+supermovetime = 999999
+pausemovetime = 999999
+scale =0.35,0.35
+sprpriority = 5
+ownpal = 1
+facing = ifelse(anim=110,-1,1)
+trans=add
+ignorehitpause = 1
+
+[State Run FX]
+type = Explod
+trigger1 = anim = 100
+trigger1 = animelemtime(2)=0
+anim = 104
+ID = 103
+pos = 10,-50
+vel=-2,0
+accel=0.08,0
+postype = P1
+supermovetime = 999999
+pausemovetime = 999999
+scale =0.4,0.4
+sprpriority = 4
+ownpal = 1
+facing = ifelse(anim=110,-1,1)
+trans=sub
+ignorehitpause = 1
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = !time
+y = 0
+
+[State 100, 1]
+type = VelSet
+trigger1 = anim = 100
+trigger1 = animelemtime(2)>=0
+x = const(velocity.run.fwd.x) * 2
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = time >= 120
+trigger2 = frontedgedist < 15
+trigger3 = target,stateno != 95840393 || target,pos y > 0
+value = ifelse(target,stateno != 95840393,52,0)
+ctrl = 1
+
+[State 0, end]
+type = changestate
+triggerall = anim = 100
+trigger1 = p2bodydist x < 25
+value = 95840396
+
+;Barrage
+[Statedef 95840396]
+type    = S
+movetype = A
+physics = N
+;anim = 100
+ctrl=0
+velset = .9,0
+sprpriority = 1
+
+;=====================================
+;CINEMATIC ZOOMS (1.1 ONLY)
+[State 3000, Reset]
+type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            =varset
+type=null
+trigger1 = !time
+fvar(12) = 0
+ignorehitpause = 1
+[State 3000, Zoom In]
+type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            =varadd
+type=null
+trigger1 = (time = [0,18])
+fvar(12) = 0.2*0.15
+ignorehitpause = 1
+[State 3000, Zoom In]
+type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            =varadd
+type=null
+trigger1 = (time = [189,205])
+fvar(12) = -0.2*0.15
+ignorehitpause = 1
+
+[State 3000, Zoom]
+type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            =zoom
+type=null
+trigger1 = time>=1&&time<=205
+scale = 1+fvar(12)
+pos = (Pos X/1)+(fvar(12)*8),0-(fvar(12)*4)
+ignorehitpause = 1
+;=====================================
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = timerfreeze
+ignorehitpause = 1
+
+[State HitSpark]
+type=null
+;
+;Spark X
+trigger1=1||var(41):=ifelse(time>200,0,57)
+;
+;Spark Y
+trigger1=1||var(42):=ifelse((anim=[400,410]),-20,-60)
+;
+;Spark Type
+;
+;0=Normal Light
+;1=Normal Medium
+;2=Normal Hard
+;10=Slash Light
+;11=Slash Medium
+;12=Slash Hard
+;
+trigger1=1||var(43):=ifelse(anim=420,2,1)
+ignorehitpause=1
+
+[State HitSpark FX]
+type = Helper
+triggerall = (anim = [200,220]) || (anim = [400,410])
+triggerall = time < 200
+trigger1 = animelemtime(2)=1
+helpertype = Normal
+name = "HitSpark"
+ID = 823000
+stateno = 823000
+pos = var(41),var(42)
+postype = P1
+ownpal = 1
+supermovetime = 99999999
+pausemovetime = 99999999
+size.shadowoffset=100+var(43)
+ignorehitpause = 1
+
+[State Corndog Visual Helper]
+type = Helper
+trigger1 = anim = 200
+trigger1 = animelemtime(2)=1
+helpertype = Normal ;Player
+name = "Corndog"
+ID = 200
+stateno = 201
+pos = 0,0
+postype = P1
+ownpal = 1
+[State Corndog Visual Helper]
+type = Helper
+trigger1 = anim = 210
+trigger1 = animelemtime(2)=1
+helpertype = Normal ;Player
+name = "Corndog"
+ID = 210
+stateno = 211
+pos = 45,-65
+postype = P1
+ownpal = 1
+[State Corndog Visual Helper]
+type = Helper
+trigger1 = anim = 220
+trigger1 = animelemtime(2)=1
+helpertype = Normal ;Player
+name = "Corndog"
+ID = 220
+stateno = 221
+pos = 0,0
+postype = P1
+ownpal = 1
+[State Corndog Visual Helper]
+type = Helper
+trigger1 = anim = 400
+trigger1 = animelemtime(2)=1
+helpertype = Normal ;Player
+name = "Corndog"
+ID = 200
+stateno = 201
+pos = 2,40
+postype = P1
+ownpal = 1
+[State Corndog Visual Helper]
+type = Helper
+trigger1 = anim = 420
+trigger1 = animelemtime(1)=1
+helpertype = Normal ;Player
+name = "Corndog"
+ID = 420
+stateno = 421
+pos = 45,45
+postype = P1
+ownpal = 1
+
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = (anim = [200,220]) || (anim = [400,410])
+triggerall = time < 200
+trigger1 = animelemtime(2)=1
+value = S1,2
+channel = 8
+
+[State 0, PlaySnd]
+type = PlaySnd
+triggerall = (anim = [200,220]) || (anim = [400,410])
+triggerall = time < 200
+trigger1 = animelemtime(2)=1
+value = s2,0
+
+[State Fury Mash]
+type = ChangeAnim
+triggerall = time < 200
+trigger1 = ifelse(time>100,time%6=0,time%8=0)
+trigger2 = !time
+value = ifelse(random<500,400+random%2*10,200+random%3*10)
+elem = 2
+
+[State 0, TargetState]
+type = TargetState
+triggerall = time < 200
+trigger1 = ifelse(time>100,time%6=0,time%8=0)
+trigger2 = !time
+value = 95840397
+ID = 95840390
+[State 0, TargetState]
+type = Envshake
+triggerall = time < 200
+trigger1 = ifelse(time>100,time%6=0,time%8=0)
+trigger2 = !time
+time = 4
+ampl = ifelse(time>100,-5,-3)
+freq = 120
+
+[State 0, TargetLifeAdd]
+type = TargetLifeAdd
+triggerall = time < 200
+trigger1 = ifelse(time>100,time%6=0,time%8=0)
+trigger2 = !time
+value = -5
+ID = 95840390
+kill = 0
+
+[State 0, TargetLifeAdd]
+type = Hitadd
+triggerall = time < 200
+trigger1 = ifelse(time>100,time%6=0,time%8=0)
+trigger2 = !time
+value = 1
+
+[State Fury Mash End]
+type = ChangeAnim
+trigger1 = time > 200 && anim != 420
+value = 420
+persistent = 0
+
+[State 0, VelAdd]
+type = VelSet
+trigger1 = anim = 420
+x = 0
+
+[State 410, 2]
+type = HitDef
+triggerall = anim = 420
+trigger1 = !movecontact
+attr = C, NA
+damage    = 200
+animtype  = Heavy
+priority = 5, Hit
+hitflag = MAFDP
+guardflag = 
+pausetime = 32,32
+sparkno = -1
+guard.sparkno=-1
+sparkxy = -10,-55
+hitsound   = s1,7
+guardsound = s1,8
+ground.type = Low
+ground.slidetime = 12
+ground.hittime  = 15
+ground.velocity = -4,-26
+air.velocity = -4,-26
+guard.velocity = -6
+guard.slidetime = 12
+guard.ctrltime = 15
+guard.hittime = 15
+fall = 1
+fall.recover = 0
+getpower = 0
+yaccel = .9
+envshake.time = 17
+envshake.ampl = -6
+envshake.freq = 130
+
+[State 0, EnvColor]
+type = EnvColor
+triggerall = anim = 420
+trigger1 = !movecontact
+value = 255,255,255
+time = 1
+persistent = 0
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = anim = 420 && !animtime
+value = 11
+ctrl = 1
+;---------------------------------------------------------------------------
+;Enemy Barrage
+[Statedef 95840397]
+type    = U
+movetype= H
+physics = N
+velset = 0,0
+poweradd = 4
+facep2 = 1
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = !time
+y = 0
+
+[State 0, ChangeAnim]
+type = ChangeAnim
+trigger1 = !time
+value = ifelse((enemynear,anim=[400,420]),5010,5000)
+elem = 1
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = random < 500
+trigger1 = animelemtime(1)=1
+value = s5000,0+random%3
+channel = 0
+lowpriority = 1
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = enemynear,anim != 420
+value = SCA
+
+[State 821, 4] 
+type = SelfState
+trigger1 = time >= 120
+value = ifelse(alive,0,5050)
+ctrl = ifelse(alive,1,0)
+
+;Blazing BG
+[Statedef 95840398]
+type     = A
+movetype = I
+physics  = N
+velset = 0,0
+ctrl     = 0
+anim     = 9999
+sprpriority = -1  
+
+[state ]
+type=selfstate
+trigger1=!ishelper
+value=52
+
+[state ]
+type=palfx
+trigger1=1
+time=1
+mul=floor(ifelse(time*10>=256,256,time*10)),floor(ifelse(time*10>=256,256,time*10)),floor(ifelse(time*10>=256,256,time*10))
+color=256
+
+[State 0, Explod]
+type = Explod
+trigger1=time>0
+trigger1 = !numexplod(95840390)
+anim = 6111
+ID = 95840390
+pos = (facing=-1&&(2**9!=512)),0
+postype = back
+bindtime = -1
+removetime = -1
+supermovetime = 9999999
+pausemovetime = 9999999
+scale = 1,1
+sprpriority = -100
+ownpal = 0
+[State 0, Explod]
+type = Explod
+trigger1=time>0
+trigger1 = !numexplod(95840391)
+anim = 6112
+ID = 95840391
+pos = (facing=-1&&(2**9!=512))+160,0
+vfacing=-1
+postype = back
+bindtime = -1
+removetime = -1
+supermovetime = 9999999
+pausemovetime = 9999999
+scale = 0.5,0.5
+trans=addalpha
+alpha=150,256
+sprpriority = -110
+ownpal = 0
+[State 0, Explod]
+type = Explod
+trigger1=time>0
+trigger1 = !numexplod(95840392)
+anim = 6112
+ID = 95840392
+pos = (facing=-1&&(2**9!=512))+160,240
+vfacing=1
+postype = back
+bindtime = -1
+removetime = -1
+supermovetime = 9999999
+pausemovetime = 9999999
+scale = 1,1*0.25
+trans=addalpha
+alpha=150,256
+sprpriority = -110
+ownpal = 0
+[State 0, Explod]
+type = Explod
+trigger1=time>0
+trigger1 = gametime%2=0
+anim = 840100+random%3
+ID = 95840490
+pos = (facing=-1&&(2**9!=512))+random%320,240-random%60
+postype = back
+vel=-1+random%50*0.1,-3-random%50*0.1
+accel=0,0.25
+bindtime = 1
+removetime = -2
+supermovetime = 9999999
+pausemovetime = 9999999
+scale = 0.3,0.3
+sprpriority = -100
+ownpal = 0
+[State 0, Explod]
+type = Explod
+trigger1=time>0
+trigger1 = 1
+anim = 840100+random%3
+ID = 95840490
+pos = (facing=-1&&(2**9!=512))+random%320,240-random%60
+postype = back
+vel=-1+random%50*0.1,-6-random%50*0.1
+accel=0,0.25
+bindtime = 1
+removetime = -2
+supermovetime = 9999999
+pausemovetime = 9999999
+scale = 0.1,0.1
+sprpriority = -100
+ownpal = 0
+
+[state ]
+type=bgpalfx
+trigger1=1
+time=1
+mul=0,0,256
+color=256
+
+[state ]
+type=changestate
+trigger1=parent,stateno!=95840390&&(parent,stateno!=[95840395,95840396])
+value=95840399
+
+[Statedef 95840399]
+type     = A
+movetype = I
+physics  = N
+velset = 0,0
+ctrl     = 0
+anim     = 9999
+sprpriority = -1  
+
+[state ]
+type=selfstate
+trigger1=!ishelper
+value=52
+
+[state ]
+type=null
+triggerall=ishelper
+trigger1=time<=3
+trigger1=1||var(0):=256
+trigger2=time=[3,5]
+trigger2=1||var(0):=206
+trigger3=time=[5,7]
+trigger3=1||var(0):=156
+trigger4=time=[7,9]
+trigger4=1||var(0):=106
+trigger5=time=[9,11]
+trigger5=1||var(0):=56
+trigger6=time=[11,13]
+trigger6=1||var(0):=26
+trigger7=time=[13,15]
+trigger7=1||var(0):=16
+trigger8=time>=15
+trigger8=1||var(0):=0
+
+[state ]
+type=palfx
+trigger1=1
+time=1
+mul=var(0),var(0),var(0)
+color=256
+
+[state ]
+type=bgpalfx
+trigger1=1
+time=1
+mul=floor(256+(var(0)*-1)),floor(256+(var(0)*-1)),floor(256)
+color=floor(256+(var(0)*-1))
+
+[state ]
+type=removeexplod
+triggerall=ishelper
+trigger1=time>=15
+id=-1
+
+[state ]
+type=destroyself
+trigger1=time>=15
