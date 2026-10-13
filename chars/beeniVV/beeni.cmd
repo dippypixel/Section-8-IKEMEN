@@ -457,6 +457,17 @@ trigger1 = backedgebodydist <= ceil(map(wallClingOffset)*const(size.xscale))
 trigger2 = command = "holdback" && vel x >=0  || (command = "holdfwd" && command = "ub")
 trigger2 = frontedgebodydist <= 0 ;ceil(-154*const(size.xscale))
 ;---------------------------------------------------------------------------
+;Punch1
+[State -1, Grab]
+type = ChangeState
+value = 800
+triggerall = !aiLevel
+triggerall = command = "y"
+trigger1 = statetype != A && ctrl
+
+
+
+;---------------------------------------------------------------------------
 ;Guard
 [State -1, Guard]
 type = ChangeState
@@ -603,7 +614,7 @@ trigger2 = movecontact
 type = ChangeState
 value = 602
 triggerall = !aiLevel
-triggerall = command = "b" && (command = "holdup")
+triggerall = command = "a" && (command = "holdup")
 triggerall = statetype = A
 triggerall = var(7) < 2
 trigger1 = ctrl
@@ -615,7 +626,7 @@ trigger2 = stateno = [600,601] && movecontact
 type = ChangeState
 value = 601
 triggerall = !aiLevel
-triggerall = command = "a" && (command = "holdfwd" || command = "holdback")
+triggerall = command = "b" && (command = "holddown" || command = "holdup")
 triggerall = statetype = A
 trigger1 = ctrl
 trigger2 = stateno = 1000 && movehit && animelemtime(5) >= 0

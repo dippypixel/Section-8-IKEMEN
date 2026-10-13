@@ -20,28 +20,28 @@ command.buffer.time = 1
 
 [Command]
 name = "Super"
-command = ~D, DF, F, D, DF, F, a
+command = ~D, DB, B, D, DB, B, a
 time = 30
 [Command]
 name = "Super"
-command = ~D, F, D, F, a
+command = ~D, B, D, B, a
 time = 30
 [Command]
 name = "Super"
-command = ~D, DF, F, D, DF, F, b
+command = ~D, DB, B, D, DB, B, b
 time = 30
 [Command]
 name = "Super"
-command = ~D, F, D, F, b
+command = ~D, B, D, B, b
 time = 30
 
 [Command]
 name = "Super"
-command = ~D, DF, F, D, DF, F, a+b
+command = ~D, DB, B, D, DB, B, a+b
 time = 30
 [Command]
 name = "Super"
-command = ~D, F, D, F, a+b
+command = ~D, B, D, B, a+b
 time = 30
 
 [Command]
