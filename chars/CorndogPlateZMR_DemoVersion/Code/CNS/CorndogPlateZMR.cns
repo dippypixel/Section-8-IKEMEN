@@ -2113,11 +2113,97 @@ type = Changestate
 trigger1 = parent,stateno != 19500
 value = 1036
 ;---------------------------------------------------------------------------
+;HoldBackCounter
+[StateDef 10000]   
+movetype = U      ; AIHU
+physics = N       ; SCANU          ;refers to the .Air file
+sprpriority = 9    ; Stand behind everything 
+anim = 9999
+
+[State 0, VarSet]
+type = VarSet
+triggerall = var(1)
+trigger1 = time=0
+trigger2 = root,command!= "holdback"
+v = 1    ;fv = 10
+value = 0
+[State 0, VarSet]
+type = Varadd
+trigger1 = root,command= "holdback"
+v = 1    ;fv = 10
+value = 1
+[State 0, VarSet]
+type = VarSet
+trigger1 = !numexplod(10000)
+v = 2    ;fv = 10
+value = 0
+[State 0, VarSet]
+type = Varadd
+trigger1 = numexplod(10000) && var(1)<35
+v = 2    ;fv = 10
+value = 1
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = var(1)=35
+value = S0,10
+ignorehitpause = 1
+;persistent = 
+
+[State 0, CooldownBar1]
+type = Explod
+trigger1 = !numexplod(10000)
+trigger1 = var(1)=35
+anim = 10000
+ID = 10000
+pos = ifelse(parent,TeamSide =2, ceil(ScreenWidth),0),(gameheight)-((gameheight)/1.5)
+postype = left  ;P2, Front, Back, Left, Right
+bindtime = 11111
+removetime = -1
+scale=.2,.2
+sprpriority = 9
+ontop = 1
+ownpal = 1
+
+[State 0, ModifyExplod]
+type = ModifyExplod
+trigger1 = var(1)<35
+ID = 10000
+trans=add
+alpha = 256-var(2)*12,var(2)*12
+[State 0, RemoveExplod]
+type = RemoveExplod
+trigger1= numexplod(10000)
+trigger1 = var(2)*12 > 256
+id = 10000
+;ignorehitpause = 
+;persistent = 
+
+
+
+
+;---------------------------------------------------------------------------
 ;Always Executed
 [Statedef -2]
 
 ;==================================================================
 ;Option
+[State ZMR Debug Info (Player)] ;Both Clipboards are for tracking certain variables in the Debug Menu, accessed by pressing Ctrl+D on your keyboard.
+type = DisplayToClipboard
+trigger1 = !var(59)
+text = "- Air Counter: %d | Aerial Rave: %d | Sucking Ass: %d | Inside ZMR?: %d | holdback time: %d | holdback time: %d"
+params = var(10),Var(4),var(6),var(21),helper(10000),var(1),helper(10000),var(2)
+[State 0, CoolDownHud Activate]
+type = Helper
+trigger1 =  !numhelper(10000) 
+helpertype = Normal 
+name = "ChargeHud"
+ID = 10000
+stateno = 10000
+pos = 0,0
+postype = p1    ;P2, Front, Back, Left, Right
+keyctrl = 0
+
 [state AILevel(Winmugen only)]
 type                                                                                                                                                                                                                                                           =null
 type=varset
@@ -2343,14 +2429,8 @@ trigger1 = (stateno != [150,153])
 var(22) = 0
 ignorehitpause = 1
 
-[State ZMR Debug Info (Player)] ;Both Clipboards are for tracking certain variables in the Debug Menu, accessed by pressing Ctrl+D on your keyboard.
-type = DisplayToClipboard
-trigger1 = !var(59)
-text = "- Air Counter: %d | Aerial Rave: %d | Sucking Ass: %d | Inside ZMR?: %d"
-params = var(10),Var(4),var(6),var(21)
-
 [State ZMR Debug Info (Player)]
-type = AppendToClipboard
+type = null;AppendToClipboard
 trigger1 = !var(59)
 text = "| Enemy Pos X: %d | Enemy Pos Y: %d"
 params = p2bodydist x,p2bodydist y

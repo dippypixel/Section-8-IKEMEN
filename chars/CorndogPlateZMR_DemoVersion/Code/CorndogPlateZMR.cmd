@@ -217,17 +217,35 @@ command = ~F, D, DF, x
 name = "CorndogSpear_x"
 command = ~F, D, DF, ~x
 [Command]
+name = "CorndogSpear_x"
+command = ~D, DF, F, x
+[Command];Negative Edge Version
+name = "CorndogSpear_x"
+command = ~D, DF, F, ~x
+[Command]
 name = "CorndogSpear_y"
 command = ~F, D, DF, y
 [Command];Negative Edge Version
 name = "CorndogSpear_y"
 command = ~F, D, DF, ~y
 [Command]
+name = "CorndogSpear_x"
+command = ~D, DF, F, y
+[Command];Negative Edge Version
+name = "CorndogSpear_x"
+command = ~D, DF, F, ~y
+[Command]
 name = "CorndogSpear_z"
 command = ~F, D, DF, z
 [Command];Negative Edge Version
 name = "CorndogSpear_z"
 command = ~F, D, DF, ~z
+[Command]
+name = "CorndogSpear_z"
+command = ~D, DF, F, z
+[Command];Negative Edge Version
+name = "CorndogSpear_z"
+command = ~D, DF, F, ~z
 
 [Command]
 name = "SauceToss_x"
