@@ -973,44 +973,19 @@ trigger1 = time>16&&time<125
 time = 1
 value = 200,200,200
 under = 1
-[State 200, 1]
-type = projectile
-triggerall = time%5=0
-trigger1 = time>20&&time<125
-projanim=3207
-projid=3207
-projremovetime=2
-offset = 30,-5
-attr = S, HA                     
-damage = 25,ceil(20*.25)          
-animtype = hard               
-guardflag = MA           
-hitflag = MAF                            
-pausetime = 0, 7          
-sparkno = s823102
-guard.sparkno = s823600            
-hitsound = s0,22
-guardsound = s1,8        
-sparkxy = 0+ceil(p2bodydist x),0              
-ground.type = high            
-ground.slidetime = 15  
-ground.hittime  = 15             
-ground.velocity = -3,-6          
-airguard.velocity = -8,0 
-guard.velocity = -9
-air.type = high              
-air.velocity = -3,-6   
-air.hittime = 20         
-getpower = 0,0
-guard.kill = 0
-palfx.time = 26
-palfx.add = 60,50,0
-palfx.mul = 302,224,110
-palfx.sinadd = 50,50,0,5
-palfx.invertall = 0
-palfx.color = 55
-fall = 1
-fall.recover = 0
+
+[State Plank Projectile]
+type = Helper
+trigger1 = time = 20
+helpertype = Normal ;Player
+name = "Hitbox"
+ID =3207
+stateno = 3207
+pos = 19,0
+postype = P1
+ownpal = 1
+size.xscale=const(size.xscale)
+size.yscale=const(size.yscale)
 
 [state ]
 type=removeexplod
@@ -1142,7 +1117,189 @@ ignorehitpause=1
 [state ]
 type=destroyself
 trigger1=time>=150||frontedgebodydist<=-100
+;------------------------------------------------
+;Projectile Hitbox
+[statedef 3207]
+type    = U
+movetype= A
+physics = N
+poweradd= 0
+juggle = 6
+velset = 0,0
+anim = 3207
+ctrl = 0
+sprpriority = 3
 
+[State 0, BindToParent]
+type = BindToParent
+trigger1 = 1
+pos = 0,0
+ignorehitpause = 1
+
+[State -3, Attack Scale for Projectiles] ;this code you can put in your projectiles for added scaling to them too.
+type = AttackMulSet
+trigger1 = 1
+value = root,fvar(3)
+ignorehitpause = 1
+
+[State 200, 1]
+type = hitdef
+trigger1 = !movecontact
+attr = , HA                    
+damage = 24,ceil(24*.25)          
+animtype = hard               
+guardflag = MA           
+hitflag = MAF                            
+pausetime = 0, 7          
+sparkno = -1;s823102
+guard.sparkno = -1;s823600            
+hitsound = s0,22
+guardsound = s1,8        
+sparkxy = 0,0            
+ground.type = high            
+ground.slidetime = 15  
+ground.hittime  = 15             
+ground.velocity = -3,-6          
+airguard.velocity = -8,0 
+guard.velocity = -9
+air.type = high              
+air.velocity = -3,-6   
+air.hittime = 20         
+getpower = 0,0
+guard.kill = 0
+palfx.time = 26
+palfx.add = 60,50,0
+palfx.mul = 302,224,110
+palfx.sinadd = 50,50,0,5
+palfx.invertall = 0
+palfx.color = 55
+fall = 1
+fall.recover = 0
+
+[State 0, MoveHitReset]
+type = MoveHitReset
+trigger1 = time%5=0
+ignorehitpause = 1
+[State 0, ChangeAnim]
+type = ChangeAnim
+trigger1 = time = 103
+value = 9999
+ignorehitpause = 1
+[State 0, StateTypeSet]
+type = StateTypeSet
+trigger1 = time = 103
+movetype = I ;I,A,H
+
+[State HitSpark]
+type=null
+;
+;Spark X
+trigger1=1||var(41):=0
+;
+;Spark Y
+trigger1=1||var(42):=0
+;
+;Spark Type
+;
+;0=Normal Light
+;1=Normal Medium
+;2=Normal Hard
+;10=Slash Light
+;11=Slash Medium
+;12=Slash Hard
+;
+trigger1=1||var(43):=2
+ignorehitpause=1
+
+[state ]
+type=varset
+trigger1=movecontact
+trigger2=var(46)>0
+var(46)=ifelse(var(46)>=7,0,var(46)+1)
+ignorehitpause=1
+[state Target,ID]
+type=varset
+triggerall=var(40)<0
+trigger1=roundstate=0||time=0
+var(44)=enemynear,id
+ignorehitpause=1
+[state Target,ID]
+type=varset
+triggerall=var(40)<0
+trigger1=movecontact=1
+trigger1=numtarget
+var(44)=target,id
+ignorehitpause=1
+[state Target,ID]
+type=varset
+triggerall=var(40)<0
+trigger1=movecontact=1
+trigger1=!numtarget
+var(44)=-1
+ignorehitpause=1
+[state HitPause]
+type=varset
+triggerall=var(40)<0
+trigger1=movecontact=1
+var(40)=hitpausetime
+ignorehitpause=1
+
+[state Disable Spark]
+type=varset
+triggerall=var(43)>0
+trigger1=stateno=0||stateno=10||stateno=20||stateno=40||stateno=50
+trigger2=movetype=h
+trigger3=roundstate<2
+var(43)=-1
+ignorehitpause=1
+
+[State HitSpark FX]
+type = Helper
+triggerall = time < 100
+triggerall=playeridexist(var(44))
+triggerall=hitpausetime=var(40)
+triggerall=var(43)>=0
+trigger1 = movehit=1
+helpertype = Normal
+name = "HitSpark"
+ID = 823000
+stateno = 823000
+pos = (ceil(playerid(var(44)),pos x-pos x)*facing)+var(41),var(42)
+postype = P1
+ownpal = 1
+supermovetime = 99999999
+pausemovetime = 99999999
+size.shadowoffset=100+var(43)
+ignorehitpause = 1
+
+[State GuardSpark FX]
+type = Helper
+triggerall = time < 100
+triggerall=playeridexist(var(44))
+triggerall=hitpausetime=var(40)
+triggerall=var(43)>=0
+trigger1 = moveguarded=1
+helpertype = Normal
+name = "GuardSpark"
+ID = 823000
+stateno = 823001
+pos = (ceil(playerid(var(44)),pos x-pos x)*facing)+var(41),var(42)
+postype = P1
+ownpal = 1
+supermovetime = 99999999
+pausemovetime = 99999999
+size.shadowoffset=100+var(43)
+ignorehitpause = 1
+
+[state Reset HitPause]
+type=varset
+trigger1=1
+var(40)=-1
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = time = 120
+trigger2 = root,movetype = H
 ;=====================================================================================================
 ;Hyper Portrait
 [statedef 6000]
