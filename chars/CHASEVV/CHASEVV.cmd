@@ -190,7 +190,6 @@ triggerall = enemynear,ailevel = 0 && random < var(59)/3-var(35) || enemynear,ai
 triggerall = (stateno != [6565600,6565621]) || (stateno = [6565600,6565621]) && (stateno != [6565610,6565611])
 triggerall = movetype = H && gethitvar(hitcount) = 1 && time = 0
 triggerall = stateno != 700 && (stateno != [120,160])
-trigger1 = !inCustomState
 trigger1 = hitdefattr != SCA, HA, HP, HT
 
 [State -1,Ai Recover]
@@ -209,7 +208,7 @@ triggerall = var(5) > (1000*.3)
 triggerall = (stateno != [120,132])
 triggerall = stateno != 700 || prevstateno != 700
 triggerALL =  enemynear,movetype != H && enemynear(!enemynear,alive),statetype !=L
-triggerall = enemynear,ailevel = 0 && random < var(59)*(ailevel/(ifelse(life < (lifemax*.5),6,4))) || enemynear,ailevel ;&& random<ifelse(life < (lifemax*.5),999,700)
+triggerall = enemynear,ailevel = 0 && random < var(59)*(ailevel/(ifelse(life < (lifemax*.5),2,4))) || enemynear,ailevel ;&& random<ifelse(life < (lifemax*.5),999,700)
 trigger1 = ctrl || (stateno = [21,22]) || stateno = 100  || stateno = 0 
 trigger1 = inguarddist && enemynear,movetype = A
 trigger1 = (enemynear,stateno != [631,633])
@@ -295,7 +294,7 @@ triggerall = power = powermax
 triggerall = enemynear,ailevel = 0 && random < var(59)*ifelse(enemynear,life < 300||fvar(12)>(ifelse(life > (lifemax*.5),36.0,19.0)),2,0) || enemynear,ailevel && random < ifelse(enemynear,life<300,	700*ifelse(life < (lifemax*.5)&&fvar(12)>19,1.5,1),	100*ifelse(fvar(12)>(ifelse(life > (lifemax*.5),36.0,19.0)),1,0))
 trigger1 = ((enemynear,pos x+ (enemynear,vel x * 13))  = [-60,60]) && enemynear,ailevel = 0 
 trigger1 = ctrl
-trigger2 = (stateno = [200,210]) && movehit
+trigger2 = (stateno = [200,210]) && movecontact
 trigger3 = stateno = 52 && prevstateno = 620
 trigger4 = enemynear,movetype = H && (stateno != [800,812])
 ;Special
@@ -443,7 +442,7 @@ trigger1 = stateno = 200 && movecontact
 trigger1 = var(54):= 201 || 1
 trigger2 = stateno = 201 && movecontact
 trigger2 = var(54):= 202 || 1
-trigger3 = stateno = 202 && movecontact
+trigger3 = stateno = 202 && movecontact 
 trigger3 = var(54):= 210 || 1
 
 
