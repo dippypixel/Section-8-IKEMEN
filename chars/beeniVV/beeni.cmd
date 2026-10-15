@@ -56,7 +56,7 @@ time = 10
 ;-| 2/3 Button Combination |-----------------------------------------------
 [Command]
 name = "recovery";Required (do not remove)
-command = x+y
+command = c
 time = 1
 
 ;-| Dir + Button |---------------------------------------------------------

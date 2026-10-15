@@ -38,7 +38,7 @@ walk.fwd  = 2.85      ;Walk forward
 walk.back = -2.75     ;Walk backward
 run.fwd  = 5.5, 0    ;Run forward (x, y)
 run.back = -4.9,-5 ;Hop backward (x, y)
-jump.neu = 0,-11.5    ;Neutral jumping velocity (x, y)
+jump.neu = 0,-13    ;Neutral jumping velocity (x, y)
 jump.back = -3    ;Jump back Speed (x, y)
 jump.fwd = 3.25       ;Jump forward Speed (x, y)
 runjump.back = -2.55,-8.1 ;Running jump speeds (opt)
@@ -442,7 +442,7 @@ guardsound = 6, 0
 ground.type = High
 ground.slidetime = 12
 ground.hittime  = 26
-ground.velocity = -6, -6
+ground.velocity = ifelse(prevstateno=[200,210],-8,-6), ifelse(prevstateno=[200,210],-6,0)
 guard.velocity = -1.25
 airguard.velocity = -3,-1.65
 air.type = High
@@ -450,7 +450,9 @@ air.velocity = -6, -3.75
 air.hittime = 26
 guard.hittime = 12
 airguard.hittime = 12
+fall= ifelse(prevstateno=[200,210],0,1)
 yaccel = .6/fvar(20)
+mindist = 150,-999
 
 [State 200, Velocity Dampen]
 type = varset
@@ -1935,7 +1937,7 @@ attr = S, SP
 damage = 42, 4
 animtype = Hard
 guardflag = MA
-hitflag = MAF
+hitflag = MAFD
 priority = 3, Hit
 pausetime = 8,8
 sparkno = S20001
@@ -3105,7 +3107,7 @@ sysvar(1) = 1
 type = VelSet
 trigger1 = animtime = 0
 x = ifelse(sysvar(1) = 0, const(velocity.jump.neu.x), ifelse(sysvar(1) = 1, ifelse(prevstateno = 100, ifelse(power=powermax,const(velocity.runjump.fwd.x)*map(speedBuff), const(velocity.runjump.fwd.x)), ifelse(power=powermax, const(velocity.jump.fwd.x)*map(speedBuff), const(velocity.jump.fwd.x))), ifelse(power=powermax,const(velocity.jump.back.x)*map(speedBuff),const(velocity.jump.back.x))))*ifelse(command="holdup", 1, 1.334)*ifelse(var(55) && map(spitballEffect) = 1, .8, 1)
-y = ifelse(((aiLevel && enemynear, pos y < 0 && enemynear, vel y >= 1) || (!ailevel && command = "holdup")), const(velocity.jump.y)*ifelse(var(55) && map(spitballEffect) = 1, .8, 1), const(velocity.jump.y)*ifelse(map(shortJumpMul)=0, 0.667, map(shortJumpMul))*ifelse(var(55) && map(spitballEffect) = 1, .8, 1))
+y = ifelse(((aiLevel && enemynear, pos y < 0 && enemynear, vel y >= 1) || (!ailevel && command = "holdup")), const(velocity.jump.y), const(velocity.jump.y)*ifelse(map(shortJumpMul)=0, 0.667, map(shortJumpMul)))
 
 
 [State 0, Explod]
