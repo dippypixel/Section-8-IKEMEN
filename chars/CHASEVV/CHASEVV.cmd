@@ -531,7 +531,7 @@ triggerall = !aiLevel
 triggerall = !var(53)
 triggerall = Pos Y < -const(movement.airjump.height)
 triggerall = stateno != [120,140]
-triggerall = ctrl && stateno != 55 || (stateno = [5200,5210]) || (stateno = 5040)&&time>10|| stateno = 1010 && animelemtime(20)>0 && !movecontact
+triggerall = ctrl && stateno != 55 || (stateno = [5200,5210]) || (stateno = 5040)&&time>10|| stateno = 1010 && animelemtime(18)>0 && !movecontact
 trigger1 = (command = "holdfwd" && vel x <= 0)  || (command = "holdback" && command = "ub")
 trigger1 = backedgebodydist <= ceil(95*const(size.xscale)) 
 trigger2 = command = "holdback" && vel x >=0  || (command = "holdfwd" && command = "ub")

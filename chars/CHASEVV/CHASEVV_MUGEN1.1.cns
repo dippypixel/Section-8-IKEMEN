@@ -1062,7 +1062,7 @@ sparkxy = -10, ceil(-185*const(size.yscale))
 hitsound = s205,2;s200, 1
 guardsound = S150,0
 guard.sparkno = S20010
-ground.type = High
+ground.type = low
 ground.slidetime = 8
 ground.hittime  = 12
 ground.velocity = -3
@@ -2382,8 +2382,7 @@ ignorehitpause = 1
 [State 200, HitSound]
 type = PlaySnd
 trigger1 = movehit
-value = s205,4
-freqmul = .95+(fvar(11)*.02)
+value = 811,ifelse(0+floor(fvar(11)*.5)>5,5,0+floor(fvar(11)*.5))
 persistent = 0
 ignorehitpause = 1
 
@@ -2730,7 +2729,7 @@ y = -6
 [State 1028, Vel X]
 type = VelSet
 trigger1 = Time = 0
-x=ifelse((enemy,fvar(11)*.5)>=12,12,(enemy,fvar(11)*.5)) ;x = 6
+x=ifelse((enemy,fvar(11)*.15)>=12,12,(enemy,fvar(11)*.15)) ;x = 6
 [State 0, Width at high speeds]
 type = Width
 trigger1 = abs(vel x) > 5
@@ -2874,6 +2873,7 @@ airguard.velocity = -1.25,-.5
 guard.hittime = 16
 airguard.hittime = 16
 yaccel = .6/fvar(20)
+p2stateno=1001
 ;id = 1000
 kill = 0
 fall = 0
@@ -2911,6 +2911,7 @@ time = 1
 id = -1
 pos = ifelse(P2dist X < 0, -30, 30),ifelse(p2dist y < 0,P2dist y/1.1,0)
 persistent = 1
+ignorehitpause=1
 ;-------------------------
 ;speed shit
 
@@ -3092,7 +3093,7 @@ guard.sparkno = S20010
 ground.type = High
 ground.slidetime = 26
 ground.hittime  = 26
-ground.velocity = (vel x*-1) + -7, ifelse(statetype=A,-2.85,0)
+ground.velocity = (vel x*-1) + ifelse(statetype=A,-3,-7), ifelse(statetype=A,-2.85,0)
 air.velocity = -1.4,-2.85
 guard.velocity = -2.5
 airguard.velocity = -.8,-.6
@@ -3125,6 +3126,26 @@ trigger1 = anim = 1001&& AnimTime = 0
 value = ifelse(statetype=A, 50,0)
 ctrl = 1
 
+
+
+; HitByTornado
+[Statedef 1001]
+type    = S
+movetype= H
+physics = N
+anim=5002
+[State 0, StateTypeSet]
+type = StateTypeSet
+trigger1 = pos y != 0
+statetype = A
+[State 0, StateTypeSet]
+type = StateTypeSet
+trigger1 = pos y >= -1
+statetype = S
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = animtime=0&&anim=5002
+value = 5001
 
 
 ;------------------------------------------------------------------------------------
@@ -3786,18 +3807,23 @@ physics = N
 anim = 3000
 sprpriority = 1
 ctrl = 0
+
+[State 0, ChangeAnim]
+type = ChangeAnim
+trigger1 = time=30 && anim=3000
+value = 3004
+ignorehitpause =1 
+
 ;zoomin
 [State 0, Zoom In]
 type = Zoom
-trigger1 = animelemtime(9) < 0
+trigger1 = animelemtime(8) < 0 && anim=3004||anim=3000
 scale = 1.0 + (0.5 * (1 - exp(-0.1 * time)))
-pos = pos x*0.25, pos y-10
-
-
+pos = (pos x) *camerazoom, 0
 
 [State 0, VelMul]
 type = VelMul
-trigger1 = animelemtime(9) < 0
+trigger1 = animelemtime(8) < 0&& anim=3004||anim=3000
 x = .7
 
 [State 0, NotHitBy]
@@ -3813,14 +3839,14 @@ time = 1
 
 [State 0, VelSet]
 type = VelSet
-trigger1 = animelem = 9
+trigger1 = animelem = 8&& anim=3004
 y = -15
 
 ;SOUNDS
 
 [State 200, 2]
 type = PlaySnd
-trigger1 = animelem = 9
+trigger1 = animelem = 8&& anim=3004
 value = S40,0
 ignorehitpause = 1
 channel = -1
@@ -3828,21 +3854,21 @@ volumescale = 250
 
 [State 200, 2]
 type = PlaySnd
-trigger1 = animelem = 7 
+trigger1 = animelem = 6&& anim=3004
 value = S3020,0
 ignorehitpause = 1
 volumescale = 400
 
 [State 200, 2]
 type = PlaySnd
-trigger1 = animelem = 2
+trigger1 = animelem = 1&& anim=3004
 value = s200, 2
 ignorehitpause = 1
 volumescale = 200
 
 [State 0, PlaySnd]
 type = PlaySnd
-trigger1 = animelem = 9
+trigger1 = animelem = 8&& anim=3004
 value = 3000,0
 channel = 9
 [State 0, PlaySnd]
@@ -3854,7 +3880,7 @@ value = 30000,0
 ;SUPER SHIT
 
 
-[State 0, Explod]
+[State 0, SuperPortaitFlash]
 type = Explod
 trigger1 = time = 0
 anim = 4444
@@ -3868,7 +3894,7 @@ scale = 0.6,0.6
 ownpal = 1
 removeongethit = 0
 sprPriority = -1
-[State 0, Explod]
+[State 0, SuperPortait]
 type = Explod
 trigger1 = time = 0
 anim = 3999
@@ -3899,9 +3925,36 @@ persistent = 0
 
 ;JUMP THING
 
+[State 0, SuperBackground Activate]
+type = Helper
+trigger1 = var(34)
+trigger1 =  !numhelper(30000) 
+helpertype = Normal 
+name = "SuperBackground"
+ID = 30000
+stateno = 30000
+pos = 0,0
+postype = p1    ;P2, Front, Back, Left, Right
+keyctrl = 0
+
+[State 0, HitsparkManager Activate]
+type = Helper
+trigger1 =  !numhelper(30001) 
+helpertype = Normal 
+name = "HitsparkManager"
+ID = 30001
+stateno = 30001
+pos = 0,0
+postype = p1    ;P2, Front, Back, Left, Right
+keyctrl = 0
+;---------------------------------------------------------------------------
+;Guard
+;------------------------
+
+
 [State 0, Explod]
 type = Explod
-trigger1 = animelem = 8
+trigger1 = animelem = 7&& anim=3004
 anim = 20060
 pos = 0,0
 postype = p1  ;p2,front,back,left,right
@@ -3927,19 +3980,20 @@ value = 0
 
 [State 0, ScreenBound]
 type = ScreenBound
-trigger1 = 1
+trigger1 = AnimElemTime(8) > 0&& anim=3004
 value = 1
-movecamera = 0,0
+movecamera = 1,0
 ignorehitpause = 1
 
 [State 0, Gravity]
 type = gravity
 trigger1 =  vel y < 150
-trigger1 = AnimElemTime(9) > 0
+trigger1 = AnimElemTime(8) > 0&& anim=3004
+
 
 [State 0, InitialVelNeutral]
 type = Velset
-triggerall = animelem = 9
+triggerall = animelem = 8&& anim=3004
 trigger1 = !ailevel
 trigger1 = command != "holdfwd" && command != "holdback" 
 trigger2 = ailevel && p2bodydist x = [-30,50]
@@ -3947,7 +4001,7 @@ x = 3
 
 [State 0, InitialVelForward]
 type = Velset
-triggerall = animelem = 9
+triggerall = animelem = 8&& anim=3004
 trigger1 = !ailevel
 trigger1 = command = "holdfwd" 
 trigger2 = ailevel && p2bodydist x > 50
@@ -3955,7 +4009,7 @@ x = 5
 
 [State 0, InitialVelBack]
 type = Velset
-triggerall = animelem = 9
+triggerall = animelem = 8&& anim=3004
 trigger1 = !ailevel
 trigger1 = command = "holdback" 
 trigger2 = ailevel && p2bodydist x < -30
@@ -3963,14 +4017,14 @@ x = -5
 
 [State 0, Air Drift Forward]
 type = Veladd
-triggerall = animelemtime(9) >=0
+triggerall = animelemtime(8) >=0&& anim=3004
 trigger1 = command = "holdfwd" && vel x < 5 && !ailevel
 trigger2 = ailevel && p2bodydist x > 10
 x = 0.3
 
 [State 0, Air Drift Back]
 type = VelAdd
-triggerall =animelemtime(9) >=0
+triggerall =animelemtime(8) >=0&& anim=3004
 trigger1 = command = "holdback" && vel x > -5 && !ailevel
 trigger2 = ailevel && p2bodydist x < -10
 x = -0.3
@@ -4022,20 +4076,19 @@ trigger1 = NumTarget(3000) && movehit = 1
 value = ifelse(time>310&&enemynear,statetype =L,3111,3020)
 ID = 3000
 ignorehitpause = 1
-
 [State 7300, AngleDraw activate]
 type = AngleDraw 
-trigger1 = AnimElemtime(9)>=0
+trigger1 = AnimElemtime(8)>=0&& anim=3004
 
 [State 7300, Angle in starting velocity]
 type = AngleDraw 
-trigger1 = AnimElemtime(9)>=0 && AnimElemtime(23)<0
+trigger1 = AnimElemtime(8)>=0 && AnimElemtime(22)<0&& anim=3004
 value = vel x*-5
 ignorehitpause = 1
 
 [State 0, Angledraw falling]
 type = AngleAdd
-trigger1 = AnimElemtime(23) > 0
+trigger1 = AnimElemtime(22) > 0&& anim=3004
 value = vel y * -.5
 
 [State 0, ChangeState]
@@ -4239,8 +4292,8 @@ ignorehitpause = 1
 type = Explod
 trigger1 =movehit && enemy,pos y > -6 && anim = [3001,3003]
 anim = 20000
-pos = (screenwidth*.5 + pos x) +-70+random%140, enemy,screenpos y + -50+random%50
-postype = left  ;p2,front,back,left,right
+pos =  (-pos x + helper(30001),pos x)*facing+-70+random%140 , helper(30001),pos y - pos y+ -50+random%50
+postype=p1
 facing = ifelse(random<500,-1,1)
 vfacing = 1
 bindtime = 0
@@ -4250,7 +4303,6 @@ sprpriority = -1
 ontop = 1
 ownpal = 1
 ignorehitpause = 1
-
 ;---------------------------------------------------------
 
 
@@ -5587,6 +5639,34 @@ trigger1 = root,stateno!=[3000,3003]
 
 
 
+;---------------------------------------------------------------------------------------------------------------------
+;---------------------------------------------------------------------------------------------------------------------
+;Super - Hitspark Manager
+[Statedef 30001]
+movetype = U      ; AIHU
+physics = N       ; SCANU          ;refers to the .Air file
+anim = 2
+sprpriority = 1
+ctrl = 0
+
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = 1
+x = root,pos x
+y = 0
+ignorehitpause = 1
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = !numexplod(30000)
+trigger1 = root,stateno!=[3000,3003]
+
+
+
+
+
+
 ;----------------------------------------------------------------------------------------------------------------
 ; Jump Start (CHASE SPECIFIC)
  [Statedef 40]
@@ -5653,7 +5733,7 @@ sysvar(1) = 1
 [State 0, VelSet]
 type = Veladd
 trigger1 = animtime = 0
-x = ifelse(sysvar(1) = 0, const(velocity.jump.neu.x), ifelse(sysvar(1) = 1, ifelse(prevstateno = 100, (vel x*1.5), const(velocity.jump.fwd.x)),ifelse(prevstateno = 105, (vel x*1.5), const(velocity.jump.back.x)))*ifelse(command="holdup", 1, 1.334))
+x = ifelse(sysvar(1) = 0, const(velocity.jump.neu.x), ifelse(sysvar(1) = 1, ifelse(prevstateno = 100, (vel x*1.15), const(velocity.jump.fwd.x)),ifelse(prevstateno = 105, (vel x*1.15), const(velocity.jump.back.x)))*ifelse(command="holdup", 1, 1.334))
 
 y = ifelse(((aiLevel && enemynear, pos y < 0 && enemynear, vel y >= 1) || (!ailevel && command = "holdup")), const(velocity.jump.y)*1, const(velocity.jump.y)*0.667)
 
@@ -6284,6 +6364,8 @@ movetype= H
 physics = N
 velset = 0,0
 
+
+
 [State 150, 1]
 type = ChangeAnim
 trigger1 = 1
@@ -6357,6 +6439,93 @@ type = ChangeState
 trigger1 = HitOver
 value = 130
 ctrl = 1
+
+;---------------------------------------------------------------------------
+; Crouch guard hit (shaking)
+ [Statedef 152]
+type    = C
+movetype= H
+physics = N
+velset = 0,0
+
+[State 152, 1]
+type = ChangeAnim
+trigger1 = 1
+value = 151
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S150,0
+volumescale = 150
+channel = -1
+
+[State 152, 3]
+type = ChangeState
+trigger1 = HitShakeOver
+value = 151 + 2*(command = "holddown")
+
+[State 152, Hi to Lo]
+type = StateTypeSet
+trigger1 = statetype = S && command = "holddown"
+statetype = C
+physics = C
+
+[State 152, Lo to Hi]
+type = StateTypeSet
+trigger1 = statetype = C && command != "holddown"
+statetype = S
+physics = S
+
+[State 152, 4]
+type = ForceFeedback
+trigger1 = time = 0
+waveform = square
+time = 4
+
+;---------------------------------------------------------------------------
+; Crouch guard hit (knocked back)
+[Statedef 153]
+type    = C
+movetype= H
+physics = C
+anim = 151
+
+[State 153, 1]
+type = HitVelSet
+trigger1 = Time = 0
+x = 1
+
+[State 153, 2]
+type = VelSet
+trigger1 = Time = GetHitVar(slidetime)
+trigger2 = HitOver
+x = 0
+
+[State 153, 3]
+type = CtrlSet
+trigger1 = Time = GetHitVar(ctrltime)
+value = 1
+
+[State 153, Hi to Lo]
+type = StateTypeSet
+trigger1 = statetype = S && command = "holddown"
+statetype = C
+physics = C
+
+[State 153, Lo to Hi]
+type = StateTypeSet
+trigger1 = statetype = C && command != "holddown"
+statetype = S
+physics = S
+
+[State 153, 4]
+type = ChangeState
+trigger1 = HitOver
+value = 131
+ctrl = 1
+
+
 
 ;---------------------------------------------------------------------------
 ; Air guard hit (shaking)
@@ -6451,9 +6620,34 @@ anim = 700
 velset = 0,0
 poweradd=50
 
+[State 0, VelSet]
+type = VelSet
+trigger1 = vel y !=0
+y = 0
+[State 0, VelSet]
+type = Velmul
+trigger1 = vel x !=0
+x = .6
+
+[State 0, StateTypeSet]
+type = StateTypeSet
+trigger1 = pos y != 0
+statetype = A
+[State 0, StateTypeSet]
+type = StateTypeSet
+trigger1 = pos y >= -1
+statetype = S
+
+[State 0, Width]
+type = Width
+trigger1 = 1
+player = 30,0
+ignorehitpause = 1
+
+
 [State 710, FX]
 type = PalFX
-trigger1 = time < 8
+trigger1 = animelemtime(2)>0&&animelemtime(2)<7
 time = 6
 add = 96,96,96
 mul = 256,256,256
@@ -6461,11 +6655,12 @@ sinadd = 0,0,0,0
 invertall = 0
 color = 256
 ignorehitpause = 1
+
 [State 710, BG FX]
 type = BGPalFX
-trigger1 = time < 6
+trigger1 = animelemtime(2)>0&&animelemtime(2)<7
 time = 2
-add = 36-(time*6),36-(time*6),36-(time*6)
+add = 36-(animelemtime(2)*6),36-(animelemtime(2)*6),36-(animelemtime(2)*6)
 mul = 256,256,256
 sinadd = 0,0,0,0
 invertall = 0
@@ -6474,13 +6669,13 @@ ignorehitpause = 1
 
 [State 710, Explod]
 type = Explod
-trigger1 = !time
+trigger1 = animelem=2
 anim = 20004 ;change this
 ID = 71
 sprpriority = 3
 postype = p1
-pos = 0, -40
-pausemovetime = 8
+pos = 60*const(size.xscale), -225*const(size.yscale)
+pausemovetime = 999
 ownpal = 1
 scale = 0.5, 0.5
 ontop = 1
@@ -6489,16 +6684,37 @@ ontop = 1
 type = PlaySnd
 trigger1 = !time
 value = s700,0
-
+[State 0, BAM]
+type = PlaySnd
+trigger1 = !time
+value = s700,1
+freqmul = .99+ numexplod(10002)*.02
 [State 0, Pause]
 type = Pause
 trigger1 = !time
-time = 9
-movetime = 9
+time = 13
+movetime = 13
 [State 0, CtrlSet]
 type = CtrlSet
-trigger1 = time = 9
+trigger1 = time = 13
 value = 1
+
+
+[State 710, Parry String Counter]
+type = Explod
+trigger1 = animelem=2
+anim = 2;1200 ;change this
+ID = 10002
+sprpriority = 3
+postype = left
+pos = 0+numexplod(10002)*5,(ScreenHeight-root,var(40)-40)
+pausemovetime = 999
+removetime=-1
+ownpal = 1
+scale = 0.02, 0.02
+ontop = 1
+
+
 
 [State 130, Stop Guarding]
 type = ChangeState
@@ -6525,8 +6741,8 @@ flag = NoShadow
 type = PosSet
 trigger1 = 1
 x = ifelse(parent,statetype = A,parent,pos x+ifelse(facing =1,10,-10),parent,pos x)
-y = ifelse(parent,stateno = 131 || (parent,stateno = [152,153]),(parent,pos y - 55),(parent,pos y - 60))
-
+y = ifelse(parent,stateno = 131 || (parent,stateno = [152,153])||root,command= "holddown",(parent,pos y - 50),(parent,pos y - 60))
+ignorehitpause=1
 [State 0, AngleDraw]
 type = AngleDraw
 trigger1 =1
@@ -6537,8 +6753,8 @@ scale = parent,var(5)*.0008+.3,parent,var(5)*.0008+.3
 type = PalFX
 trigger1 = 1
 time = 1
-add = ifelse(parent,stateno=150 || parent,stateno=154,100,0),ifelse(parent,stateno=150 || parent,stateno=154,100,0),ifelse(parent,stateno=150 || parent,stateno=154,100,0)
-mul = 256,ifelse(parent,stateno=150 || parent,stateno=154,100,256),ifelse(parent,stateno=150 || parent,stateno=154,100,256)
+add = ifelse(parent,stateno=150 || parent,stateno=154|| parent,stateno=152,100,0),ifelse(parent,stateno=150 || parent,stateno=154|| parent,stateno=152,100,0),ifelse(parent,stateno=150 || parent,stateno=154|| parent,stateno=152,100,0)
+mul = 256,ifelse(parent,stateno=150 || parent,stateno=154|| parent,stateno=152,100,256),ifelse(parent,stateno=150 || parent,stateno=154|| parent,stateno=152,100,256)
 sinadd = 0,0,0,10
 invertall = 0
 color = 256*(parent,var(5)*.001)
@@ -7087,6 +7303,7 @@ ignorehitpause = 1
 type = DestroySelf
 trigger1 = time >4
 trigger2 = root,power !=powermax
+trigger3 = root,sysvar(3) != gametime
 
 
 [statedef -2]
@@ -7095,8 +7312,8 @@ trigger2 = root,power !=powermax
 [State 0, DEBUG TEXT]
 type = DisplayToClipboard
 trigger1 = 1
-text = " guard = %d, cooldown = %d, kickflip = %d, %d,fvar20 = %f, %d"
-params = var(5),var(19),var(12),var(21),fvar(20),var(36)
+text = " guard = %d, cooldown = %d, kickflip = %d, %d,fvar20 = %f, %f"
+params = var(5),var(19),var(12),var(21),fvar(20),fvar(12)
 ignorehitpause = 1
 
 [State 0, ANGRY]
@@ -7177,19 +7394,6 @@ size.yscale =const(size.xscale)*.5
 
 
 
-[State 0, SuperBackground Activate]
-type = Helper
-trigger1 = var(34)
-trigger1 = stateno = 3000
-trigger1 =  !numhelper(30000) 
-helpertype = Normal 
-name = "SuperBackground"
-ID = 30000
-stateno = 30000
-pos = 0,0
-postype = p1    ;P2, Front, Back, Left, Right
-keyctrl = 0
-
 [State 0, MaxPowerVFX Activate]
 type = Helper
 trigger1 =var(37)&&power =powermax  && roundstate=2
@@ -7259,6 +7463,14 @@ facing = 1
 keyctrl = 0
 ownpal = 1
 persistent = 0
+
+[State -1, Fuckass compromise for making autoguard work in mugen 1.1]
+type = null;HitOverride
+trigger1 = var(5) > 0 && (stateno =[120,160]) && command= "hold_c"
+attr = SCA,NA,SA,HA,NP,SP,HP
+stateno = 150
+time = 1
+
 
 ; Stand Parry enabled
 ;-------------------------
@@ -7420,10 +7632,23 @@ channel = 6
 persistent = 0
 volumescale = 100
 
+
+[State -1,HitDetected]
+type = VarSet
+trigger1 = 1
+fv = 10    ;fv = 10
+value = 0
+ignorehitpause = 1
+
+[State -1,HitReset]
+type = VarSet
+trigger1 = 1
+fv = 10    ;fv = 10
+value = 1
 ;combo code by ace_underscore 
 [State -1,combo code]
 type = VarAdd
-trigger1 = fvar(10)=1 && movehit = 1  && stateno != 811
+trigger1 = fvar(10)=1 && movehit = 1  && stateno != [1000,1020]
 fv = 11    ;fv = 10
 value = 1
 ignorehitpause = 1
@@ -7432,20 +7657,19 @@ type = VarSet
 trigger1 = fvar(11)>0 && !numtarget
 fv = 11    ;fv = 10
 value = 0
-[State -1,combo code]
-type = VarSet
-trigger1 = 1
-fv = 10    ;fv = 10
-value = 0
-ignorehitpause = 1
 
-
-
-[State -1,combocode]
-type = VarSet
-trigger1 = 1
-fv = 10    ;fv = 10
+;combo code by ace_underscore 
+[State -1,combo code for CPU]
+type = VarAdd
+trigger1 = fvar(10)=1 && movehit = 1 && stateno != 811
+fv = 12    ;fv = 10
 value = 1
+ignorehitpause = 1
+[State -1,combo code for CPU]
+type = VarSet
+trigger1 = fvar(12)>0 && !numtarget
+fv = 12    ;fv = 10
+value = 0
 
 
 
@@ -7623,7 +7847,10 @@ value = abs(vel x)*1
 
 [Statedef -3]
 
-
+[State -3, targetstate detection]
+type = VarSet
+trigger1 = 1
+sysvar(3) = gametime
 
 [State 0, VictoryQuote]
 type = VictoryQuote
