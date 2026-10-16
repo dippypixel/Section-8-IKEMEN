@@ -288,7 +288,7 @@ trigger1 = command = "holdy" && command = "holdb"
 [State -1, Light Kung Fu Palm]
 type = ChangeState
 value = 1050
-triggerall = command = "FQCF_x"
+triggerall = command = "FQCF_x" || command = "FQCF_y" 
 trigger1 = var(1) || var(3) ;Use combo condition (above)
 
 ;Projectile 1 - Fireball
