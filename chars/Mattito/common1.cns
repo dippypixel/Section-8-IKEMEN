@@ -175,7 +175,7 @@ type = VelSet
 trigger1 = AnimTime = 0
 trigger1 = prevstateno = 100 ;RUN_FWD
 trigger1 = sysvar(1) = 1
-x = const(velocity.runjump.fwd.x)
+x = const(velocity.jump.fwd.x)*1.3
 
 [State 40, 6]
 type = ChangeState
@@ -308,6 +308,28 @@ sprpriority = 1
 velset = 0, 0
 ctrl = 1
 
+[State 0, VarSet]
+type = VarSet
+trigger1 = time =0
+v = 10    ;fv = 10
+value = 0
+[State 0, VarSet]
+type = VarSet
+trigger1 = time =0
+trigger2= command = "holdfwd"
+v = 9    ;fv = 10
+value = 0
+[State 0, VarSet]
+type = VarSet
+trigger1 = command = "holdback"
+v = 9    ;fv = 10
+value = 1
+[State 0, VarSet]
+type = Varadd
+trigger1 = command != "holdback"&&command != "holdfwd"
+v = 10    ;fv = 10
+value = 1
+
 [State 0, VelSet]
 type = VelSet
 trigger1 = time > 3
@@ -328,7 +350,11 @@ type = MakeDust
 trigger1 = time <= 42
 pos = -15+random%11,-2
 spacing = 1
-
+[State 100, 3]
+type = PlaySnd
+trigger1 = time%2=0
+value = 20,1
+channel = 0
 ;[State 100, 3]
 ;type = PlaySnd
 ;trigger1 = time = 0
@@ -358,12 +384,13 @@ value = 1
 
 [State 100, 8]
 type = VelSet
-trigger1 = command = "holdback"
+trigger1 = var(9)=1
 x = -10
 
 [State 100, 10]
 type = ChangeState
 trigger1 = AnimTime = 0
+trigger2 = var(10)>6
 value = 0
 
 ;---------------------------------------------------------------------------
@@ -375,6 +402,18 @@ anim = 105
 sprpriority = 1
 velset = 0, 0
 ctrl = 0
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time =0
+trigger2= command = "holdback"
+v = 9    ;fv = 10
+value = 0
+[State 0, VarSet]
+type = VarSet
+trigger1 = command = "holdfwd"
+v = 9    ;fv = 10
+value = 1
 
 [State 0, VelSet]
 type = VelSet
@@ -419,6 +458,12 @@ type = ChangeState
 trigger1 = command = "up" && time >= 4
 value = 40
 
+[State 100, 3]
+type = PlaySnd
+trigger1 = time%2=0
+value = 20,1
+channel = 0
+
 [State 100, CtrlSet]
 type = CtrlSet
 trigger1 = command = "down"
@@ -426,7 +471,7 @@ value = 1
 
 [State 100, 8]
 type = VelSet
-trigger1 = command = "holdfwd"
+trigger1 = var(9)=1
 x = 10
 
 [State 100, 10]

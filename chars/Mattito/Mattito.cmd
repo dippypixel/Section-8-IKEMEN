@@ -685,10 +685,11 @@ trigger2 = ((stateno=[200,250])||(stateno=[400,420])||(stateno=[430,450])) && (m
 [State -1, Slide S]
 type = ChangeState
 value = 1310
-triggerall = var(59) != 1
+triggerall = var(59) != 1 
+triggerall = var(11) <2 
 triggerall = command = "slide2"
 trigger1 = statetype != A
-trigger1 = ctrl
+trigger1 = ctrl && (stateno!=[1300,1310])
 trigger2 = ((stateno=[200,250])||(stateno=[400,420])||(stateno=[430,450])) && (movecontact)
 
 ;---------------------------------------------------------------------------
@@ -697,9 +698,10 @@ trigger2 = ((stateno=[200,250])||(stateno=[400,420])||(stateno=[430,450])) && (m
 type = ChangeState
 value = 1300
 triggerall = var(59) != 1
+triggerall = var(11) <2 
 triggerall = command = "slide1"
 trigger1 = statetype != A
-trigger1 = ctrl
+trigger1 = ctrl && (stateno!=[1300,1310])
 trigger2 = ((stateno=[200,250])||(stateno=[400,420])||(stateno=[430,450])) && (movecontact)
 
 ;---------------------------------------------------------------------------
@@ -756,7 +758,7 @@ trigger1 = statetype = S
 trigger1 = ctrl 
 trigger2 = stateno = 100 || stateno = 105
 trigger3 = (stateno = 200||stateno = 230||stateno = 400||stateno = 430) && movecontact
-trigger4 = stateno = 1300 && (movecontact) && animelem = 20
+trigger4=(stateno=[1300,1310])&&time>20&&movehit
 
 ;---------------------------------------------------------------------------
 ; 
@@ -770,8 +772,8 @@ trigger1 = statetype = S
 trigger1 = ctrl
 trigger2 = stateno = 100 || stateno = 105
 trigger3 = stateno = 1300 && (movecontact) && animelem = 20
-trigger4 = (stateno = 200||stateno = 230||stateno = 240||stateno = 400||stateno = 430) && movecontact
-
+trigger4 = (stateno = 200||stateno = 230||stateno = 210||stateno = 240||stateno = 400||stateno = 430) && movecontact
+trigger5=(stateno=[1300,1310])&&time>20&&movehit
 ;---------------------------------------------------------------------------
 ; 
 [State -1, s.HP]
@@ -785,7 +787,7 @@ trigger1 = ctrl
 trigger2 = stateno = 100 || stateno = 105
 trigger3 = (stateno = 200||stateno = 230||stateno = 240||stateno = 400||stateno = 430) && movecontact
 trigger4 = stateno = 1300 && (movecontact) && animelem = 20
-
+trigger5=(stateno=[1300,1310])&&time>20&&movehit
 ;---------------------------------------------------------------------------
 ; 
 [State -1, f + s.LK]
@@ -799,7 +801,7 @@ trigger1 = ctrl
 trigger2 = stateno = 100 || stateno = 105
 trigger3 = (stateno = 200||stateno = 230||stateno = 400||stateno = 430) && movecontact
 trigger4 = stateno = 1300 && (movecontact) && animelem = 20
-
+trigger5=(stateno=[1300,1310])&&time>20&&movehit
 ;---------------------------------------------------------------------------
 ; 
 [State -1, s.LK]
@@ -813,7 +815,7 @@ trigger1 = ctrl
 trigger2 = stateno = 100 || stateno = 105
 trigger3 = (stateno = 200||stateno = 230||stateno = 400||stateno = 430) && movecontact
 trigger4 = stateno = 1300 && (movecontact) && animelem = 20
-
+trigger5=(stateno=[1300,1310])&&time>20&&movehit
 ;---------------------------------------------------------------------------
 ; 
 [State -1, s.HK]
@@ -827,7 +829,7 @@ trigger1 = ctrl
 trigger2 = stateno = 100 || stateno = 105
 trigger3 = (stateno = 200||stateno = 230||stateno = 240||stateno = 400||stateno = 430) && movecontact
 trigger4 = stateno = 1300 && (movecontact) && animelem = 20
-
+trigger5=(stateno=[1300,1310])&&time>20&&movehit
 ;---------------------------------------------------------------------------
 ;
 [State -1, c.LP]
@@ -839,7 +841,7 @@ triggerall = command = "holddown"
 trigger1 = statetype = C
 trigger1 = ctrl
 trigger2 = (stateno = 200||stateno = 230||stateno = 400||stateno = 430) && movecontact
-
+trigger3=(stateno=[1300,1310])&&time>20&&movehit
 ;---------------------------------------------------------------------------
 ;
 [State -1, c.HP]
@@ -851,7 +853,7 @@ triggerall = command = "holddown"
 trigger1 = statetype = C
 trigger1 = ctrl
 trigger2 = (stateno = 200||stateno = 230||stateno = 240||stateno = 400||stateno = 430) && movecontact
-
+trigger3=(stateno=[1300,1310])&&time>20&&movehit
 ;---------------------------------------------------------------------------
 ; 
 [State -1, c.LK]
@@ -863,6 +865,7 @@ triggerall = command = "holddown"
 trigger1 = statetype = C
 trigger1 = ctrl
 trigger2 = (stateno = 200||stateno = 230||stateno = 400||stateno = 430) && movecontact
+trigger3=(stateno=[1300,1310])&&time>20&&movehit
 ;---------------------------------------------------------------------------
 ; 
 [State -1, c.HK]
@@ -874,7 +877,7 @@ triggerall = command = "holddown"
 trigger1 = statetype = C
 trigger1 = ctrl
 trigger2 = (stateno = 200||stateno = 230||stateno = 240||stateno = 400||stateno = 430) && movecontact
-
+trigger3=(stateno=[1300,1310])&&time>20&&movehit
 ;---------------------------------------------------------------------------
 ; 
 [State -1, a.LP]
@@ -885,8 +888,6 @@ triggerall = command = "x"
 trigger1 = statetype = A
 trigger1 = ctrl
 trigger2 = (stateno = 600||stateno = 630) && movecontact
-trigger3 = (stateno= 1310||stateno=1320) && (movecontact) && animelem = 20
-
 ;---------------------------------------------------------------------------
 ; 
 [State -1, a.HP]
