@@ -1,0 +1,331 @@
+;---------------------------------------------------------------------------
+; Special Zoom
+[Statedef 1999]
+type    = U
+movetype= I
+physics = N
+juggle  = 0
+poweradd= 0
+ctrl = 0
+anim = 69
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = time < 51
+flag = nomusic
+flag2 = nokoslow
+ignorehitpause = 1
+
+[State 0, Pause]
+type = Pause
+trigger1 = time < 50
+time = 2
+movetime = 2
+endcmdbuftime = 0
+pausebg = 1
+ignorehitpause = 1
+
+[State 0, BindToRoot]
+type = BindToRoot
+trigger1 = 1
+time = 1
+facing = 0
+pos = 0,0
+
+[State 0, Helper]
+type = Helper
+trigger1 = time = 2
+helpertype = normal ;player
+name = "Zoom Helper"
+stateno = 3998
+pos = 0,0
+postype = p1    ;p2,front,back,left,right
+facing = 1
+keyctrl = 0
+ownpal = 1
+supermovetime = 99999
+pausemovetime = 99999
+
+[State 0, BGPalFX]
+type = BGPalFX
+trigger1 = time >= 2 && Time < 51
+time = 2
+add = 15,15,23
+mul = 0,0,0
+sinadd = 0,0,0,0
+invertall = 0
+color = 256
+[State 0, BGPalFX]
+type = BGPalFX
+trigger1 = Time >= 51
+time = 1
+add = 15,15,23
+mul = ceil(0+((time-51)*18.2857143)),ceil(0+((time-51)*18.2857143)),ceil(0+((time-51)*18.2857143))
+sinadd = 0,0,0,0
+invertall = 0
+color = 256
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 2
+value = ifelse(WinKO,3999,5),ifelse(WinKO,0,6)
+[State 0, Explod]
+type = Explod
+trigger1 = time = 2
+anim = 1999+(winko*2000)
+ID = 1999
+pos = (gamewidth / 2  * camerazoom) ,(gameheight / 2 * camerazoom)
+postype = left  ;p2,front,back,left,right
+facing = 1
+vfacing = 1
+bindtime = -1
+removetime = -2
+scale = ((gamewidth / 1306) * camerazoom) , ((gameheight / 734) * camerazoom)
+sprpriority = -1
+ontop = 0
+shadow = 0,0,0
+ownpal = 1
+removeongethit = 0
+persistent = 1
+supermovetime = -1 
+pausemovetime  = -1
+
+[State 0, ModifyExplod]
+type = ModifyExplod
+trigger1 = numexplod(1999)
+ID = 1999
+pos = (gamewidth / 2  * camerazoom) ,(gameheight / 2 * camerazoom)
+scale = ((gamewidth / 1306) * camerazoom) , ((gameheight / 734) * camerazoom)
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = time > 2
+trigger1 = !numexplod(1999)
+
+
+;---------------------------------------------------------------------------
+; BG Zoom
+[Statedef 3998]
+type    = U
+movetype= I
+physics = N
+juggle  = 0
+poweradd= 0
+ctrl = 0
+anim = 69
+
+[State 0, BindToRoot]
+type = BindToRoot
+trigger1 = 1
+time = 1
+facing = 0
+pos = 0,0
+
+[State 1999, Zoom]
+type = Zoom
+trigger1 = Time <= 4
+scale = 1+(time*.125)
+pos = Pos X+(-3+random%6), Pos Y+(-3+random%6)
+[State 1999, Zoom]
+type = Zoom
+trigger1 = Time >= 5 && Time <= 49
+scale = 1.5
+pos = Pos X+(-3+random%6), Pos Y+(-3+random%6)
+[State 1999, Zoom]
+type = Zoom
+trigger1 = Time >= 50 && Time <= 54
+scale = 1.5-((time-50)*.125)
+pos = Pos X+(-3+random%6), Pos Y+(-3+random%6)
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = time >= 55
+
+;---------------------------------------------------------------------------
+; Hyper Portrait
+[Statedef 2999]
+type    = U
+movetype = I
+physics = N
+juggle  = 0
+poweradd= 0
+ctrl = 0
+anim = 2999
+sprpriority = 99999
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = 1
+x = ceil((-gamewidth/2)*facing)
+
+[State 0, VarSet]
+type = VarAdd
+trigger1 = time<18
+v = 29
+value = 18-(time)
+[State 0, VarSet]
+type = VarAdd
+trigger1 = time>=40
+v = 29
+value = -(time-40)
+
+[State 0, Offset]
+type = Offset
+trigger1 = 1
+x = ((-200 + var(29) + random%5) * facing) / camerazoom
+y = ceil((-Screenpos Y)+(gameheight/4)+random%5)
+
+[State 0, AngleDraw]
+type = AngleDraw
+trigger1 = 1
+scale = (1.95918367347 / (camerazoom*1.95918367347)), (1.95918367347 / (camerazoom*1.95918367347))
+
+[State 0, DisplayToClipboard]
+type = DisplayToClipboard
+trigger1 = 1
+text = "x = %f,  y = %f, zoom = %f, dick = %f"
+params = (gamewidth / 640) * camerazoom , (gameheight / 480) * camerazoom, camerazoom, ceil(((-Screenpos Y)+(gameheight/3)+random%5) * camerazoom)
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+
+[State 1200, ChangeState]
+type = destroyself
+trigger1 = time >= 60
+
+;---------------------------------------------------------------------------
+; Finisher Portraits
+[Statedef 3299]
+type    = A
+movetype= I
+physics = N
+juggle  = 0
+ctrl = 0
+velset = 0,0
+anim = 3299
+sprpriority = 99999
+
+[State 0, DisplayToClipboard]
+type = DisplayToClipboard
+trigger1 = 1
+text = "fvar(27) = %f  fvar(28) = %f, Pos x = %f"
+params = fvar(27), fvar(28), Pos X
+ignorehitpause = 1
+
+[State 0, AngleDraw]
+type = AngleDraw
+trigger1 = 1
+scale = 0.5+fvar(29),0.5+fvar(29)
+ignorehitpause = 1
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = Time = 0
+flag = invisible
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = noshadow
+
+[State 0, Starting var]
+type = VarSet
+trigger1 = !time
+fv = 29
+value = 0.5
+[State 0, Shrink]
+type = VarSet
+trigger1 = Time
+fv = 29
+value = (fvar(29)*0.75)
+
+[State 0, BGPalFX]
+type = BGPalFX
+trigger1 = Time < 5
+trigger1 = parent,stateno != 3202
+time = 1
+add = 0,0,0
+mul = ceil(256-(51.2*(time))),ceil(256-(51.2*(time))),ceil(256-(51.2*(time)))
+sinadd = 0,0,0,0
+invertall = 0
+color = 256
+ignorehitpause = 1
+[State 0, BGPalFX]
+type = BGPalFX
+trigger1 = Time >= 5 && Time <= 30
+trigger1 = parent,stateno != 3202
+time = 1
+add = 0,0,0
+mul = 0,0,0
+sinadd = 0,0,0,0
+invertall = 0
+color = 256
+ignorehitpause = 1
+[State 0, BGPalFX]
+type = BGPalFX
+trigger1 = Time > 30 && Time < 40
+trigger1 = parent,stateno != 3202
+time = 1
+add = 0,0,0
+mul = ceil(25.6*(time-30)),ceil(25.6*(time-30)),ceil(25.6*(time-30))
+sinadd = 0,0,0,0
+invertall = 0
+color = 256
+ignorehitpause = 1
+
+[State 0, BGPalFX]
+type = PalFX
+trigger1 = Time < 10
+time = 1
+add = 0,0,0
+mul = ceil(25.6*time),ceil(25.6*time),ceil(25.6*time)
+sinadd = 0,0,0,0
+invertall = 0
+color = 256
+ignorehitpause = 1 
+
+[State 0, Trans]
+type = Trans
+trigger1 = Time > 30
+trans = add
+alpha = 256-ceil(25.6*(time-30)),ceil(25.6*(time-30))
+
+[State 0, PosSet]
+type = PosSet
+trigger1 = 1
+x = fvar(27)*-facing
+[State 0, Offset]
+type = Offset
+trigger1 = 1
+x = -5+random%10
+y = ceil((-Screenpos Y)+(gameheight/1.5)+(-5+random%10))
+
+[State 0, VelSet]
+type = VarSet
+trigger1 = !time
+fv = 27
+value = 0
+[State 0, VelSet]
+type = VarAdd
+trigger1 = 1
+fv = 27
+value = fvar(28)
+[State 0, VelSet]
+type = VarSet
+trigger1 = Time = 0
+fv = 28
+value = 15
+[State 0, VelSet]
+type = VarSet
+trigger1 = Time < 30
+fv = 28
+value = fvar(28)*0.75
+[State 0, VelAdd]
+type = VarAdd
+trigger1 = Time >= 30
+fv = 28
+value = 1.25
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = time = 40
