@@ -579,7 +579,7 @@ value = 240
 triggerall = !aiLevel && var(17)<2
 triggerall = command = "holdfwd" && command = "holddown" && command = "a"
 trigger1 = statetype != A && ctrl
-trigger2= movecontact && stateno = [200,210]
+trigger2= movecontact && stateno = [200,210] && stateno!=202
 
 
 
