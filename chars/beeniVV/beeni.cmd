@@ -522,7 +522,7 @@ triggerall = statetype != A
 trigger1 = ctrl
 trigger2 = stateno = [200,230] && movecontact
 trigger3 = stateno = [1000,1999] && movecontact
-
+trigger4 = helper(1000),movehit
 ;---------------------------------------------------------------------------
 ;Special3
 [State -1, Special3]
@@ -616,7 +616,7 @@ value = 602
 triggerall = !aiLevel
 triggerall = command = "a" && (command = "holdup")
 triggerall = statetype = A
-triggerall = var(7) < 2
+triggerall = var(7) < 1
 trigger1 = ctrl
 trigger2 = stateno = [600,601] && movecontact
 
@@ -645,7 +645,7 @@ trigger1 = ctrl ;&& command != "holdfwd" && command != "holdback"
 trigger2 = prevstateno != 600 && stateno = 600 && movecontact
 trigger3 = stateno = 1000 && movehit && animelemtime(5) >= 0
 trigger4 = stateno = 602 && movecontact
-
+trigger5 = stateno = 230 && movecontact && animelemtime(5) >= 0
 
 ;---------------------------------------------------------------------------
 ;AirAttackH

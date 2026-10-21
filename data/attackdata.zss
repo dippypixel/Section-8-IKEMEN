@@ -1,0 +1,534 @@
+[Function fPotSAttackDataConfig()]
+mapset{map: "_pots_attackdata_cfg_starthidden"; value: 1}
+mapset{map: "_pots_attackdata_cfg_font"; value: -1}
+mapset{map: "_pots_attackdata_cfg_layer"; value: 1}
+mapset{map: "_pots_attackdata_cfg_text_x"; value: 125}
+mapset{map: "_pots_attackdata_cfg_text_y"; value: 50}
+mapset{map: "_pots_attackdata_cfg_text_scale"; value: 0.50}
+mapset{map: "_pots_attackdata_cfg_text_linespacing"; value: 7}
+mapset{map: "_pots_attackdata_cfg_text_columnspacing"; value: 70}
+mapset{map: "_pots_attackdata_cfg_advantage_color"; value: 1}
+mapset{map: "_pots_attackdata_cfg_guardlevel"; value: 1}
+mapset{map: "_pots_attackdata_cfg_guardlevel_combo"; value: 1}
+mapset{map: "_pots_attackdata_cfg_guardlevel_font"; value: -1}
+mapset{map: "_pots_attackdata_cfg_guardlevel_scale"; value: 0.50}
+mapset{map: "_pots_attackdata_cfg_guardlevel_linespacing"; value: 8}
+[StateDef 1615201920;
+	type: A;
+	movetype: I;
+	ctrl: 0;
+	anim: -2;
+]
+if !time {
+	call fPotSAttackDataConfig();
+	mapSet{map: "_pots_attackdata_hidetext"; value: map(_pots_attackdata_cfg_starthidden)}
+}
+assertSpecial{flag: runlast}
+if numenemy {
+	if enemy, teammode = tag {
+		let player = enemy, teamleader;
+	} else if enemy, teammode = simul {
+		let player = root, p2, playerno;
+	} else {
+		let player = enemy, playerno;
+	}
+	if root, movetype = H {
+		mapSet{map: "_pots_attackdata_combo"; value: player($player), combocount}
+	}
+	if player($player), combocount {
+		if player($player), combocount > map(_pots_attackdata_maxcombo) {
+			mapSet{map: "_pots_attackdata_maxcombo"; value: player($player), combocount}
+		}
+	}
+	if root, life < map(_pots_attackdata_prevlife) {
+		mapSet{map: "_pots_attackdata_hitdamage"; value: map(_pots_attackdata_prevlife) - root, life}
+		mapAdd{map: "_pots_attackdata_combodamage_internal"; value: map(_pots_attackdata_prevlife) - root, life}
+		mapSet{map: "_pots_attackdata_combodamage_display"; value: map(_pots_attackdata_combodamage_internal)}
+	}
+	if map(_pots_attackdata_combodamage_internal) > map(_pots_attackdata_maxdamage) {
+		mapSet{map: "_pots_attackdata_maxdamage"; value: map(_pots_attackdata_combodamage_internal)}
+	}
+	if root, movetype != H {
+		mapSet{map: "_pots_attackdata_combodamage_internal"; value: 0}
+	}
+	mapSet{map: "_pots_attackdata_prevlife"; value: root, life}
+	if player($player), ctrl = 0
+	|| (player($player), time <= 1 && player($player), prevstateno = [120, 155])
+	|| (player($player), time <= 1 && player($player), movetype != H && player($player), prevmovetype = H) {
+		mapSet{map: "_pots_attackdata_playerctrl"; value: player($player), ctrl}
+	}
+	if root, ctrl = 0
+	|| (root, time <= 1 && root, prevstateno = [120, 155])
+	|| (root, time <= 1 && root, movetype != H && root, prevmovetype = H) {
+		mapSet{map: "_pots_attackdata_dummyctrl"; value: root, ctrl}
+	}
+	if map(_pots_attackdata_playerctrl) != map(_pots_attackdata_dummyctrl) {
+		if map(_pots_attackdata_playerctrl) && player($player), pausetime = 0 {
+			mapAdd{map: "_pots_attackdata_advantage_timer"; value: 1}
+		}
+		if map(_pots_attackdata_dummyctrl) && root, pausetime = 0 {
+			mapAdd{map: "_pots_attackdata_advantage_timer"; value: -1}
+		}
+		mapSet{map: "_pots_attackdata_advantage_display"; value: map(_pots_attackdata_advantage_timer)}
+	} else {
+		mapSet{map: "_pots_attackdata_advantage_timer"; value: 0}
+	}
+	if !map(_pots_attackdata_playerctrl) && !map(_pots_attackdata_dummyctrl) {
+		mapSet{map: "_pots_attackdata_advantage_display"; value: 0}
+	}
+	if root, movetype = H {
+		mapSet{map: "_pots_attackdata_startup_wait"; value: 1}
+	} else {
+		if map(_pots_attackdata_playerctrl) {
+			mapSet{map: "_pots_attackdata_startup_timer"; value: 0}
+			mapSet{map: "_pots_attackdata_startup_wait"; value: 0}
+		}
+	}
+	if player($player), movetype = A && root, movetype != H {
+		if !map(_pots_attackdata_startup_wait) && root, pausetime = 0 {
+			mapAdd{map: "_pots_attackdata_startup_timer"; value: 1}
+			mapSet{map: "_pots_attackdata_startup_display"; value: 0}
+		}
+	} else {
+		if map(_pots_attackdata_startup_timer) && map(_pots_attackdata_startup_wait) {
+			mapSet{map: "_pots_attackdata_startup_display"; value: map(_pots_attackdata_startup_timer)}
+			mapSet{map: "_pots_attackdata_startup_timer"; value: 0}
+		}
+	}
+	mapSet{map: "_pots_attackdata_playerctrl"; value: player($player), ctrl}
+	mapSet{map: "_pots_attackdata_dummyctrl"; value: root, ctrl}
+	if root, inputTime(s) = 1
+	&& !(root, map(_iksys_trainingDummyControl) = 0 && root, map(_iksys_trainingButtonJam) > 0 && root, map(_iksys_trainingButtonJam) = 7) {
+		mapSet{map: "_pots_attackdata_hidetext"; value: !map(_pots_attackdata_hidetext)}
+	}
+	if !debugMode(lifebarhide) {
+		if !map(_pots_attackdata_hidetext) {
+			if map(_pots_attackdata_cfg_guardlevel) {
+				if root, movetype = H
+				&& root, gethitvar(frame)
+				&& root, pausetime = 0
+				&& cond(map(_pots_attackdata_cfg_guardlevel_combo) = 0, root, prevmovetype != H, 1) {
+					let text_velx_dummy = 0;
+					let text_vely_dummy = -1;
+					if map(_pots_attackdata_levelunder) {
+						let text_vely_dummy = 1;
+					}
+					let text_velx_player = 0;
+					let text_vely_player = -1;
+					if map(_pots_attackdata_levelunder) {
+						let text_vely_player = 1;
+					}
+					let unguardable = 0;
+					if map(_pots_attackdata_unguardable)
+					|| cond(playerIDexist(root, gethitvar(ID)), playerID(root, gethitvar(ID)), isasserted(unguardable), 0) {
+						let unguardable = 1;
+					}
+					let hitter = root, gethitvar(ID);
+					if playerIDexist($hitter)
+					&& root, gethitvar(attr) != SCA, AT
+					&& playerID($hitter), moveHitVar(frame)
+					&& abs(playerID($hitter), hitDefVar(sparkx) + playerID($hitter), hitDefVar(sparky)) > 2 {
+						let correction = (320.0 / root, localcoord x) * camerazoom;
+						mapSet{map: "_pots_attackdata_levelposy"; value: (playerID($hitter), screenpos y + playerID($hitter), hitDefVar(sparky)) * $correction}
+					}
+					if $unguardable
+					|| root, gethitvar(guardflag) != LHA {
+						if root, gethitvar(attr) = SCA, AT {
+							text{
+								font: F map(_pots_attackdata_cfg_guardlevel_font);
+								text: "THROW";
+								removetime: 30;
+								layerno: 1;
+								align: 0;
+								localcoord: 320, 240;
+								pos: map(_pots_attackdata_levelposx), map(_pots_attackdata_levelposy);
+								velocity: $text_velx_dummy, $text_vely_dummy;
+								friction: 0.95, 0.95;
+								scale: map(_pots_attackdata_cfg_guardlevel_scale), map(_pots_attackdata_cfg_guardlevel_scale);
+								color: 256, 0, 0;
+							}
+						} else {
+							text{
+								font: F map(_pots_attackdata_cfg_guardlevel_font);
+								text: "NONE";
+								removetime: 30;
+								layerno: 1;
+								align: 0;
+								localcoord: 320, 240;
+								pos: map(_pots_attackdata_levelposx), map(_pots_attackdata_levelposy);
+								velocity: $text_velx_dummy, $text_vely_dummy;
+								friction: 0.95, 0.95;
+								scale: map(_pots_attackdata_cfg_guardlevel_scale), map(_pots_attackdata_cfg_guardlevel_scale);
+								color: 256, 0, 0;
+							}
+						}
+					} else if root, gethitvar(guardflag) = A && root, gethitvar(guardflag) != L && root, gethitvar(guardflag) != H {
+						text{
+							font: F map(_pots_attackdata_cfg_guardlevel_font);
+							text: "AIR ONLY";
+							removetime: 30;
+							layerno: 1;
+							align: 0;
+							localcoord: 320, 240;
+							pos: map(_pots_attackdata_levelposx), map(_pots_attackdata_levelposy);
+							velocity: $text_velx_dummy, $text_vely_dummy;
+							friction: 0.95, 0.95;
+							scale: map(_pots_attackdata_cfg_guardlevel_scale), map(_pots_attackdata_cfg_guardlevel_scale);
+							color: 256, 256, 0;
+						}
+					} else if root, statetype = A && root, prevstatetype = A && root, prevmovetype != H {
+						if root, gethitvar(guardflag) = A {
+							text{
+								font: F map(_pots_attackdata_cfg_guardlevel_font);
+								text: "AIR OK";
+								removetime: 30;
+								layerno: 1;
+								align: 0;
+								localcoord: 320, 240;
+								pos: map(_pots_attackdata_levelposx), map(_pots_attackdata_levelposy);
+								velocity: $text_velx_dummy, $text_vely_dummy;
+								friction: 0.95, 0.95;
+								scale: map(_pots_attackdata_cfg_guardlevel_scale), map(_pots_attackdata_cfg_guardlevel_scale);
+								color: 0, 256, 0;
+							}
+						} else {
+							text{
+								font: F map(_pots_attackdata_cfg_guardlevel_font);
+								text: "GROUND";
+								removetime: 30;
+								layerno: 1;
+								align: 0;
+								localcoord: 320, 240;
+								pos: map(_pots_attackdata_levelposx), map(_pots_attackdata_levelposy);
+								velocity: $text_velx_dummy, $text_vely_dummy;
+								friction: 0.95, 0.95;
+								scale: map(_pots_attackdata_cfg_guardlevel_scale), map(_pots_attackdata_cfg_guardlevel_scale);
+								color: 256, 256, 0;
+							}
+						}
+					} else if root, gethitvar(guardflag) != L && root, gethitvar(guardflag) = H {
+						text{
+							font: F map(_pots_attackdata_cfg_guardlevel_font);
+							text: "HIGH";
+							removetime: 30;
+							layerno: 1;
+							align: 0;
+							localcoord: 320, 240;
+							pos: map(_pots_attackdata_levelposx), map(_pots_attackdata_levelposy);
+							velocity: $text_velx_dummy, $text_vely_dummy;
+							friction: 0.95, 0.95;
+							scale: map(_pots_attackdata_cfg_guardlevel_scale), map(_pots_attackdata_cfg_guardlevel_scale);
+							color: 256, 256, 0;
+						}
+					} else if root, gethitvar(guardflag) = L && root, gethitvar(guardflag) != H {
+						text{
+							font: F map(_pots_attackdata_cfg_guardlevel_font);
+							text: "LOW";
+							removetime: 30;
+							layerno: 1;
+							align: 0;
+							localcoord: 320, 240;
+							pos: map(_pots_attackdata_levelposx), map(_pots_attackdata_levelposy);
+							velocity: $text_velx_dummy, $text_vely_dummy;
+							friction: 0.95, 0.95;
+							scale: map(_pots_attackdata_cfg_guardlevel_scale), map(_pots_attackdata_cfg_guardlevel_scale);
+							color: 256, 256, 0;
+						}
+					} else {
+						text{
+							font: F map(_pots_attackdata_cfg_guardlevel_font);
+							text: "MID";
+							removetime: 30;
+							layerno: 1;
+							align: 0;
+							localcoord: 320, 240;
+							pos: map(_pots_attackdata_levelposx), map(_pots_attackdata_levelposy);
+							velocity: $text_velx_dummy, $text_vely_dummy;
+							friction: 0.95, 0.95;
+							scale: map(_pots_attackdata_cfg_guardlevel_scale), map(_pots_attackdata_cfg_guardlevel_scale);
+							color: 0, 256, 0;
+						}
+					}
+					if map(_pots_attackdata_crossup)
+					&& root, prevmovetype != H
+					&& $unguardable = 0
+					&& root, gethitvar(guardflag) = LHA {
+						text{
+							font: F map(_pots_attackdata_cfg_guardlevel_font);
+							text: "CROSSUP";
+							removetime: 30;
+							layerno: 1;
+							align: 0;
+							localcoord: 320, 240;
+							pos: map(_pots_attackdata_levelposx), map(_pots_attackdata_levelposy) - map(_pots_attackdata_cfg_guardlevel_linespacing);
+							velocity: $text_velx_player, $text_vely_player;
+							friction: 0.95, 0.95;
+							scale: map(_pots_attackdata_cfg_guardlevel_scale), map(_pots_attackdata_cfg_guardlevel_scale);
+							color: 0, 256, 0;
+						}
+					}
+				}
+			}
+			text{
+				font: F map(_pots_attackdata_cfg_font);
+				text: "Hit Damage";
+				removetime: 1;
+				layerno: map(_pots_attackdata_cfg_layer);
+				align: 1;
+				localcoord: 320, 240;
+				pos: map(_pots_attackdata_cfg_text_x), map(_pots_attackdata_cfg_text_y) + 0 * map(_pots_attackdata_cfg_text_linespacing);
+				scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+			}
+			text{
+				font: F map(_pots_attackdata_cfg_font);
+				text: "%d";
+				params: ceil(map(_pots_attackdata_hitdamage));
+				removetime: 1;
+				layerno: map(_pots_attackdata_cfg_layer);
+				align: -1;
+				localcoord: 320, 240;
+				pos: map(_pots_attackdata_cfg_text_x) + map(_pots_attackdata_cfg_text_columnspacing), map(_pots_attackdata_cfg_text_y) + 0 * map(_pots_attackdata_cfg_text_linespacing);
+				scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+			}
+			text{
+				font: F map(_pots_attackdata_cfg_font);
+				text: "Combo Damage";
+				removetime: 1;
+				layerno: map(_pots_attackdata_cfg_layer);
+				align: 1;
+				localcoord: 320, 240;
+				pos: map(_pots_attackdata_cfg_text_x), map(_pots_attackdata_cfg_text_y) + 1 * map(_pots_attackdata_cfg_text_linespacing);
+				scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+			}
+			text{
+				font: F map(_pots_attackdata_cfg_font);
+				text: "%d";
+				params: ceil(map(_pots_attackdata_combodamage_display));
+				removetime: 1;
+				layerno: map(_pots_attackdata_cfg_layer);
+				align: -1;
+				localcoord: 320, 240;
+				pos: map(_pots_attackdata_cfg_text_x) + map(_pots_attackdata_cfg_text_columnspacing), map(_pots_attackdata_cfg_text_y) + 1 * map(_pots_attackdata_cfg_text_linespacing);
+				scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+			}
+			text{
+				font: F map(_pots_attackdata_cfg_font);
+				text: "Max Damage";
+				removetime: 1;
+				layerno: map(_pots_attackdata_cfg_layer);
+				align: 1;
+				localcoord: 320, 240;
+				pos: map(_pots_attackdata_cfg_text_x), map(_pots_attackdata_cfg_text_y) + 2 * map(_pots_attackdata_cfg_text_linespacing);
+				scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+			}
+			text{
+				font: F map(_pots_attackdata_cfg_font);
+				text: "%d";
+				params: ceil(map(_pots_attackdata_maxdamage));
+				removetime: 1;
+				layerno: map(_pots_attackdata_cfg_layer);
+				align: -1;
+				localcoord: 320, 240;
+				pos: map(_pots_attackdata_cfg_text_x) + map(_pots_attackdata_cfg_text_columnspacing), map(_pots_attackdata_cfg_text_y) + 2 * map(_pots_attackdata_cfg_text_linespacing);
+				scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+			}
+			text{
+				font: F map(_pots_attackdata_cfg_font);
+				text: "Max Combo";
+				removetime: 1;
+				layerno: map(_pots_attackdata_cfg_layer);
+				align: 1;
+				localcoord: 320, 240;
+				pos: map(_pots_attackdata_cfg_text_x), map(_pots_attackdata_cfg_text_y) + 3 * map(_pots_attackdata_cfg_text_linespacing);
+				scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+			}
+			text{
+				font: F map(_pots_attackdata_cfg_font);
+				text: "%d";
+				params: ceil(map(_pots_attackdata_maxcombo));
+				removetime: 1;
+				layerno: map(_pots_attackdata_cfg_layer);
+				align: -1;
+				localcoord: 320, 240;
+				pos: map(_pots_attackdata_cfg_text_x) + map(_pots_attackdata_cfg_text_columnspacing), map(_pots_attackdata_cfg_text_y) + 3 * map(_pots_attackdata_cfg_text_linespacing);
+				scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+			}
+			text{
+				font: F map(_pots_attackdata_cfg_font);
+				text: "Advantage";
+				removetime: 1;
+				layerno: map(_pots_attackdata_cfg_layer);
+				align: 1;
+				localcoord: 320, 240;
+				pos: map(_pots_attackdata_cfg_text_x), map(_pots_attackdata_cfg_text_y) + 4 * map(_pots_attackdata_cfg_text_linespacing);
+				scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+			}
+			let advantage_r = 256;
+			let advantage_g = 256;
+			let advantage_b = 256;
+			if map(_pots_attackdata_cfg_advantage_color) {
+				if map(_pots_attackdata_cfg_advantage_color) {
+					if map(_pots_attackdata_advantage_display) >= 1 {
+						let advantage_r = 64;
+						let advantage_g = 256;
+						let advantage_b = 64;
+					}
+					if map(_pots_attackdata_advantage_display) <= -1 {
+						let advantage_r = 256;
+						let advantage_g = 64;
+						let advantage_b = 64;
+					}
+				}
+			}
+			if map(_pots_attackdata_advantage_display) >= 1 {
+				text{
+					font: F map(_pots_attackdata_cfg_font);
+					text: "+%d";
+					params: ceil(map(_pots_attackdata_advantage_display));
+					removetime: 1;
+					layerno: map(_pots_attackdata_cfg_layer);
+					align: -1;
+					localcoord: 320, 240;
+					pos: map(_pots_attackdata_cfg_text_x) + map(_pots_attackdata_cfg_text_columnspacing), map(_pots_attackdata_cfg_text_y) + 4 * map(_pots_attackdata_cfg_text_linespacing);
+					scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+					color: $advantage_r, $advantage_g, $advantage_b;
+				}
+			} else {
+				text{
+					font: F map(_pots_attackdata_cfg_font);
+					text: "%d";
+					params: ceil(map(_pots_attackdata_advantage_display));
+					removetime: 1;
+					layerno: map(_pots_attackdata_cfg_layer);
+					align: -1;
+					localcoord: 320, 240;
+					pos: map(_pots_attackdata_cfg_text_x) + map(_pots_attackdata_cfg_text_columnspacing), map(_pots_attackdata_cfg_text_y) + 4 * map(_pots_attackdata_cfg_text_linespacing);
+					scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+					color: $advantage_r, $advantage_g, $advantage_b;
+				}
+			}
+			text{
+				font: F map(_pots_attackdata_cfg_font);
+				text: "Startup";
+				removetime: 1;
+				layerno: map(_pots_attackdata_cfg_layer);
+				align: 1;
+				localcoord: 320, 240;
+				pos: map(_pots_attackdata_cfg_text_x), map(_pots_attackdata_cfg_text_y) + 5 * map(_pots_attackdata_cfg_text_linespacing);
+				scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+			}
+			text{
+				font: F map(_pots_attackdata_cfg_font);
+				text: "%d";
+				params: ceil(map(_pots_attackdata_startup_display));
+				removetime: 1;
+				layerno: map(_pots_attackdata_cfg_layer);
+				align: -1;
+				localcoord: 320, 240;
+				pos: map(_pots_attackdata_cfg_text_x) + map(_pots_attackdata_cfg_text_columnspacing), map(_pots_attackdata_cfg_text_y) + 5 * map(_pots_attackdata_cfg_text_linespacing);
+				scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+			}
+			text{
+				font: F map(_pots_attackdata_cfg_font);
+				text: "P2BodyDist X";
+				removetime: 1;
+				layerno: map(_pots_attackdata_cfg_layer);
+				align: 1;
+				localcoord: 320, 240;
+				pos: map(_pots_attackdata_cfg_text_x), map(_pots_attackdata_cfg_text_y) + 6 * map(_pots_attackdata_cfg_text_linespacing);
+				scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+			}
+			text{
+				font: F map(_pots_attackdata_cfg_font);
+				text: "%f";
+				params: parent,P2BodyDist X;
+				removetime: 1;
+				layerno: map(_pots_attackdata_cfg_layer);
+				align: -1;
+				localcoord: 320, 240;
+				pos: map(_pots_attackdata_cfg_text_x) + 1.3*map(_pots_attackdata_cfg_text_columnspacing), map(_pots_attackdata_cfg_text_y) + 6 * map(_pots_attackdata_cfg_text_linespacing);
+				scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+			}
+			text{
+				font: F map(_pots_attackdata_cfg_font);
+				text: "P2Dist Y";
+				removetime: 1;
+				layerno: map(_pots_attackdata_cfg_layer);
+				align: 1;
+				localcoord: 320, 240;
+				pos: map(_pots_attackdata_cfg_text_x), map(_pots_attackdata_cfg_text_y) + 7 * map(_pots_attackdata_cfg_text_linespacing);
+				scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+			}
+			text{
+				font: F map(_pots_attackdata_cfg_font);
+				text: "%f";
+				params: enemyNear,P2Dist Y;
+				removetime: 1;
+				layerno: map(_pots_attackdata_cfg_layer);
+				align: -1;
+				localcoord: 320, 240;
+				pos: map(_pots_attackdata_cfg_text_x) + 1.3*map(_pots_attackdata_cfg_text_columnspacing), map(_pots_attackdata_cfg_text_y) + 7 * map(_pots_attackdata_cfg_text_linespacing);
+				scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+			}
+		} else {
+			text{
+				font: F map(_pots_attackdata_cfg_font);
+				text: "Press P2 Start";
+				removetime: 1;
+				layerno: map(_pots_attackdata_cfg_layer);
+				align: 0;
+				localcoord: 320, 240;
+				pos: map(_pots_attackdata_cfg_text_x) + map(_pots_attackdata_cfg_text_columnspacing) / 2.0, map(_pots_attackdata_cfg_text_y);
+				scale: map(_pots_attackdata_cfg_text_scale), map(_pots_attackdata_cfg_text_scale);
+			}
+		}
+	}
+}
+if map(_pots_attackdata_cfg_guardlevel) {
+	let correction = (320.0 / root, localcoord x) * camerazoom;
+	mapSet{map: "_pots_attackdata_levelposx"; value: root, screenpos x * $correction}
+	mapSet{map: "_pots_attackdata_levelposy"; value: (root, screenpos y + root, const(size.head.pos.y) / 2.0) * $correction}
+	if root, statetype = S && root, isasserted(nostandguard)
+	|| root, statetype = C && root, isasserted(nocrouchguard)
+	|| root, statetype = A && root, isasserted(noairguard) {
+		let noscaguard = 1;
+	}
+	if $noscaguard && root, stateno != [120, 155] && root, ctrl {
+		mapSet{map: "_pots_attackdata_unguardable"; value: 1}
+	} else {
+		mapSet{map: "_pots_attackdata_unguardable"; value: 0}
+	}
+	if player($player), p2, ID = root, ID
+	&& player($player), vel x >= 0 && player($player), p2dist x < 0 {
+		mapSet{map: "_pots_attackdata_crossup"; value: 1}
+	} else {
+		mapSet{map: "_pots_attackdata_crossup"; value: 0}
+	}
+}
+posset{x: root, pos x; y: const240p(240)}
+assertspecial{flag: invisible; flag2: noshadow}
+if numhelper(1615201920) > 1 {
+	if helper(1615201920), ID != ID {
+		destroyself{recursive: 1}
+	}
+}
+displaytoclipboard{
+	text: "Player = %d, Advantage Timer = %d, Startup Timer = %d";
+	params: $player, ceil(map(_pots_attackdata_advantage_timer)), ceil(map(_pots_attackdata_startup_timer));
+}
+appendtoclipboard{
+	text: "\nBy PotS - https://network.mugenguild.com/pots/";
+}
+[StateDef -4]
+if gameMode = "training" && playerNo = 2 && !ishelper {
+	if !numhelper(1615201920) {
+		helper{
+			stateno: 1615201920;
+			ID: 1615201920;
+			name: "Attack Data Display";
+			pausemovetime: 5184000;
+			supermovetime: 5184000;
+			preserve: 1;
+		}
+	}
+}
