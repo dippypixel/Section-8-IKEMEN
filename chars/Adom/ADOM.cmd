@@ -283,6 +283,19 @@ time = 10
 
 ;-| 2/3 Button Combination |-----------------------------------------------
 [Command]
+name = "grab" ;Required (do not remove)
+command = a+x
+time = 1
+[Command]
+name = "grab" ;Required (do not remove)
+command = b+y
+time = 1
+[Command]
+name = "grab" ;Required (do not remove)
+command = c+z
+time = 1
+
+[Command]
 name = "recovery" ;Required (do not remove)
 command = x+y
 time = 1
@@ -940,6 +953,16 @@ trigger1 = statetype = S
 trigger1 = ctrl
 
 ;===========================================================================
+;---------------------------------------------------------------------------
+; Throw
+[State -1, Throw]
+type = ChangeState
+value = 800
+triggerall = command = "grab"
+trigger1 = statetype = S
+trigger1 = ctrl
+triggerall = stateno != 100
+
 ;---------------------------------------------------------------------------
 ; Taunt
 [State -1, Taunt]
