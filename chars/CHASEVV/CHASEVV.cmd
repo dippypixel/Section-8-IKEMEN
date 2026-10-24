@@ -190,7 +190,6 @@ triggerall = enemynear,ailevel = 0 && random < var(59)/3-var(35) || enemynear,ai
 triggerall = (stateno != [6565600,6565621]) || (stateno = [6565600,6565621]) && (stateno != [6565610,6565611])
 triggerall = movetype = H && gethitvar(hitcount) = 1 && time = 0
 triggerall = stateno != 700 && (stateno != [120,160])
-trigger1 = !inCustomState
 trigger1 = hitdefattr != SCA, HA, HP, HT
 
 [State -1,Ai Recover]
