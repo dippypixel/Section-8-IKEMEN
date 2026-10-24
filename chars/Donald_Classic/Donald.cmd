@@ -633,7 +633,7 @@ triggerall = Var(59) = 0
 triggerall = command = "hanva-ga-da"
 triggerall = power >= 3000
 triggerall = statetype != A
-triggerall = life <= (LifeMax/2)
+;triggerall = life <= (LifeMax/2)
 triggerall = NumHelper(1810) = 0
 triggerall = NumHelper(2100) = 0 
 triggerall = NumHelper(2200) = 0
@@ -664,6 +664,7 @@ value = 3050
 triggerall = Var(59) = 0
 triggerall = power >= 2000
 triggerall = statetype != A
+triggerall = NumHelper(1810) = 0
 triggerall = NumHelper(2100) = 0 
 triggerall = NumHelper(2200) = 0
 triggerall = NumHelper(3500) = 0 
@@ -789,7 +790,7 @@ type = ChangeState
 value = 1800
 triggerall = Var(59) = 0
 triggerall = command = "apple bom_y"
-triggerall = NumHelper(1810) = 0 ;‚h‚cƒiƒ“ƒo[1200‚Ìƒwƒ‹ƒp[‚ª‰æ–Ê’†‚É‚PŒÂ‚ào‚Ä‚È‚¢
+triggerall = NumHelper(1810) = 0
 triggerall = NumHelper(2100) = 0 
 triggerall = NumHelper(2200) = 0
 triggerall = NumHelper(3500) = 0 
