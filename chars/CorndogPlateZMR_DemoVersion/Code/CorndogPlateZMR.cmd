@@ -175,17 +175,16 @@ time = 20
 
 [Command]
 name = "CondimentCannon"
-command = ~B, DB, D, DF, F, x+y
+command = ~B, $D, F, x+y
 time = 20
 [Command]
 name = "CondimentCannon"
-command = ~B, DB, D, DF, F, x+z
+command = ~B, $D, F, y+z
 time = 20
 [Command]
 name = "CondimentCannon"
-command = ~B, DB, D, DF, F, y+z
+command = ~B, $D, F, x+z
 time = 20
-
 ;-| Special Motions |------------------------------------------------------
 
 ;these include Negative Edge, a technique where specials can be done as
