@@ -268,7 +268,7 @@ var(2) = 1
 type = ChangeState
 value = 1020
 triggerall = command = "QCF_z"
-triggerall = power >= 330 && numhelper(1021) = 0
+triggerall = power >= 330 && numhelper(1021) = 0 && numexplod(1021)=0
 trigger1 = var(1) ;Use combo condition (above)
 ;===================================================;
 ;                 SPECIAL MOVES                     ;
