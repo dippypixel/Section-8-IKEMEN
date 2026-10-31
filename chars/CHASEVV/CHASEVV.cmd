@@ -630,7 +630,7 @@ trigger3 = (stateno = [600,610]) && movecontact
 trigger4 = stateno = 620 && movecontact && (enemy,stateno = [631,633])
 ;--------------------------------------------
 ;Kick
-s[State -1, Footsaw]
+[State -1, Footsaw]
 type = ChangeState
 value = 220
 triggerall = !aiLevel
