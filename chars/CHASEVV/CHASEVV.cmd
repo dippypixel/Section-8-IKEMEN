@@ -22,11 +22,6 @@ name = "Super"
 command = D, DB, B, b
 time = 15
 
-
-[Command]
-name = "Special3"
-command = ~B, F, a
-
 [Command]
 name = "Special2"
 command = ~D, DF, F, b
@@ -34,6 +29,10 @@ command = ~D, DF, F, b
 [Command]
 name = "Special"
 command = ~D, DF,F, a
+
+[Command]
+name = "Special3"
+command = ~5B, F, a
 
 [Command]
 name = "Uppercut"
@@ -569,14 +568,6 @@ triggerall = !var(55)
 trigger1 = command = "BB"
 trigger1 = statetype = S
 trigger1 = ctrl
-
-[State -1, Run BackTurn]
-type = ChangeState
-value = 106
-triggerall = !aiLevel
-triggerall = !var(55)
-trigger1 = command = "holdfwd"
-trigger1 = (stateno = 105 && time >= 5) || (stateno = 101 && time >= 9)
 ;---------------------------------------------------------------------------
 ;Jump Cancel
 [State -1, Jump Cancel]
@@ -609,7 +600,7 @@ triggerall = !aiLevel
 triggerall = !var(13)
 triggerall = command = "Special3"
 triggerall = (stateno != [810,812]) 
-trigger1 = statetype != A && ctrl
+trigger1 = statetype != A && ctrl|| stateno=101|| stateno=106
 trigger2 = hitdefattr = SC, NA 
 trigger2 = movecontact
 trigger3 = stateno = 195
@@ -622,7 +613,7 @@ value = 1010
 triggerall = !aiLevel
 triggerall = !var(12)
 triggerall = command = "Special2"
-trigger1 = statetype != A && ctrl
+trigger1 = statetype != A && ctrl|| stateno=101|| stateno=106
 trigger2 = (stateno = [202,210]) && movecontact
 
 ;---------------------------------------------------------------------------
@@ -633,10 +624,21 @@ value = 1000
 triggerall = !aiLevel
 triggerall = !var(11)
 triggerall = command = "Special"
-trigger1 = ctrl
+trigger1 = ctrl || stateno=101|| stateno=106
 trigger2 = (stateno = [202,210]) && movecontact
 trigger3 = (stateno = [600,610]) && movecontact
 trigger4 = stateno = 620 && movecontact && (enemy,stateno = [631,633])
+;--------------------------------------------
+;Kick
+s[State -1, Footsaw]
+type = ChangeState
+value = 220
+triggerall = !aiLevel
+triggerall = command = "b" && command = "holddown" && command = "holdback"
+trigger1 = statetype != A && ctrl || stateno=101&&time<8|| stateno=106
+trigger2 = (stateno = [202,210]) 
+trigger2 = movecontact
+
 ;===========================================================================
 ;Kung Fu Throw
 [State -1, Throw]
@@ -653,7 +655,7 @@ type = ChangeState
 value = 200
 triggerall = !aiLevel
 triggerall = command = "a"
-trigger1 = statetype != A && ctrl
+trigger1 = statetype != A && ctrl|| stateno=101&&time<8|| stateno=106
 trigger2 = anim=1001&& movecontact&&animelemtime(3)>=1 && pos y = 0 ;Combo out of Hurricane Chase
 
 
@@ -673,23 +675,13 @@ value = 202
 triggerall = !aiLevel
 triggerall = command = "a"
 trigger1 = stateno = 201 && movecontact
-;--------------------------------------------
-;Kick
-[State -1, Footsaw]
-type = ChangeState
-value = 220
-triggerall = !aiLevel
-triggerall = command = "b" && command = "holddown" && command = "holdback"
-trigger1 = statetype != A && ctrl
-trigger2 = (stateno = [202,210]) 
-trigger2 = movecontact
 ;Kick
 [State -1, Kick]
 type = ChangeState
 value = 210
 triggerall = !aiLevel
 triggerall = command = "b"
-trigger1 = statetype != A && ctrl
+trigger1 = statetype != A && ctrl || stateno=101&&time>5|| stateno=106
 trigger2 = (stateno = [200,202])
 trigger2 = movecontact
 trigger3 = anim=1001&& movecontact&&animelemtime(3)>=1  && pos y = 0 ;Combo out of Hurricane Chase
@@ -706,6 +698,7 @@ triggerall= command = "holdup" && command = "a"
 trigger1 = ctrl
 trigger2 = stateno = 600 && movecontact
 trigger3 = stateno = 610 && movecontact
+trigger4 = stateno = 1010 && !moveguarded && time >= ifelse(var(17)=1,30,35) ;Combo out of KickFlip
 ;---------------------------------------------------------------------------
 
 ;AirAttack
@@ -765,3 +758,25 @@ triggerall = (roundstate = [2,3])
 triggerall = statetype != A
 trigger1 = ctrl
 trigger2 = enemy,life = 0 && movehit
+
+[State -1, Run BackTurn]
+type = ChangeState
+value = 106
+triggerall = !aiLevel
+triggerall = !var(55)
+trigger1 = command = "holdfwd"
+trigger1 = (stateno = 105 && time >= 5) || (stateno = 101 && time >= 9)
+trigger2= stateno=110
+trigger2 = command = "holdfwd"
+trigger2 = (prevstateno = 105) || (prevstateno = 101 && time >= 9)
+
+[State -1, Run BackTurn]
+type = ChangeState
+value = 101
+triggerall = !aiLevel
+triggerall = !var(55)
+trigger1 = command = "holdback"
+trigger1 = (stateno = 100) || (stateno = 106 && time >= 9)
+trigger2= stateno=110
+trigger2 = command = "holdback"
+trigger2 = (prevstateno = 100) || (prevstateno = 106 && time >= 9)
