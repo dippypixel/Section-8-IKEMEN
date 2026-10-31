@@ -124,21 +124,23 @@ except in form of difference file from this character.
 Releases
 ==============================================================================
 
+05/10/08	Adjusted
+
 22/05/08	Bugfix
 
-27/04/08	A bug about "big jump" was fixed.
+27/04/08	A bug about "big jump" was fixed
 
-26/04/08	Adjusted AI.
+26/04/08	Adjusted AI
 
-24/04/08	Adjustment of the level (range from 0 to 12) of AI became available.
+24/04/08	Adjustment of the level (range from 0 to 12) of AI became available
 
-23/04/08	Modified ACT files.
-		Adjusted AI.
+23/04/08	Modified ACT files
+		Adjusted AI
 
-22/04/08	Small correction.
-		Adjusted AI.
+22/04/08	Small correction
+		Adjusted AI
 
-20/04/08	Made Public.
+20/04/08	Made Public
 
 ------------------------------------------------------------------------------
 Sorry for my poor English.

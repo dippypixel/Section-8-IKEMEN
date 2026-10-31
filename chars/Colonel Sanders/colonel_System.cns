@@ -4,6 +4,34 @@
 
 [Statedef -2]
 
+[State -2, End of First Battle]
+type = VarSet
+trigger1 = RoundState = 4
+fvar(38) = 1
+IgnoreHitPause = 1
+
+[State -2, TimerFreeze]
+type = AssertSpecial
+trigger1 = (StateNo = [3000,4999]) && MoveType != H
+trigger2 = NumHelper(3400)
+flag = timerfreeze
+IgnoreHitPause = 1
+
+[State -2, AssertSpecial: NoAirGuard]
+type = AssertSpecial
+trigger1 = P2dist x < 0 && StateType = A
+flag = NoAirGuard
+IgnoreHitPause = 1
+
+[state -2, No Clones]
+type = remappal
+triggerall=numenemy && roundstate=0
+trigger1=(!var(51)||AILevel)&&var(50)<2&&((teamside!=1&&!AILevel&&Enemy,AILevel=0)||(teamside!=1&&AILevel)||(teamside=1&&AILevel&&Enemy,AILevel=0))
+trigger1=enemy,authorname="peg"&&enemy,name="Colonel"&&enemy,var(50)<2&&(enemy,palno=palno|(enemy,palno=palno+6&&!var(51))|enemy,palno=palno-6)
+source = 1, 1
+dest = 1, palno + ifelse(palno>6, -5, 1) + ifelse((palno=6|palno=12), -7, 0)
+ignorehitpause = 1
+
 [State -2, クリップボード]
 type = DisplayToClipboard
 trigger1 = 1
@@ -23,18 +51,171 @@ text = "pp0x=%f, pp1x=%f"
 params = (Helper(7000),Pos X), (Helper(7001),Pos X)
 
 [State -2, 画面端判定発射]
-type = Helper
+type = null;Helper
 trigger1 = RoundState = 2
 trigger1 = !NumHelper(7000)
 stateno = 7000
 ID = 7000
 
 [State -2, 画面端判定発射]
-type = Helper
+type = null;Helper
 trigger1 = RoundState = 2
 trigger1 = !NumHelper(7001)
 stateno = 7000
 ID = 7001
+
+[State -2, StopSnd]
+type = StopSnd
+trigger1 = StateNo != 6070
+channel = 4
+
+[State -2]
+type = removeExplod
+trigger1 = StateNo != 6070
+id = 7020
+
+[State -2]
+type = removeExplod
+trigger1 = StateNo != 6070
+id = 7021
+
+[State -2, Mode Selector on]
+type=helper
+triggerall= var(50) < 2
+triggerall= !numhelper(256) && roundstate<2 && !AILevel && var(51) = 1
+triggerall= !numhelper(257) && ((stateno=[190,194])||stateno=0||(stateno=[6900,6999]))
+trigger1=!roundsexisted && !fvar(38)
+id=257
+stateno=257
+facing=facing
+ownpal=1
+size.xscale =0.5
+size.yscale =0.5
+persistent=0
+
+[state -2, Normal or Rage]
+type = varset
+trigger1 = numhelper(257)
+trigger1 = helper(257),time>0
+trigger1 =roundstate<2
+trigger1=helper(257),var(11)=[0,1]
+var(50)= helper(257),var(11)
+ignorehitpause = 1
+
+[State -2, Rage system]
+type=helper
+triggerall= !var(15) || var(50) > 2
+triggerall= var(50) >= 1 && alive && roundstate = 2
+triggerall= MoveType != H || (StateNo = [120,159]) || (StateNo = [5000,5999])
+triggerall= !numhelper(8995)
+trigger1= Life <= ceil(LifeMax*0.4)
+trigger2= var(50) > 2
+helpertype=normal
+stateno=8995
+ID=8995
+name="Rage Helper"
+postype=p1
+pos=0,0
+pauseMoveTime=99999
+superMoveTime=99999
+ownpal=1
+ignorehitpause=1
+
+[State -2, Red Aura for Rage system]
+type=helper
+triggerall= !var(15) || var(50) > 2
+triggerall= MoveType != H || (StateNo = [120,159]) || (StateNo = [5000,5999])
+triggerall= !numhelper(8800)
+trigger1= numhelper(8995)
+helpertype=normal
+stateno=8800
+ID=8800
+name="Aura"
+postype=p1
+pos=0,0
+pauseMoveTime=99999
+superMoveTime=99999
+ownpal=1
+ignorehitpause=1
+
+[State -2, Camera Focus]
+type = null;helper
+triggerall = numenemy && !drawgame
+triggerall = Alive && Win && RoundState = 4 
+triggerall = !Numhelper(6001) && pos X != 0
+trigger1 = numenemy = 1
+trigger1 = !(enemynear,alive)
+trigger2 = numenemy >= 2
+trigger2 = !(enemynear(0),alive) && !(enemynear(1),alive)
+name = "Camera Focus"
+id = 6001
+pos = 0,0
+postype = p1
+stateno = 6001
+helpertype = normal
+ownpal = 1
+keyctrl = 1
+
+[State -2, レイジシステム攻撃力リセット]
+type = attackmulset
+trigger1 = !numhelper(8995)
+value = ifelse(var(35),0.5,1)
+ignorehitpause = 1
+
+[State -2, レイジシステム攻撃力アップ]
+type = attackmulset
+trigger1 = numhelper(8995)
+value = ifelse(var(35),0.625,1.25)
+ignorehitpause = 1
+
+[State -2, レイジシステム防御力ダウン]
+type = lifeadd
+trigger1 = var(50) = 1
+trigger1 = stateno != [6080, 6082]
+trigger1 = gethitvar(hitcount) = 1 && gethitvar(damage)
+value = -ceil(0.111 * gethitvar(damage))
+kill = 0
+ignorehitpause = 1
+
+[State -2, レイジシステム防御力ダウン]
+type = defencemulset
+trigger1 = var(50) = 1
+value = 1.111 * (const(data.fall.defence_mul) ** gethitvar(fallcount))
+ignorehitpause = 1
+
+[State -2, Waiting]
+type = VarSet
+trigger1 = RoundState < 2
+v = 49
+value = 0
+
+[State -2, Beginning]
+type = VarSet
+trigger1 = var(49) = 0 && RoundState >= 2 && Ctrl
+v = 49
+value = 1
+
+[State -2, Poweradd]
+type = poweradd
+trigger1 = Numhelper(8995) && var(49)
+trigger1 = (StateNo != [3000,4999]) && !NumHelper(3400)
+trigger1 = (MoveType != H) || (StateNo = [120,159])
+value = ifelse(GameTime % 2 = 0, 2, 1)
+ignorehitpause = 1
+
+;---------------------------------------------------------------------------
+; 勝利台詞
+;---------------------------------------------------------------------------
+
+[State -2, Victory Quotes(non-specific)]
+type=VictoryQuote
+trigger1=1
+value=random%5
+[State -2, Victory Quote vs. Donald / Ronald]
+type=VictoryQuote
+triggerall = NumEnemy
+trigger1=Enemy, Name="Donald" || Enemy, Name="Ronald" || Enemy, Name="Donald McDonald" || Enemy, Name="Ronald McDonald"
+value=5
 
 ;---------------------------------------------------------------------------
 ; 汎用処理
@@ -53,16 +234,14 @@ v = 1
 value = 0
 
 [State -2, 無敵]
-type = NotHitBy
+type = Null;NotHitBy
 trigger1 = (RoundState != 2);（※）
 value = SCA
 time = 10
-supermovetime = 99999999
-pausemovetime = 99999999
 IgnoreHitPause = 1
 
 [State -2, スクロール];負けて倒れたらカメラワークを相手に移す処理
-type = ScreenBound
+type = null;ScreenBound
 triggerall = (Life <= 0) || (!Alive) || (Lose)
 trigger1 = (StateNo = 5150) && (RoundState = 4);（※）
 value = 0
@@ -74,7 +253,7 @@ type = AfterImageTime
 trigger1 = (StateNo = [800,899]) && (MoveType = H)
 trigger2 = (PrevStateNo = [1000,4999]) && (StateNo = [5000,5899]) && (MoveType = H)
 trigger3 = (PrevStateNo = [6000,10999]) && (StateNo = [5000,5899]) && (MoveType = H)
-trigger5 = (RoundState > 3)
+trigger4 = (RoundState > 3)
 time = 0
 IgnoreHitPause = 1
 
@@ -94,6 +273,7 @@ value = 10005
 [State -2]
 type = VarRangeSet
 trigger1 = (MoveType = H)
+trigger2 = StateNo = 40 || StateNo = 1010
 first = 35
 last = 36
 value = 0
@@ -101,14 +281,14 @@ IgnoreHitPause = 1
 
 [State -2]
 type = VarSet
-trigger1 = (command = "holdfwd") && (Var(0) = 0)
+trigger1 = (command = "holdfwd") && (Var(0) = 0) && Vel X < const(velocity.jump.fwd.x)
 v = 36
 value = 1
 IgnoreHitPause = 1
 
 [State -2]
 type = VarSet
-trigger1 = (command = "holdback") && (Var(0) = 0)
+trigger1 = (command = "holdback") && (Var(0) = 0) && Vel X > const(velocity.jump.back.x)
 v = 36
 value = -1
 IgnoreHitPause = 1
@@ -116,6 +296,8 @@ IgnoreHitPause = 1
 [State -2]
 type = VarSet
 trigger1 = (command != "holdfwd") && (command != "holdback") && (Var(0) = 0)
+trigger2 = var(36) = 1 && Vel X >= const(velocity.jump.fwd.x)
+trigger3 = var(36) = -1 && Vel X <= const(velocity.jump.back.x)
 v = 36
 value = 0
 IgnoreHitPause = 1
@@ -123,10 +305,14 @@ IgnoreHitPause = 1
 [State -2]
 type = VelAdd
 triggerall = (var(35) = 1) && (var(36) != 0)
-trigger1 = (StateType = A) && (Time > 0)
-trigger1 = Vel X = [-3,3]
-x = var(36)*0.8
+trigger1 = (StateType = A) && (Time > 0) && (StateNo = [50,51]) && (PrevStateNo != [600,699])
+x = var(36)*0.5
 IgnoreHitPause = 1
+
+[State -2]
+type = AssertSpecial
+trigger1 = (var(35) = 1)
+flag = nojugglecheck
 
 [State -2]
 type = Turn
@@ -226,3 +412,26 @@ IgnoreHitPause = 1
 
 ;---------------------------------------------------------------------------
 
+;---------------------------------------------------------------------------
+; 投げ技用処理
+;---------------------------------------------------------------------------
+[State -2, Throws Allowed]
+type = VarSet
+triggerall = NumEnemy
+trigger1 = EnemyNear, MoveType != H
+trigger1 = EnemyNear, StateNo != 140
+trigger1 = (EnemyNear, Ctrl && EnemyNear, Time >= 1) || (EnemyNear, Time >= 8)
+trigger2 = EnemyNear, MoveType = A
+trigger3 = (EnemyNear, StateNo != [0, 52]) && (EnemyNear, StateNo != [120, 155]) && (EnemyNear, StateNo != [5000, 5120])
+var(47) = 0
+
+[State -2, Throws Disallowed]
+type = VarSet
+triggerall = NumEnemy
+trigger1 = (EnemyNear, StateNo = [150,155])
+trigger2 = (EnemyNear, MoveType = H && EnemyNear, StateType != A) && !var(21) && !var(22)
+trigger3 = (EnemyNear, StateNo = [5020,5040]) && !(EnemyNear, HitFall)
+trigger4 = ((EnemyNear, StateNo = 0) || (EnemyNear, StateNo = 52)) && (EnemyNear, PrevStateNo = [5000,5040]) && ((EnemyNear, Time <= 0) || !(EnemyNear, Ctrl))
+trigger5 = (EnemyNear, StateNo = 0) && (EnemyNear, PrevStateNo = 52) && ((EnemyNear, Time <= 0) || !(EnemyNear, Ctrl))
+trigger6 = (EnemyNear, StateNo = 40) && (EnemyNear, Time >= 1 || EnemyNear, PrevStateNo = 0 || EnemyNear, PrevStateNo = 52)
+var(47) = 1

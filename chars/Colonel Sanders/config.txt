@@ -1,0 +1,150 @@
+;---------------------------------------------------------------------------
+; Initialize (at the start of the round)
+[Statedef 5900]
+type = S
+
+[State 5900, First Battle]
+type = VarSet
+trigger1 = !roundsexisted && matchno = 1
+fvar(38) = 0
+
+[state 5900, Reset Variables]
+type = varrangeset
+trigger1 = !fvar(38)
+first = 0
+last = 59
+value = 0
+[state 5900, Reset Variables]
+type = varrangeset
+trigger1 = !fvar(38)
+first = 0
+last = 39
+fvalue = 0
+
+
+;---------------------------------------------------------------------------
+;Mode Select
+[State 5900, Mode Select]
+type = varset
+trigger1 = 1
+var(51) = 0
+;0 = No
+; Palettes 01, 02, 03, 04, 05, 06  -> NORMAL
+; Palettes 07, 08, 09, 10, 11, 12  -> RAGE SYSTEM
+;1 = Yes
+
+;---------------------------------------------------------------------------
+;Default Mode
+[State 5900, Default Mode]
+type = VarSet
+trigger1 = !fvar(38)
+var(50) = 0
+ignoreHitPause = 0
+;0 = Normal
+;1 = Rage System
+
+;---------------------------------------------------------------------------
+;Auto Config Change for Add004
+[State 5900, Auto Config Change for Add004]
+type = VarSet
+trigger1 = 1
+var(53) = 0
+;0 = No
+;1 = Yes
+
+;---------------------------------------------------------------------------
+;Boss Mode in Arcade Mode
+[State 5900, Boss Mode in Arcade Mode]
+type = VarSet
+triggerall = IsHomeTeam && MatchNo >= 2
+v = 50
+value = 3
+
+trigger1 = 1
+; 0 = OFF
+; 1 = ON
+
+trigger1 = MatchNo >= 5
+; Choose how many stages later this character will be in Boss Mode.
+; The number you enter must be at least 2.
+
+;=============================================================================
+;Do Not Edit Below This Line
+;=============================================================================
+
+;-----------------------------------------------------------------------------
+;Auto Config Change for Add004
+
+[State 5900, Mode Selector]
+type = VarSet
+triggerall = var(53)
+trigger1 = 1
+v = 51
+value = 0
+;-----------------------------------------------------------------------------
+
+[State 5900, Rage Move Flag Reset]
+type = VarSet
+trigger1 = !Time
+v = 15
+value = 0
+
+[State 5900, Full Rage]
+type = VarSet
+trigger1 = var(50) > 3
+v = 50
+value = 3
+
+[state 5900, Palette]
+type = remappal
+trigger1 = 1
+source = 1, 1
+dest = 1, palno
+ignorehitpause = 1
+[state 5900, No Mode Selector]
+type = remappal
+triggerall = (!var(51)|AILevel) && var(50) < 2 && palno>6
+trigger1 = 1
+source = 1, 1
+dest = 1, palno - 6
+ignorehitpause = 1
+
+[State 5900, No Mode Selector]
+type = VarSet
+triggerall = var(50) < 2
+triggerall = !var(51) || AILevel
+trigger1 =!roundsexisted && !fvar(38)
+v = 50
+value = ifelse(palno>6, ifelse(var(50),0,1), ifelse(var(50),1,0))
+
+[State 5900, Tag Assist StateNo]
+type = VarSet
+triggerall = var(58)
+trigger1 = 1
+sysvar(0) = 1050
+
+
+[State 5900, intro VS Donald McDonald]
+type=changestate
+trigger1= numenemy
+trigger1= !roundsexisted && !(enemy,roundsexisted)
+trigger1= !(teammode=simul) && !(enemy,teammode=simul)
+trigger1=enemy,authorname="Sennou-Room"&&enemy,name="Donald McDonald"
+value=6910
+
+[State 5900, Turns Intro]
+type = ChangeState
+trigger1 = TeamMode = Turns
+trigger1 = !RoundsExisted && RoundNo >= 2
+value = 6900
+
+[State 5900, 4] ;Intro for round 1
+type = ChangeState
+trigger1 = roundno = 1
+value = 190
+
+[State 5900, 5] ;All other rounds
+type = ChangeState
+trigger1 = 1
+value = 0
+
