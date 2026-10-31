@@ -204,7 +204,7 @@ time = 1
 ;Triple Kung Fu Palm (uses one super bar)
 [State -1, Triple Kung Fu Palm]
 type = ChangeState
-value = 3100;3000
+value = 3000
 triggerall = command = "Hyper1"
 triggerall = power >= 1000
 trigger1 = statetype = S
@@ -268,7 +268,7 @@ var(2) = 1
 type = ChangeState
 value = 1020
 triggerall = command = "QCF_z"
-triggerall = power >= 330 && numhelper(1021) = 0
+triggerall = power >= 330 && numhelper(1021) = 0 && numexplod(1021)=0
 trigger1 = var(1) ;Use combo condition (above)
 ;===================================================;
 ;                 SPECIAL MOVES                     ;
@@ -344,7 +344,7 @@ type = ChangeState
 value = 200
 triggerall = command = "x" && command != "holddown"
 triggerall = statetype != A
-trigger1 = ctrl
+trigger1 = ctrl || (stateno = [700,705]) && animelemtime(4) >= 0
 trigger2 = (Stateno = 200) && Movecontact ;&& prevstateno != 200
 
 ;Stand Strong Punch
@@ -353,7 +353,7 @@ type = ChangeState
 value = 210
 triggerall = command = "y" && command != "holddown"
 triggerall = statetype != A
-trigger1 = ctrl
+trigger1 = ctrl || (stateno = [700,705]) && animelemtime(4) >= 0
 trigger2 = (StateNo = 200) && Movecontact
 ;trigger3 = (StateNo = 230) && Movecontact
 
@@ -363,7 +363,7 @@ type = ChangeState
 value = 220
 triggerall = command = "z"
 triggerall = statetype != A
-trigger1 = ctrl
+trigger1 = ctrl || (stateno = [700,705]) && animelemtime(4) >= 0
 trigger2 = stateno = 210
 trigger2 = movecontact
 trigger3 = (stateno = [120,169]) && stateno!= 140
@@ -375,7 +375,7 @@ type = ChangeState
 value = 230
 triggerall = command = "a" && command != "holddown"
 triggerall = statetype != A
-trigger1 = ctrl
+trigger1 = ctrl || (stateno = [700,705]) && animelemtime(4) >= 0
 trigger2 = (Stateno = 200) && Movecontact
 
 ;Stand Strong Kick
@@ -384,7 +384,7 @@ type = ChangeState
 value = 240
 triggerall = command = "b" && command != "holddown"
 triggerall = statetype != A
-trigger1 = ctrl
+trigger1 = ctrl || (stateno = [700,705]) && animelemtime(4) >= 0
 trigger2 = (StateNo = 200) ||(StateNo = 230) && time >= 8
 trigger2 =  Movecontact
 
@@ -394,7 +394,7 @@ type = ChangeState
 value = 400
 triggerall = command = "x" && command = "holddown"
 triggerall = statetype != A
-trigger1 = ctrl
+trigger1 = ctrl || (stateno = [700,705]) && animelemtime(4) >= 0
 trigger2 = (StateNo = 200) || (StateNo = 400)
 trigger2 = Movecontact
 ;trigger3 = (StateNo = 230) && Movecontact
@@ -405,7 +405,7 @@ type = ChangeState
 value = 410
 triggerall = command = "y" && command = "holddown"
 triggerall = statetype != A
-trigger1 = ctrl
+trigger1 = ctrl || (stateno = [700,705]) && animelemtime(4) >= 0
 trigger2 = (StateNo = 400) && Movecontact
 ;trigger3 = (StateNo = 230) && Movecontact
 ;trigger4 = (StateNo = 400) && Movecontact
@@ -418,7 +418,7 @@ type = ChangeState
 value = 430
 triggerall = command = "a" && command = "holddown"
 triggerall = statetype != A
-trigger1 = ctrl
+trigger1 = ctrl || (stateno = [700,705]) && animelemtime(4) >= 0
 ;trigger2 = (Stateno = 200) && Movecontact
 ;trigger3 = (Stateno = 230) && Movecontact
 ;trigger4 = (Stateno = 400) && Movecontact
@@ -429,7 +429,7 @@ type = ChangeState
 value = 440
 triggerall = command = "b" && command = "holddown"
 triggerall = statetype != A
-trigger1 = ctrl
+trigger1 = ctrl || (stateno = [700,705]) && animelemtime(4) >= 0
 ;trigger2 = (StateNo = 200) && Movecontact
 ;trigger3 = (StateNo = 230) && Movecontact
 ;trigger4 = (StateNo = 410) && Movecontact

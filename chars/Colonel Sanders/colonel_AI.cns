@@ -14,65 +14,227 @@
 
 [Statedef -3]
 
+[State -3, Parry Detection]
+type = Helper
+triggerAll = RoundState = 2 && !NumHelper(6090)
+triggerAll = (MoveType = I && ctrl) || (StateNo = [6080,6082]) && Time >= 8 || StateNo = 5120 && AnimTime=0
+triggerAll = (command != "rlsfwd" && command != "rlsback" && command != "rlsup" && command != "rlsdown") || AILevel
+trigger1 = !AIlevel && (statetype = S || statetype = C || stateno = 5120 && AnimTime=0) && (ifElse(P2dist x >= 0, command = "fwd", command = "back") || command = "down")
+trigger2 = !AIlevel && statetype = A && (ifElse(P2dist x >= 0, command = "fwd", command = "back"))
+trigger3 = AIlevel && (stateno != [6080, 6082]) && inguarddist && random < 50
+trigger4 = AIlevel && (stateno = [6080, 6082]) && time = 14 && random < 667
+stateNo = 6090
+ID = 6090
+name = "Parry Detection"
+posType = P1
+pauseMoveTime = 65535
+superMoveTime = 65535
+
+[State -3, Parry Attacks]
+type = ChangeState
+trigger1 = (StateNo != [6080,6082]) && NumHelper(6090)
+trigger1 = Helper(6090), StateNo = 6091
+value = ifElse((Helper(6090), Anim = 6092), 6082, ifElse((Helper(6090), Anim = 6091), 6081, 6080))
+ignoreHitPause = 1
+
+[State -3, Parry Projectiles]
+type = HitOverride
+trigger1 = (StateNo != [6080,6082]) && NumHelper(6090)
+trigger1 = !(Helper(6090), var(0)) && (Helper(6090), Anim = 6090)
+attr = SA, AP
+stateNo = 6080
+slot = 0
+time = 1
+ignoreHitPause = 1
+
+[State -3, Parry Projectiles]
+type = HitOverride
+trigger1 = (StateNo != [6080,6082]) && NumHelper(6090)
+trigger1 = !(Helper(6090), var(0)) && (Helper(6090), Anim = 6091)
+attr = C, AP
+stateNo = 6081
+slot = 0
+time = 1
+ignoreHitPause = 1
+
+[State -3, Parry Projectiles]
+type = HitOverride
+trigger1 = (StateNo != [6080,6082]) && NumHelper(6090)
+trigger1 = !(Helper(6090), var(0)) && (Helper(6090), Anim = 6092)
+attr = SCA, AP
+stateNo = 6082
+slot = 0
+time = 1
+ignoreHitPause = 1
+
+[State -3, Assert: NoWalk after Parry]
+type = AssertSpecial
+trigger1 = numhelper(6085)
+flag = NoWalk
+ignoreHitPause = 1
+
+[State -3, Movement AfterImage]
+type=AfterImage
+triggerAll=(Time=1 && StateNo != 40) || (AnimTime = 0 && StateNo = 40)
+trigger1=StateNo=40 && var(3)
+trigger2=StateNo=10003
+trigger3=(StateNo=[700,710])
+trigger4=StateNo=10004
+time=2
+timeGap=1
+frameGap=4
+length=9
+palBright=0,0,0
+palContrast=128,128,128
+palPostBright=0,0,0
+palAdd=0,0,0
+palMul=0.9,0.9,0.9
+trans=Add1
+
+[State -3, Level 1 Super AfterImage]
+type=AfterImage
+trigger1=StateNo=3000 && Time = 40
+trigger2=StateNo=3300 && Time = 50
+trigger3=StateNo=3400 && Time = 30
+time=2
+timeGap=1
+frameGap=10
+length=21
+palBright=0,0,0
+palContrast=128,128,128
+palPostBright=0,0,0
+palAdd=0,0,0
+palMul=0.75,0.75,0.75
+trans=Add1
+
+[State -3, Level 2 Super AfterImage]
+type=AfterImage
+trigger1=StateNo=3500 && Time = 50
+trigger2=StateNo=3600 && Time = 2
+trigger3=StateNo=3601 && AnimElem = 2
+time=2
+timeGap=1
+framegap=10
+length=21
+palBright=0,0,0
+palContrast=32,32,160
+palPostBright=0,0,0
+palAdd=0,0,0
+palMul=0.75,0.75,0.75
+trans=Add1
+
+[State -3, Level 3 Super AfterImage]
+type=AfterImage
+trigger1=StateNo=3200 && Time = 2
+time=2
+timeGap=1
+frameGap=10
+length=21
+palBright=0,0,0
+palContrast=160,32,32
+palPostBright=0,0,0
+palAdd=0,0,0
+palMul= 0.75,0.75,0.75
+trans=Add1
+
+[State -3, AfterImage Persist]
+type=AfterImageTime
+trigger1=(StateNo=[50,51]) || (StateNo=[600,699]) || (StateNo=[1020,1030])
+trigger1=(vel y < -1 && !var(35)) || var(35)
+trigger1=(PrevStateNo=40&&var(3))||PrevStateNo!=40
+trigger2=StateNo=[700,710]
+trigger3=(StateNo=[3000,4999]) && StateNo!=3204
+trigger4=StateNo=3204 && AnimElemTime(10)<0
+time=2
+
+[State -3, AfterImage Off]
+type=AfterImageTime
+triggerAll=Time <= 1
+trigger1=StateNo=3000 || StateNo=3200 || Stateno=3300 || StateNo=3400 || StateNo=3500
+time=0
+
+[State -3, Get Hit Sound]
+type=PlaySnd
+triggerAll=Alive && Time=1
+triggerAll=StateNo=5000 || StateNo=5010
+trigger1=GetHitVar(AnimType) >= 2 && Random < 500
+trigger2=GetHitVar(AnimType)=1 && Random < 375
+trigger3=GetHitVar(AnimType)=0 && Random < 250
+value=5000,(Random % 5)
+channel=0
+ignoreHitPause=1
+[State -3, Get Hit Sound]
+type =PlaySnd
+triggerAll=Alive && Time=1
+trigger1=(StateNo=5000 || StateNo=5010) && NumEnemy
+trigger1=GetHitVar(fall) || (EnemyNear, HitDefAttr=SCA,SA,HA)
+trigger2=(StateNo=5020 || StateNo=5070 || StateNo=5080)
+trigger3=(StateNo=5050 || StateNo=5100) && (PrevStateNo != [5000,5199])
+value=5000,(Random % 5)
+channel=0
+ignoreHitPause=1
+
+[State -3, Super Finish]
+type = Helper
+triggerAll = WinKO
+triggerAll = RoundState = 3 && !NumHelper(8600) && fvar(39) < 1
+trigger1 = MoveHit = 1 && (StateNo = [3000,3999])
+trigger2 = (StateNo = 3206)
+trigger3 = (StateNo = 3305)
+trigger4 = (StateNo = [3503,3504])
+trigger5 = NumHelper(3400)
+trigger5 = Helper(3400),StateNo = 3403
+trigger6 = (StateNo = 3601)
+helperType = Normal
+stateNo = 8605
+ID = 8600
+name = "Super Finish"
+posType = left
+pos = 160,-120
+ownPal = 1
+size.xscale =1.0
+size.yscale =1.0
+pauseMoveTime = 255
+superMoveTime = 255
+ignoreHitPause = 1
+
+[State -3, Not Finish FX]
+type = VarSet
+trigger1 = 1
+fvar(39) = Ifelse(RoundState >= 3, 1, 0)
+IgnoreHitPause = 1
+
 ;---------------------------------------------------------------------------
 ;AI”­“®(Activate AI)
 ;---------------------------------------------------------------------------
 
-[State -3, Activate_AI]
+[State -3, Activate_AI for Single]
 type = VarSet
 triggerall = (var(0) = 0) && (RoundState < 3)
-trigger1 = (command = "AI-000") || (command = "AI-011")
-trigger2 = (command = "AI-001") || (command = "AI-012")
-trigger3 = (command = "AI-002") || (command = "AI-013")
-trigger4 = (command = "AI-003") || (command = "AI-014")
-trigger5 = (command = "AI-004") || (command = "AI-015")
-trigger6 = (command = "AI-005") || (command = "AI-016")
-trigger7 = (command = "AI-006") || (command = "AI-017")
-trigger8 = (command = "AI-007") || (command = "AI-018")
-trigger9 = (command = "AI-008") || (command = "AI-019")
-trigger10= (command = "AI-009") || (command = "AI-020")
-trigger11= (command = "AI-010") || (command = "AI-021")
-trigger12 = (command = "AI-022") || (command = "AI-023")
-trigger13 = (command = "AI-024") || (command = "AI-025")
-trigger14 = (command = "AI-026") || (command = "AI-027")
-trigger15 = (command = "AI-028") || (command = "AI-029")
-trigger16 = (command = "AI-030") || (command = "AI-031")
-trigger17 = (command = "AI-032") || (command = "AI-033")
-trigger18 = (command = "AI-034") || (command = "AI-035")
-trigger19 = (command = "AI-036") || (command = "AI-037")
-trigger20 = (command = "AI-038") || (command = "AI-039")
-trigger21 = (command = "AI-040") || (command = "AI-041")
-trigger22 = (command = "AI-042") || (command = "AI-043")
-trigger23 = (command = "AI-044") || (command = "AI-045")
-trigger24 = (command = "AI-046") || (command = "AI-047")
-trigger25 = (command = "AI-048") || (command = "AI-049")
-trigger26 = (command = "AI-050") || (command = "AI-051")
-trigger27 = (command = "AI-052") || (command = "AI-053")
-trigger28 = (command = "AI-054") || (command = "AI-055")
-trigger29 = (command = "AI-056") || (command = "AI-057")
-trigger30 = (command = "AI-058") || (command = "AI-059")
-trigger31 = (command = "AI-060") || (command = "AI-061")
-trigger32 = (command = "AI-062") || (command = "AI-063")
-trigger33 = (command = "AI-064") || (command = "AI-065")
-trigger34 = (command = "AI-066") || (command = "AI-067")
-trigger35 = (command = "AI-068") || (command = "AI-069")
-trigger36 = (command = "AI-070") || (command = "AI-071")
-trigger37 = (command = "AI-072") || (command = "AI-073")
-trigger38 = (command = "AI-074") || (command = "AI-075")
-trigger39 = (command = "AI-076") || (command = "AI-077")
-trigger40 = (command = "AI-078") || (command = "AI-079")
-trigger41 = (command = "AI-080") || (command = "AI-081")
-trigger42 = (command = "AI-082") || (command = "AI-083")
-trigger43 = (command = "AI-084") || (command = "AI-085")
-trigger44 = (command = "AI-086") || (command = "AI-087")
-trigger45 = (command = "AI-088") || (command = "AI-089")
-trigger46 = (command = "AI-090") || (command = "AI-091")
-trigger47 = (command = "AI-092") || (command = "AI-093")
-trigger48 = (command = "AI-094") || (command = "AI-095")
-trigger49 = (command = "AI-096") || (command = "AI-097")
-trigger50 = (command = "AI-098") || (command = "AI-099")
+triggerall = AILevel
+trigger1 = TeamMode!=Simul
 v = 0
-value = 12;‚±‚Ì’l‚É‚æ‚èAI‚ÌƒŒƒxƒ‹‚ªŒˆ’è‚³‚ê‚Ü‚·B0‚ÅAI‚È‚µA12‚ÅÅ‚ƒŒƒxƒ‹‚É‚È‚è‚Ü‚·B
+value = floor(AILevel * 1.5);‚±‚Ì’l‚É‚æ‚èAI‚ÌƒŒƒxƒ‹‚ªŒˆ’è‚³‚ê‚Ü‚·B0‚ÅAI‚È‚µA12‚ÅÅ‚ƒŒƒxƒ‹‚É‚È‚è‚Ü‚·B
+IgnoreHitPause = 1
+Persistent = 1
+
+[State -3, Activate_AI for Simul]
+type = VarSet
+triggerall = (var(0) = 0) && (RoundState < 3)
+triggerall = AILevel
+triggerall = NumPartner
+trigger1 = TeamMode=Simul
+v = 0
+value = ifelse(Partner,AILevel<1, 12, floor(AILevel * 1.5))
+IgnoreHitPause = 1
+Persistent = 1
+
+[State -3, Stop_AI]
+type = VarSet
+triggerall = (var(0) > 0) && (RoundState < 3)
+trigger1 = !AILevel
+v = 0
+value = 0
 IgnoreHitPause = 1
 Persistent = 1
 
@@ -133,6 +295,7 @@ Persistent = 1
 
 [State -3, ‘OƒWƒƒƒ“ƒv]
 type = Varset
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -149,6 +312,7 @@ IgnoreHitPause = 1
 
 [State -3, ŒãƒWƒƒƒ“ƒv]
 type = Varset
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -165,6 +329,7 @@ IgnoreHitPause = 1
 
 [State -3, ƒvƒŒƒbƒVƒƒ[ƒtƒ‰ƒCƒ„[]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -184,6 +349,7 @@ IgnoreHitPause = 1
 
 [State -3, ƒcƒCƒXƒ^[]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -198,11 +364,12 @@ trigger1 = (P2StateType = S)
 trigger1 = (P2MoveType != H)
 trigger1 = (P2StateNo != 40)
 trigger1 = (!EnemyNear,Ctrl)
-value = 3300
+value = ifelse(power>1999&&random<500,3600,3300)
 IgnoreHitPause = 1
 
 [State -3, ƒJ[ƒlƒ‹‚Rƒ_[ƒX]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -221,6 +388,7 @@ IgnoreHitPause = 1
 
 [State -3, ƒL[ƒ‹]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -308,6 +476,7 @@ value = 12
 
 [State -3, ‰“‹——£]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -323,6 +492,7 @@ IgnoreHitPause = 1
 
 [State -3, ’†‹——£]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -338,6 +508,7 @@ IgnoreHitPause = 1
 
 [State -3, ‹ß‹——£]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -357,6 +528,7 @@ IgnoreHitPause = 1
 
 [State -3, ‰“‹——£]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -372,6 +544,7 @@ IgnoreHitPause = 1
 
 [State -3, ’†‹——£]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -387,6 +560,7 @@ IgnoreHitPause = 1
 
 [State -3, ‹ß‹——£]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -405,6 +579,7 @@ IgnoreHitPause = 1
 
 [State -3, ‰“‹——£]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -416,11 +591,12 @@ trigger1 = (var(59) = [1,240])
 trigger1 = (P2BodyDist X = [201,999])
 trigger1 = (P2StateType != L)
 trigger1 = (P2MoveType != A)
-value = ifelse(Random<400,ifelse(Random<400,240,1000),ifelse(Random<900,700,1000))
+value = ifelse(Random<400,ifelse(Random<400,240,1000),ifelse((Random<900&&numhelper(1055)=0),1050,1000))
 IgnoreHitPause = 1
 
 [State -3, ’†‹——£]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -433,11 +609,12 @@ trigger1 = (P2BodyDist X = [71,200])
 trigger1 = (P2BodyDist Y > -51)
 trigger1 = (P2StateType != L)
 trigger1 = (P2MoveType != A)
-value = ifelse(Random<200,700,ifelse(Random<600, 1000, ifelse(Random<800 || P2BodyDist X < 120, 210, 240)))
+value = ifelse((Random<200&&numhelper(1055)=0),1050,ifelse(Random<600, 1000, ifelse(Random<800 || P2BodyDist X < 120, 210, 240)))
 IgnoreHitPause = 1
 
 [State -3, ‹ß‹——£]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -455,6 +632,7 @@ IgnoreHitPause = 1
 
 [State -3, –§’…]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -467,11 +645,12 @@ trigger1 = (P2BodyDist X = [-20,20])
 trigger1 = (P2BodyDist Y > -51)
 trigger1 = (P2StateType != L)
 trigger1 = (P2MoveType != A)
-value = ifelse(PrevStateNo = 810,430,ifelse(Random < 700, 800, ifelse(Random<800,400,430)))
+value = ifelse(PrevStateNo = 810,430,ifelse(Random < 700 && P2StateType != A, 800, ifelse(Random<800,400,430)))
 IgnoreHitPause = 1
 
 [State -3, ‹ß‹——£ƒ_ƒEƒ“]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -489,6 +668,7 @@ IgnoreHitPause = 1
 
 [State -3, ‹ß‹——£ƒ_ƒEƒ“]
 type = VarSet
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -511,6 +691,7 @@ IgnoreHitPause = 1
 
 [State -3, ‰“‹——£]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -526,6 +707,7 @@ IgnoreHitPause = 1
 
 [State -3, ’†‹——£]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -541,6 +723,7 @@ IgnoreHitPause = 1
 
 [State -3, ‹ß‹——£]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (RoundState = 2)
@@ -558,6 +741,20 @@ IgnoreHitPause = 1
 ;“ÁŽê‹Zƒp[ƒg
 ;---------------------------------------------------------------------------
 
+[State -3, ’nãŽó‚¯g]
+type = ChangeState
+triggerall = (var(0) > 0)
+triggerall = (var(1) = 0)
+triggerall = (var(59) = [1,240])
+triggerall = (RoundState = 2)
+triggerall = (Alive)
+triggerall = (NumEnemy)
+triggerall = (GetHitVar(fall.recover))
+triggerall = (Vel Y > 0) && (Pos Y >= -20)
+trigger1 = (StateNo = 5050) && (P2MoveType != A)
+value = 5200
+IgnoreHitPause = 1
+
 [State -3, ‹ó’†Žó‚¯g]
 type = ChangeState
 triggerall = (var(0) > 0)
@@ -567,16 +764,15 @@ triggerall = (RoundState = 2)
 triggerall = (Alive)
 triggerall = (NumEnemy)
 triggerall = (CanRecover)
-trigger1 = (StateNo = 5030) && (Movetype = H) && (P2MoveType != A) && (Pos Y < -20)
-trigger2 = (StateNo = 5035) && (Movetype = H) && (P2MoveType != A) && (Pos Y < -20)
-trigger3 = (StateNo = 5050) && (Movetype = H) && (P2MoveType != A) && (Pos Y < -20)
-trigger4 = (StateNo = 5071) && (Movetype = H) && (P2MoveType != A) && (Pos Y < -20)
+triggerall = (Vel Y > 0) && (Pos Y < -20)
+trigger1 = (StateNo = 5050) && (P2MoveType != A)
 value = 5210
 IgnoreHitPause = 1
 
 ;---------------------------------------------------------------------------
 [State -3, ‘ŠŽè‚ÌŒã‚ë‚És‚«‰ß‚¬‚½ê‡]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (var(34) = 0) && (var(35) = 0)
@@ -600,7 +796,7 @@ trigger3 = (AnimElemTime(4) > 0)
 trigger3 = (!MoveContact)
 trigger3 = (EnemyNear,P2Dist X < 0)
 trigger3 = (EnemyNear,MoveType = A)
-value = ifelse(PrevStateNo = 810,430,ifelse(Random < 700, 800, ifelse(Random<800,400,430)))
+value = ifelse(PrevStateNo = 810,430,ifelse(Random < 700 && P2StateType != A, 800, ifelse(Random<800,400,430)))
 IgnoreHitPause = 1
 
 ;---------------------------------------------------------------------------
@@ -609,6 +805,7 @@ IgnoreHitPause = 1
 
 [State -3, Žã->Žã]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(57) = [1,640])
 triggerall = (RoundState = 2)
@@ -617,13 +814,14 @@ triggerall = (NumEnemy)
 triggerall = (P2BodyDist X < 42)
 triggerall = (P2BodyDist Y < -60)
 trigger1 = (StateNo = 200) && (MoveContact) && (AnimElem = 3)
-trigger2 = (StateNo = 400) && (MoveContact) && (AnimElem = 3)
-trigger3 = (StateNo = 230) && (MoveContact) && (AnimElem = 3)
-trigger4 = (StateNo = 430) && (MoveContact) && (AnimElem = 3)
-value = ifelse(P2BodyDist X < 25 && P2BodyDist Y > -20,ifelse(P2BodyDist X < 16, 230, 430),ifelse(P2BodyDist X > 30 || P2BodyDist Y < -30 ,200, 400))
+trigger2 = (StateNo = 230) && (MoveContact) && (AnimElem = 3)
+;trigger3 = (StateNo = 400) && (MoveContact) && (AnimElem = 3)
+;trigger4 = (StateNo = 430) && (MoveContact) && (AnimElem = 3)
+value = ifelse(P2BodyDist X < 25 && P2BodyDist Y > -20 && StateNo != 200 && StateNo != 230,ifelse(P2BodyDist X < 16, 230, 430),ifelse(StateNo != 200 && StateNo != 230 && (P2BodyDist X > 30 || P2BodyDist Y < -30), 200, 400))
 
 [State -3, Žã->‹­]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(57) = [1,640])
 triggerall = (RoundState = 2)
@@ -639,16 +837,18 @@ value = ifelse(Random<300 || Power > 1999,210,410)
 
 [State -3, ‹­ƒpƒ“ƒ`]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(57) = [1,640])
 triggerall = (RoundState = 2)
 triggerall = (Alive)
 triggerall = (NumEnemy)
 trigger1 = (StateNo = 210) && (MoveHit)
-value = ifelse(P2BodyDist Y > -60,ifelse(Power > 2999,3200,ifelse(Random < 200 && P2BodyDist X < 71,440,ifelse(Random < 60 && Power > 999,3000,1000))),410)
+value = ifelse(P2BodyDist Y > -60,ifelse(Random < 200 && P2BodyDist X < 71,440,1000),410)
 
 [State -3, ‚µ‚á‚ª‚Ý‹­ƒpƒ“ƒ`]
 type = VarSet
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(57) = [1,640])
 triggerall = (RoundState = 2)
@@ -658,8 +858,9 @@ trigger1 = (StateNo = 410) && (MoveHit)
 v = 1
 value = 4
 
-[State -3, ‹­ƒLƒbƒN]
+[State -3, ‹­ƒLƒbƒN -> ƒhƒ‰ƒ€]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 ;triggerall = (var(57) = [1,640])
 triggerall = (RoundState = 2)
@@ -670,6 +871,7 @@ value = 1000
 
 [State -3, ‚µ‚á‚ª‚Ý‹­ƒLƒbƒN]
 type = null;ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(57) = [1,640])
 triggerall = (RoundState = 2)
@@ -681,6 +883,7 @@ value = 3200
 
 [State -3, ƒWƒƒƒ“ƒvŽã]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 ;triggerall = (var(57) = [1,640])
 triggerall = (RoundState = 2)
@@ -692,6 +895,7 @@ value = ifelse(Var(35) = 1 && Random < 400 && EnemyNear,Vel Y <= 0,ifelse(Random
 
 [State -3, ƒWƒƒƒ“ƒv‹­]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 ;triggerall = (var(57) = [1,640])
 triggerall = (RoundState = 2)
@@ -700,10 +904,11 @@ triggerall = (NumEnemy)
 triggerall = (P2BodyDist X < 100 && P2BodyDist Y > -20)
 trigger1 = (StateNo = 610) && (MoveContact)
 trigger2 = (StateNo = 640) && (MoveContact)
-value = ifelse((Random < 600 || Var(35) = 0), ifelse(P2BodyDist X < 50 && P2BodyDist Y > 40, 1020, 1030), ifelse(StateNo = 610 && P2BodyDist X < 30,640,1030))
+value = ifelse((Random < 600 || Var(35) = 0), ifelse(P2BodyDist X < 30 && P2BodyDist Y > 40, 1020, 1030), ifelse(StateNo = 610 && P2BodyDist X < 30,640,1030))
 
 [State -3, ’…’nŽž(“G‚â‚ç‚ê)]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (var(57) = [1,320])
@@ -716,6 +921,7 @@ value = ifelse(Power > 999 && Random < 100,3000,ifelse(Random < 700,430,700))
 
 [State -3, ’…’nŽž(“G‹ó’†‚â‚ç‚ê0)]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (var(57) = [1,640])
@@ -723,11 +929,13 @@ triggerall = (RoundState = 2)
 triggerall = (Alive)
 triggerall = (NumEnemy)
 triggerall = (Ctrl)
+trigger1 = !(StateType = A)
 trigger1 = (P2StateType = A) && (P2MoveType = H) && (P2BodyDist Y < 0.3 * P2BodyDist X) && (P2BodyDist Y > 0.3 * P2BodyDist X -120) && (Power > 2999)
 value = 3200
 
 [State -3, ’…’nŽž(“G‹ó’†‰“‚­‚Å‚â‚ç‚ê2)]
 type = VarSet
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (var(57) = [1,320])
@@ -741,6 +949,7 @@ value = 7
 
 [State -3, ’…’nŽž(“G‹ó’†‚â‚ç‚ê1)]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (Random < 300)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
@@ -754,6 +963,7 @@ value = ifelse(Power > 2999,3200,ifelse(P2BodyDist Y < -30,430,ifelse(P2BodyDist
 
 [State -3, ’…’nŽž(“G‹ó’†‚â‚ç‚ê2)]
 type = VarSet
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (var(57) = [1,640])
@@ -767,6 +977,7 @@ value = ifelse(((P2BodyDist X = [0,70]) && (EnemyNear,Vel X > 0)),3,1);‘O‚©‚’¼ƒ
 
 [State -3, ’…’nŽž(“G‹ó’†‚â‚ç‚ê3)]
 type = VarSet
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(1) = 0)
 triggerall = (var(57) = [1,640])
@@ -780,19 +991,9 @@ value = ifelse((P2BodyDist X = [0,70]),6,4);‘O‚©‚’¼ƒWƒƒƒ“ƒv
 
 ;---------------------------------------------------------------------------
 
-[State -3, ƒhƒ‰ƒ€->‹‡‚¢]
-type = ChangeState
-triggerall = (var(0) > 0)
-triggerall = (var(57) = [1,640])
-triggerall = (RoundState = 2)
-triggerall = (Alive)
-triggerall = (NumEnemy)
-trigger1 = (StateNo = 1000) && (MoveHit) && (P2BodyDist X < 140)
-trigger1 = (P2BodyDist X > 50) && (Power > 999) && (Power < 2000) && (Random < 40 || (P2Life > 100 && P2Life < 200)) && (MoveHit)
-value = 3000
-
 [State -3, ƒhƒ‰ƒ€->ƒEƒBƒ“ƒO]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(57) = [1,640])
 triggerall = (RoundState = 2)
@@ -804,6 +1005,7 @@ value = 1010
 
 [State -3, ƒEƒBƒ“ƒO]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 triggerall = (var(0) > 0)
 triggerall = (var(57) = [1,640])
 triggerall = (RoundState = 2)
@@ -852,34 +1054,56 @@ value = -1
 
 [State -3, ƒWƒƒƒ“ƒv]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 trigger1 = (Var(1) = 1) || (Var(1) = 2) || (Var(1) = 3)
 trigger2 = ((Var(1) = 9) && (StateNo = 100)) || ((Var(1) = 10) && (StateNo = 105))
 value = 40
 
 [State -3, ‘åƒWƒƒƒ“ƒv]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 trigger1 = (Var(2) = 2)
 trigger1 = (Var(1) = 4) || (Var(1) = 5) || (Var(1) = 6)
 value = 10003
 
 [State -3, ‘Oƒ_ƒbƒVƒ…]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 trigger1 = ((Var(2) = 10) && (Var(1) = 7)) || ((Var(2) = 12) && (Var(1) = 9))
 value = 100
 
 [State -3, Œãƒ_ƒbƒVƒ…]
 type = ChangeState
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 trigger1 = ((Var(2) = 10) && (Var(1) = 8)) || ((Var(2) = 12) && (Var(1) = 10))
 value = 105
 
 [State -3, ‹ü‚ÝƒK[ƒh]
 type = ChangeState
+triggerall = !numhelper(6085) && (P2Dist x >= 0 || StateType != A)
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 trigger1 = (Var(1) = 11)
+trigger1 = (StateNo != [100, 105])
 trigger1 = (StateNo != [120, 155])
+trigger1 = (StateNo != [6080, 6082])
 value = 120
 
 [State -3, —§‚¿ƒK[ƒh]
 type = ChangeState
+triggerall = !numhelper(6085) && (P2Dist x >= 0 || StateType != A)
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
 trigger1 = (Var(1) = 12)
+trigger1 = (StateNo != [100, 105])
 trigger1 = (StateNo != [120, 155])
+trigger1 = (StateNo != [6080, 6082])
 value = 120
+
+[State -3, powercharge]
+type = changestate
+value = 6070
+triggerall = !var(53)||(var(53)&&sysfvar(4)=0)
+trigger1 = AIlevel && numenemy
+trigger1 = roundstate = 2 && statetype != A && (!NumHelper(3400))
+trigger1 = (ctrl && (StateNo != [100,105])) || ((StateNo = [100,105]) && (Anim = 101 || Anim = 106))
+trigger1 = power < const(data.power) && power < powermax
+trigger1 = random < (50 * ((var(0)-4) ** 2 / 64.0)) && !inguarddist && p2movetype != A && p2dist x >= 160

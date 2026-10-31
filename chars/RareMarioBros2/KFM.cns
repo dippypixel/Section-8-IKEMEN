@@ -324,9 +324,9 @@ projcancelanim = 1812
 projscale = floor(const(size.xscale)),floor(const(size.yscale))
 projremove = 1
 projremovetime = 11;-1
-velocity = floor(14.05*const(size.xscale)),floor(1*const(size.yscale))
+velocity = 14.05*const(size.xscale),1*const(size.yscale)
 velmul = .9,1
-accel = 0,floor(.78*const(size.yscale))
+accel = 0,.78*const(size.yscale)
 ;projpriority = 1
 projsprpriority = 3
 ;projedgebound = 40
@@ -1935,6 +1935,16 @@ type = PlaySnd
 trigger1 = animelem = 3
 value = S1000,10
 
+[State 0, Detect Spam]
+type = Explod
+trigger1 = animelem = 3
+anim = 9999
+ID = 1021
+bindtime = 1
+removetime = 90
+removeongethit = 1
+persistent = 0
+
 [State 0, Helper]
 type = Helper
 trigger1 = animelem = 3
@@ -2639,6 +2649,12 @@ anim = 1150
 ctrl = 0
 sprpriority = 2
 
+[State 0, Width]
+type = Width
+trigger1 = 1
+edge = 0,0
+player = 6*const(size.xscale),6*const(size.xscale)
+
 [State 0, Detect Spam]
 type = Explod
 trigger1 = time = 0
@@ -2776,6 +2792,11 @@ type = PlaySnd
 trigger1 = AnimElem = 4
 value = 0, 5
 
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = animelem = 5
+value = S60,0
+
 [State 0, VelSet]
 type = VelSet
 trigger1 = AnimElem = 5
@@ -2881,7 +2902,7 @@ sprpriority = 2
 [State 3000, Super A]
 type = SuperPause
 trigger1 = AnimElem = 1
-pos = floor(-15*const(size.Xscale)), floor(-23*const(size.yscale))
+pos = floor(-18*const(size.Xscale)), floor(-69*const(size.yscale))
 anim = 101
 sound = S3999, 0
 poweradd = -1000
@@ -2903,7 +2924,7 @@ supermovetime = 65535
 pausemovetime = 65535
 
 [State 0, NotHitBy]
-type = NotHitBy
+type = null;NotHitBy
 trigger1 = 1
 value = SCA,NA,NP
 time = 1
@@ -2918,17 +2939,17 @@ channel = 1
 
 [State 0, PlaySnd]
 type = PlaySnd
-trigger1 = animelem = 2
+trigger1 = animelem = 4
 value = S3000,3
 
 [State 0, PlaySnd]
 type = PlaySnd
-trigger1 = animelem = 3
+trigger1 = animelem = 6
 value = S3000,2
 
 [State 0, Pause]
 type = Pause
-trigger1 = time%3 = 0 && animelemtime(2) >= 0 && animelemtime(3) < 0
+trigger1 = time%3 = 0 && animelemtime(4) >= 0 && animelemtime(6) < 0
 time = 3
 movetime = 3
 ;rising shake kinda
@@ -2940,25 +2961,25 @@ value = .5
 
 [State 0, VarSet]
 type = VarSet
-trigger1 = time%2 = 0 && animelemtime(2) >= 0 && animelemtime(3) < 0
+trigger1 = time%2 = 0 && animelemtime(4) >= 0 && animelemtime(6) < 0
 fv = 10    ;fv = 10
 value = fvar(10)*-1.1
 
 [State 0, VarSet]
 type = VarSet
-trigger1 = ANIMELEM = 3
+trigger1 = ANIMELEM = 6
 fv = 10    ;fv = 10
 value = 50
 
 [State 0, VarSet]
 type = VarSet
-trigger1 = time%2 = 0 && animelemtime(3) >= 0
+trigger1 = time%2 = 0 && animelemtime(6) >= 0
 fv = 10    ;fv = 10
 value = fvar(10)/-1.2
 
 [State 0, EnvShake]
 type = EnvShake
-trigger1 = time%2 = 0 && animelemtime(2) >= 0
+trigger1 = time%2 = 0 && animelemtime(4) >= 0
 time = 3
 freq = 0;60
 ampl = fvar(10)
@@ -2977,12 +2998,12 @@ time = 2
 
 [State 0, Helper]
 type = Helper
-trigger1 = animelem = 2
+trigger1 = animelem = 4
 helpertype = Normal ;Player
 name = "Ki Blast"
 ID = 3010
 stateno = 3010
-pos = floor(-15*const(size.Xscale)), floor(-23*const(size.yscale))
+pos = floor(-18*const(size.Xscale)), floor(-90*const(size.yscale))
 postype = P1    ;P2, Front, Back, Left, Right
 facing = 1
 ;keyctrl = 0
@@ -3100,9 +3121,15 @@ trigger1 = time = 0
 fv = 11    ;fv = 10
 value = 1
 
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 0
+fv = 12    ;fv = 10
+value = 0
+
 [State 0, VarAdd]
 type = VarAdd
-trigger1 = time%1 = 0 && vel x = 0
+trigger1 = time%1 = 0 && var(12) = 0;vel x = 0
 fv = 11    ;fv = 
 value = 0.01
 
@@ -3112,28 +3139,242 @@ type = AngleDraw
 trigger1 = 1
 value = 0
 scale = fvar(11),fvar(11)
+ignorehitpause = 1
 
+[State 0, VarSet]
+type = VarSet
+trigger1 = root, animelemtime(6) >= 0
+v = 12    ;fv = 10
+value = 1
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = var(12) = 1
+fv = 1
+value = 20*cos(atan(((enemynear, pos y + (enemynear,const(size.mid.pos.y))) - pos y)/((enemynear, pos x) - pos x)))
+persistent = 0
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = var(12) = 1
+fv = 2
+value = 20*sin(atan(((enemynear, pos y + (enemynear,const(size.mid.pos.y))) - pos y)/((enemynear, pos x) - pos x)))
+persistent = 0
 
 [State 0, VelSet]
 type = VelSet
-trigger1 = root, animelemtime(3) >= 0; time = 80
-x = 20
-y = 0
+trigger1 = var(12) = 1
+x = fvar(1);20*cos(atan(((enemynear, pos y + (enemynear,const(size.mid.pos.y))) - pos y)/((enemynear, pos x) - pos x)))
+y = fvar(2);20*sin(atan(((enemynear, pos y + (enemynear,const(size.mid.pos.y))) - pos y)/((enemynear, pos x) - pos x)))
+persistent = 0
 
 [State 0, ChangeAnim]
 type = ChangeAnim
-trigger1 = root, animelemtime(3) >= 0
+trigger1 = var(12) = 1
 value = 3011
 ;elem = 1
-;ignorehitpause = 
+ignorehitpause = 0
 persistent = 0
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 0
+v = 10    ;fv = 10
+value = 0
+;ignorehitpause = 
+;persistent = 
+
+[State 3000, 5]
+type = HitDef
+;triggerall = var(12) = 1
+trigger1 = time = 0
+attr = A, HP
+animtype  = Hard
+damage    = 70,5
+getpower  = 0
+priority  = 6
+guardflag = MA
+pausetime = 2,2
+sparkxy = 0,0
+hitsound = S3000,4
+guardsound = S6,1
+ground.type = Low
+ground.slidetime = 120
+ground.hittime  = 120
+ground.velocity = -20, -2
+air.velocity = -20, -2
+fall = 1
+yaccel = .1
+fall.animtype = Hard
+fall.recover = 0
+
+[State 0, MoveHitReset]
+type = MoveHitReset
+trigger1 = movecontact && !movehit
+;ignorehitpause = 
+;persistent = 
+
+
+[State 0, VarAdd]
+type = VarAdd
+trigger1 = movecontact = 1
+v = 10    ;fv = 
+value = 1
+
+[State 0, Pause]
+type = Pause
+trigger1 = movecontact = 1
+time = 10
+;movetime = 1
+
+[State 0, DestroySelf]
+type = null;DestroySelf
+triggerall = var(11)!= 1
+trigger1 = parent, stateno!= 3000 || parent, movetype = H || time >= 200
+;ignorehitpause = 
+;persistent = 
+
+
+[State 0, TargetBind]
+type = TargetBind
+trigger1 = numtarget && movehit
+time = 1
+pos = 25,25
+;ignorehitpause = 
+;persistent = 
+
+
+[State 1026, Hit wall]
+type = ChangeState
+triggerall = var(12) = 1
+trigger1 = FrontEdgeBodyDist <= 20
+trigger2 = (Vel y > 0) && (Pos y >= 12)
+value = 3011
+
+[State 0, ChangeState]
+type = ChangeState
+triggerall = var(12) != 1
+trigger1 = parent, stateno!= 3000 || parent, movetype = H
+value = 3012
+;anim =
+;ignorehitpause = 
+;persistent = 
+
+
+;---------------------------------------------------------------------------
+; Ki Explosion or smth
+[Statedef 3011]
+type    = A
+movetype= A
+physics = N
+velset = 0,0
+anim = 3012
+sprpriority = 3
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S3000,5
+
+[State 3000, Super B]
+type = AfterImage
+trigger1 = time = 0
+time = 9999
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+time = 9999
+
+[State 3050, 2]
+type = HitDef
+trigger1 = animelemtime(10) <= 0
+trigger1 = time = 0
+attr = A, HP
+animtype  = Up               ;Make p2 use "Up" type animation on hit
+damage    = 205, 10
+getpower  = 0
+priority  = 5
+hitflag = MAFD
+guardflag = MA
+pausetime = 0,12
+sparkno = 3
+sparkxy = 0,0
+hitsound   = S5,5
+guardsound = S6,1
+ground.type = Low
+ground.slidetime = 26
+ground.hittime  = 28
+ground.velocity = -1.3,-25
+guard.velocity = -11
+air.velocity = -1.3,-25
+airguard.velocity = -4.5,-5
+envshake.time = 25           ;Parameters for shaking the screen on hit
+envshake.ampl = 7
+envshake.freq = 176
+p2facing = 1                 ;Force p2 to face p1 on hit
+fall = 1
+fall.recover = 0             ;Prevent p2 from recovering
+fall.damage = 70             ;p2 will take 70 damage on hitting the ground
+fall.envshake.ampl = 6       ;Parameters for shaking the screen on fall
+fall.envshake.freq = 178
+fall.envshake.time = 15
+yaccel = .8                  ;Accelerate p2 downwards rapidly
 
 
 [State 0, DestroySelf]
 type = DestroySelf
-trigger1 = parent, stateno!= 3000 || parent, movetype = H || time >= 200
+trigger1 = animtime = 0
 ;ignorehitpause = 
 ;persistent = 
+
+;---------------------------------------------------------------------------
+; FAIL
+[Statedef 3012]
+type    = A
+movetype= A
+physics = N
+velset = 0,0
+anim = 3012
+sprpriority = 3
+
+[State 0, Pause]
+type = Pause
+trigger1 = time = 0
+time = 30
+movetime = 30
+
+[State 0, EnvColor]
+type = EnvColor
+trigger1 = time = 0
+value = 255,255,255
+time = 2
+under = 1
+
+[State 0, AngleDraw]
+type = AngleDraw
+trigger1 =1
+value = 0
+scale = .25,.25
+;ignorehitpause = 
+;persistent = 
+
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S1000,11
+[State 0, PlaySnd]
+type = PlaySnd
+trigger1 = time = 0
+value = S1000,11
+
+[State 0, DestroySelf]
+type = DestroySelf
+trigger1 = animtime = 0
+;ignorehitpause = 
+;persistent = 
+
 
 ;---------------------------------------------------------------------------
 ; HYPER 2 - Kung Fu Palm
@@ -3191,50 +3432,6 @@ value = C, NA
 time = 1
 
 ;--------------------------------
-
-[State 0, PlaySnd]
-type = PlaySnd
-trigger1 = animelem = 1
-value = S3000,4
-channel = 1
-
-[State 0, PlaySnd]
-type = PlaySnd
-trigger1 = animelem = 3
-value = S3000,5
-
-;rising shake kinda
-[State 0, VarSet]
-type = VarSet
-trigger1 = time = 0
-fv = 10    ;fv = 10
-value = .5
-
-[State 0, VarSet]
-type = VarSet
-trigger1 = time%2 = 0 && animelemtime(1) >= 0 && animelemtime(5) < 0
-fv = 10    ;fv = 10
-value = fvar(10)*-1.2
-
-[State 0, VarSet]
-type = VarSet
-trigger1 = ANIMELEM = 5
-fv = 10    ;fv = 10
-value = 50
-
-[State 0, VarSet]
-type = VarSet
-trigger1 = time%2 = 0 && animelemtime(5) >= 0
-fv = 10    ;fv = 10
-value = fvar(10)/-5
-
-[State 0, EnvShake]
-type = EnvShake
-trigger1 = time%2 = 0 && animelemtime(1) >= 0
-time = 3
-freq = 0;60
-ampl = fvar(10)
-phase = 90
 
 [State 3000, 4]
 type = VelSet

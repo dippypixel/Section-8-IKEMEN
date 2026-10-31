@@ -398,6 +398,18 @@ command = D
 time = 1
 
 ;---------------------------------------------------------------------------
+;Parry Mash Prevention
+
+[Command]
+name = "FF_Parry"     ;Required (do not remove)
+command = F, F, F
+time = 15
+[Command]
+name = "DD_Parry"     ;Required (do not remove)
+command = D, D, D
+time = 15
+
+;---------------------------------------------------------------------------
 ; 2. State entry
 ; --------------
 ; This is where you define what commands bring you to what states.
@@ -599,6 +611,30 @@ triggerall = !ishelper
 trigger1 = movetype=A
 time = 1
 
+[State Parry Mash Prevention] ;made so that parrys go under quick cooldown if missed.
+type = Explod ;this is to reward more precise inputs and encourage rhythm in your presses.
+triggerall = !numexplod(160160)
+triggerall = stateno = 160
+triggerall = movetype != A && (stateno != [5000,5300])
+trigger1 = command = "FF_Parry"
+trigger2 = command = "DD_Parry"
+anim = 9999
+ID = 160160
+pos = -50,-70
+bindtime = -1
+removetime = 23
+postype = P1
+scale = 1.2,1.2
+ignorehitpause = 1
+
+[State Parry Mash Prevention]
+type = RemoveExplod
+trigger1 = movetype = A
+trigger2 = (stateno = [5000,5300])
+trigger3 = stateno = 160 && !time
+id = 160160
+ignorehitpause = 1
+
 [State -1, Standing Parry] 
 type = hitoverride
 triggerall = !ishelper
@@ -610,7 +646,7 @@ triggerall = roundstate = 2 && statetype != A
 triggerall = enemynear,name!="CorndogOfLightV2"
 triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
 ;-------------------------------------------------
-trigger1 = !Var(59)
+trigger1 = !Var(59) && !numexplod(160160) ;parry spam prevention
 trigger1 = command = "fwd" && command != "back" && command != "up" && command != "down"
 trigger2=var(59)&&var(50)>=5&&alive
 trigger2=random<=ceil((var(50)*12)*ifelse(statetype=a,1.15,1))
@@ -631,7 +667,7 @@ triggerall = (stateno != [200,620]) || (stateno != [1000,1090]) || (stateno != [
 triggerall = enemynear,name!="CorndogOfLightV2"
 triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
 ;-------------------------------------------------
-trigger1 = !Var(59) 
+trigger1 = !Var(59) && !numexplod(160160) ;parry spam prevention
 trigger1 = command != "fwd" && command != "back" && command != "up" && command = "down"
 trigger2=var(59)&&var(50)>=5&&alive
 trigger2=random<=ceil((var(50)*12)*ifelse(statetype=a,1.15,1))
@@ -651,7 +687,7 @@ triggerall = (stateno != [200,620]) || (stateno != [1000,1090]) || (stateno != [
 triggerall = enemynear,name!="CorndogOfLightV2"
 triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
 ;-------------------------------------------------
-trigger1 = !Var(59)
+trigger1 = !Var(59) && !numexplod(160160) ;parry spam prevention
 trigger1 = command = "fwd" && command != "back" && command != "up" && command != "down"
 trigger2=var(59)&&var(50)>=5&&alive
 trigger2=random<=ceil((var(50)*12)*ifelse(statetype=a,1.15,1))
@@ -671,7 +707,7 @@ triggerall = roundstate = 2 && statetype != A
 triggerall = enemynear,name!="CorndogOfLightV2"
 triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
 ;-------------------------------------------------
-trigger1 = !Var(59)
+trigger1 = !Var(59) && !numexplod(160160) ;parry spam prevention
 trigger1 = command = "fwd" && command != "back" && command != "up" && command != "down"
 trigger2=var(59)&&var(50)>=5&&alive
 trigger2=random<=ceil((var(50)*2)*ifelse(statetype=a,1.15,1))
@@ -690,7 +726,7 @@ triggerall = roundstate = 2 && statetype != A
 triggerall = enemynear,name!="CorndogOfLightV2"
 triggerall = enemynear,name!="PizzaRollOfDarknessV2" 
 ;-------------------------------------------------
-trigger1 = !Var(59)
+trigger1 = !Var(59) && !numexplod(160160) ;parry spam prevention
 trigger1 = command != "fwd" && command != "back" && command != "up" && command = "down"
 trigger2=var(59)&&var(50)>=5&&alive
 trigger2=random<=ceil((var(50)*2)*ifelse(statetype=a,1.15,1))
