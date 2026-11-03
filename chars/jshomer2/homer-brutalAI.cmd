@@ -264,7 +264,11 @@ time = 30
 
 [Command]
 name = "Sideswitch"
-command = ~D,DB,B,y
+command = ~F, $D, B,a
+time = 33
+[Command]
+name = "Sideswitch"
+command = ~F, $D, B,b
 time = 33
 
 
