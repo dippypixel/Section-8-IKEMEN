@@ -205,7 +205,7 @@ time = 1
 [State -1, Triple Kung Fu Palm]
 type = ChangeState
 value = 3000
-triggerall = command = "Hyper1"
+triggerall = command = "Hyper1" && numhelper(3010) = 0
 triggerall = power >= 1000
 trigger1 = statetype = S
 trigger1 = ctrl
@@ -555,7 +555,7 @@ trigger1 = ctrl
 [State -1, T S]
 type = ChangeState
 value = 705
-triggerall = command = "c" && command = "holdback"
+triggerall = command = "c" && command = "holdback" && numexplod(700) = 0
 trigger1 = statetype != A
 trigger1 = ctrl
 trigger2 = power >= 1000
@@ -566,7 +566,7 @@ trigger2 = stateno = [150,151]
 [State -1, T S]
 type = ChangeState
 value = 700
-triggerall = command = "c"
+triggerall = command = "c" && numexplod(700) = 0
 trigger1 = statetype != A
 trigger1 = ctrl
 trigger2 = power >= 1000
