@@ -1013,7 +1013,7 @@ trigger1 = ctrl ;&& var(1)
 [State -1, Power Up]
 type = ChangeState
 value = 750
-trigger1 = Var(59) = 2 || Var(59) = 6
+;trigger1 = Var(59) = 2 || Var(59) = 6
 trigger1 = !AIlevel
 trigger1 = command = "holdb" && command = "holdy"
 trigger1 = roundstate = 2 && statetype != A && ctrl
@@ -1032,15 +1032,15 @@ trigger1 = power >= 1000
 
 ;=[ ALPHA COUNTER ]=
 
-[State -1, Alpha Counter]
-type = ChangeState
-value = 780
-trigger1 = Var(59) != 5
-trigger1 = stateno = [150, 153]
-trigger1 = !AIlevel
-trigger1 = command = "y" && command = "b"
-trigger1 = power >= 500
-trigger1 = StateType != A
+;[State -1, Alpha Counter]
+;type = ChangeState
+;value = 780
+;trigger1 = Var(59) != 5
+;trigger1 = stateno = [150, 153]
+;trigger1 = !AIlevel
+;trigger1 = command = "y" && command = "b"
+;trigger1 = power >= 500
+;trigger1 = StateType != A
 
 ;=[ ADVANCING GUARD ]=
 
@@ -1567,7 +1567,7 @@ trigger2 = var(20) && (stateno = [600,699]) && movecontact
 
 [State -1, Standing Parry]
 type = hitoverride
-triggerall = (Var(59) = [0, 1]) || (Var(59) = [5, 6])
+;triggerall = (Var(59) = [0, 1]) || (Var(59) = [5, 6])
 triggerall = !AIlevel
 triggerall = pos Y = 0
 trigger1 = statetype != A
@@ -1581,7 +1581,7 @@ time = 3
 
 [State -1, Crouching Parry]
 type = hitoverride
-triggerall = (Var(59) = [0, 1]) || (Var(59) = [5, 6])
+;triggerall = (Var(59) = [0, 1]) || (Var(59) = [5, 6])
 triggerall = !AIlevel
 triggerall = pos Y = 0
 trigger1 = roundstate = 2 && statetype != A
@@ -1595,7 +1595,7 @@ time = 3
 
 [State -1, Air Parry]
 type = hitoverride
-triggerall = (Var(59) = [0, 1]) || (Var(59) = [5, 6])
+;triggerall = (Var(59) = [0, 1]) || (Var(59) = [5, 6])
 trigger1 = !AIlevel
 trigger1 = roundstate = 2 && statetype = A
 trigger1 = command = "F" && command != "B" && command != "U" && command != "D"
