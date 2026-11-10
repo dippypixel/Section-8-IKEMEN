@@ -528,19 +528,6 @@ trigger1 = stateno = 202 || stateno = 210
 ignorehitpause=1
 
 ;---------------------------------------------------------------------------
-;Super
-[State -1, Super]
-type = ChangeState
-value = 3000
-triggerall = !aiLevel
-triggerall = power = powermax
-triggerall = command = "Super"
-triggerall = statetype != A
-trigger1 = ctrl
-trigger2 = stateno = [200,230] && movecontact
-trigger3 = stateno = [1000,1999] && movecontact
-trigger4 = helper(1000),movehit
-;---------------------------------------------------------------------------
 ;Special3
 [State -1, Special3]
 type = ChangeState
@@ -579,10 +566,15 @@ trigger3 = stateno = [600,610] && movecontact
 type = ChangeState
 value = 620
 triggerall = !aiLevel
+triggerall=!var(7)
 triggerall = command = "b" && command = "holddown" && command = "holdfwd"
 trigger1 = statetype = A && ctrl
 trigger2 = stateno = [600,610]
 trigger2 = movecontact
+trigger3 = stateno = 1000 && movehit && animelemtime(10) >= 0
+trigger4 = stateno = 602 && movecontact
+trigger5 = stateno = 230 && movecontact && animelemtime(5) >= 0
+s
 ;Kick
 [State -1, Kick]
 type = ChangeState

@@ -837,6 +837,7 @@ ctrl = 0
 anim = 622
 sprpriority = 2
 
+
 [State 0, VelSet]
 type = VelSet
 trigger1 = prevstateno=1000&&time=1
@@ -961,7 +962,7 @@ trigger1 = Time = 20
 value = 1
 
 ;---------------------------------------------------------------------------
-; Air Punch
+; Corndog Slam
 [Statedef 620]
 type    = A
 movetype= A
@@ -977,6 +978,14 @@ type = VelSet
 trigger1= time=0
 trigger1 = (PREVSTATENO=[600,610]) && vel y > 0
 y = -5
+
+
+[State 0, Width]
+type = Width
+trigger1 = animelemtime(3)>0 &&animelemtime(5)<0
+value = 80,0
+ignorehitpause = 1
+;persistent = 
 
 [State 0, StateTypeSet]
 type = StateTypeSet
@@ -1013,8 +1022,8 @@ ground.type = High
 ground.slidetime = 6
 ground.hittime  = 14
 air.hittime = 14
-ground.velocity = -20,-10*fvar(20)
-air.velocity = -20,-10*fvar(20)
+ground.velocity = -20,-10
+air.velocity = -20,-10
 guard.velocity = -1
 airguard.velocity = -.5, -1
 guard.hittime = 6
@@ -1030,6 +1039,17 @@ trigger1 = MoveHit = 1
 value = 622
 ID = 622
 persistent = 1
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = !ailevel
+trigger1 = command = "holdup" 
+trigger1 = movehit
+value = 40
+ctrl = 1
+;anim =
+ignorehitpause = 0
+
 [State 200, Velocity Dampen]
 type = varset
 trigger1 = movehit
@@ -1189,7 +1209,7 @@ trigger1 = (Time = 0) && (BackEdgeDist < 30)
 [State 1028, Gravity]
 type = VelAdd
 trigger1 = 1
-y = gethitvar(yaccel)
+y = .6
 
 [State 1028, Anim 5060] ;Coming down - normal
 type = ChangeAnim
@@ -1594,6 +1614,7 @@ ctrl = 0                         ;Set ctrl (Def: no change)
 anim = 1000
 poweradd = 0 ;every character should get the same amount of power for normals. don't change this if you are making a character for ZMR
 sprpriority = 0  
+facep2=1
 [State 0, VarAdd]
 type = VarSet
 trigger1 = !time
@@ -1661,7 +1682,7 @@ persistent = 0
 type = VelSet
 trigger1 = time=1
 x = 6
-y = -6
+y = ifelse(statetype=A,-6,-6)
 
 
 [State 0, VelAdd]
@@ -1688,6 +1709,16 @@ velset = 0,0
 anim = 1010
 ctrl = 0
 sprpriority = 2
+facep2=1
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = animelemtime(2)<3
+value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
+;value2 = S,NA
+time = 1
+;ignorehitpause = 
+;persistent = 
+
 [State 0, VarAdd]
 type = VarSet
 trigger1 = !time
@@ -1729,7 +1760,6 @@ y = .48
 type = ChangeState
 triggerall = animelemtime(4)>=0
 trigger1 = command = "a"
-trigger1=movecontact
 value = 1011
 
 [State 0, Explod]
@@ -1760,7 +1790,6 @@ ground.cornerpush.veloff = 0
 trigger1 = time=1
 attr = S, SA
 damage = 22, 7
-animtype = Up
 guardflag = MA
 hitflag = MAF
 priority = 3, Hit
@@ -1769,17 +1798,21 @@ sparkno = S20001
 sparkxy = -10, ceil(-185*const(size.yscale))
 hitsound   = S205,4
 guardsound = 6, 0
+animtype = Med
 ground.type = High
-ground.slidetime = 18
-ground.hittime  = 41
-ground.velocity = -2, -12
-airguard.velocity = -1.1,-2
-air.type = High
-air.velocity = -2, -12
-air.hittime = 41
-guard.hittime = 18
-airguard.hittime = 18
-yaccel = .6/fvar(20)
+ground.slidetime = 15
+ground.hittime  = 15
+guard.hittime = 22
+guard.ctrltime = 22
+ground.velocity = -3,-12
+air.velocity = -3,-12
+getpower = 10
+fall = 1
+fall.recover = 0
+envshake.time = 15
+envshake.ampl = -7
+envshake.freq = 150
+yaccel = .6;/fvar(20)
 
 [State 200, Velocity Dampen]
 type = varset
@@ -1814,8 +1847,6 @@ poweradd = 0
 anim = 1012
 ctrl = 0
 sprpriority = 2
-
-
 [State 200, PlaySnd]
 type = PlaySnd
 trigger1 = time=1
@@ -1824,14 +1855,13 @@ channel = 0
 [State 0, VelSet]
 type = VelSet
 trigger1 = animelemtime(4)=1
-x = 3
-y = 10
-persistent = 0
-[State 1051]
-type = VelAdd
+x = 4
+y = 8
+[State 0, Gravity]
+type = Gravity
 trigger1 = 1
-y = .48
-
+;ignorehitpause = 
+;persistent = 
 
 [State 0, Explod]
 type = Explod
@@ -1877,20 +1907,18 @@ sparkno = S20001
 sparkxy = -10,ceil(-29*const(size.yscale))
 hitsound   = S1013,0
 guardsound = 6,0
+animtype = Med
 ground.type = High
-ground.slidetime = 6
-ground.hittime  = 16
-air.hittime = 16
+ground.slidetime = 15
+ground.hittime  = 15
 ground.velocity = -4
-air.velocity = -1.75,1
-guard.velocity = -1
-airguard.velocity = -.5, -1
-guard.hittime = 6
-airguard.hittime = 6
-fall.yvelocity= -12
-envshake.time = 10
-envshake.freq = 60
-envshake.ampl = 7
+air.velocity = -4,-2
+getpower = 10
+fall = 1
+fall.recover = 0
+envshake.time = 12
+envshake.ampl = -5
+envshake.freq = 120
 yaccel = .6/fvar(20)
 
 [State 200, Velocity Dampen]
@@ -1903,11 +1931,49 @@ ignorehitpause = 1
 persistent = 0
 [State 191, 3]
 type = ChangeState
+triggerall=movehit
 trigger1 = pos y >= vel y
 value = 52
 ctrl = 1
+[State 191, 3]
+type = ChangeState
+triggerall=!movehit
+trigger1 = pos y >= vel y
+value = 1012
+ctrl = 0
 
 
+
+;---------------------------------------------------------------------------
+; Jump Land
+[Statedef 1012]
+type    = S
+physics = S
+ctrl = 0
+anim = 1013
+velset = 0,0
+
+[State 0, StopSnd]
+type = StopSnd
+triggerall = prevstateno = 1013
+trigger1 = !time
+channel = 0
+
+[State 52, 1]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 52, 2]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 52, 4]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
 
 ;---------------------------------------------------------------------------
 ; Soda Pop
@@ -2041,7 +2107,7 @@ persistent=0
 [State 0, VelAdd]
 type = VelAdd
 trigger1 = 1
-y =ifelse(fvar(2)<0,.35,ifelse(fvar(2)>.35,.35,fvar(2)))
+y =.35
 
 [State 200, 1]
 type = HitDef
@@ -3854,13 +3920,13 @@ ignorehitpause = 1
 
 [State -2, Uppercut Cooldown]
 type = VarAdd
-trigger1 = stateno = 602 && time = 1
+trigger1 = stateno = 620 && time = 1
 v =  7 ;fv = 
 value = 1
 
 [State -2, Reset Uppercut Cooldown when land]
 type = VarSet
-trigger1 = statetype !=A
+trigger1 = !numtarget
 ;trigger2 = !numtarget
 v = 7   ;fv = 10
 value = 0
