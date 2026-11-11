@@ -549,6 +549,7 @@ triggerall = command = "Special2"
 trigger1 = ctrl
 trigger2 = stateno = [200,210] && movecontact
 trigger3 = stateno = [600,610] && movecontact
+trigger4= stateno=220 &&movehit && time > 30
 ;---------------------------------------------------------------------------
 ;Is A Special
 [State -1, Special]
@@ -560,6 +561,7 @@ triggerall = command = "Special"
 trigger1 = ctrl
 trigger2 = stateno = [200,210] && movecontact
 trigger3 = stateno = [600,610] && movecontact
+trigger4= stateno=220 &&movehit && time > 10
 ;===========================================================================
 ;Kick
 [State -1, Kick]

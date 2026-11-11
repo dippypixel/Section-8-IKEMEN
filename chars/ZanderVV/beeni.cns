@@ -551,7 +551,7 @@ ground.cornerpush.veloff = 0
 trigger1 = time=1
 attr = S, NA
 animtype  = Medium
-damage    = 29
+damage    = 40
 guardflag = MA
 pausetime = 6,0
 sparkno = S20002
@@ -1010,7 +1010,7 @@ type = HitDef
 ground.cornerpush.veloff = 0
 trigger1 = time=1
 attr = A, NA
-damage    = 24
+damage    = 40
 guardflag = HA
 priority = 3
 pausetime = 12,12
@@ -1045,7 +1045,7 @@ type = ChangeState
 trigger1 = !ailevel
 trigger1 = command = "holdup" 
 trigger1 = movehit
-value = 40
+value = 45
 ctrl = 1
 ;anim =
 ignorehitpause = 0
@@ -1075,6 +1075,12 @@ physics = N
 type = ChangeAnim
 Trigger1 = Time = 0
 value = 5030
+
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = CameraFreeze
 
 [State 0, PlayerPush]
 type = PlayerPush
@@ -1122,6 +1128,11 @@ type    = A
 movetype= H
 physics = N
 
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = CameraFreeze
+
 [State 1027, Turn]
 type = Turn
 trigger1 = (Time = 0) && (FrontEdgeBodyDist <= 30)
@@ -1163,15 +1174,6 @@ trigger1 = Time = 0
 value = F7, 2
 volumescale = 200
 
-[State 0, EnvShake]
-type = EnvShake
-trigger1 = time = 0
-time = 5
-freq = 120
-ampl = -4
-;phase = 90
-;ignorehitpause = 
-;persistent = 
 
 
 [State 1027, State]
@@ -1185,6 +1187,11 @@ value = 624
 type    = A
 movetype= H
 physics = N
+
+[State 0, AssertSpecial]
+type = AssertSpecial
+trigger1 = 1
+flag = CameraFreeze
 
 
 [State 1028, Vel Y]
@@ -1712,7 +1719,7 @@ sprpriority = 2
 facep2=1
 [State 0, NotHitBy]
 type = NotHitBy
-trigger1 = animelemtime(2)<3
+trigger1 = animelemtime(3)<0
 value = SCA,NA,SA,HA,NP,SP,HP,NT,ST,HT
 ;value2 = S,NA
 time = 1
@@ -1805,7 +1812,7 @@ ground.hittime  = 15
 guard.hittime = 22
 guard.ctrltime = 22
 ground.velocity = -3,-12
-air.velocity = -3,-12
+air.velocity = -3,-10
 getpower = 10
 fall = 1
 fall.recover = 0
@@ -2495,6 +2502,80 @@ trigger1 = animtime=0
 value = 50
 ctrl = 1
  
+
+
+;----------------------------------------------------------------------------------------------------------------
+; Jump Start (converted to .cns)
+ [Statedef 45]
+type = S
+physics = S
+anim = 40
+ctrl = 0
+sprpriority = 1
+facep2 = 1 
+
+[State 0, NotHitBy]
+type = NotHitBy
+trigger1 = name != "Matt (Boss)" || (name = "Matt (Boss)" && map(isHeavy) != 1)
+value = ,AT
+time = 1
+
+[State 0, 3] ;Stop moving if low velocity or 4 ticks pass
+type = VelSet
+trigger1 = abs(vel x) < Const(movement.stand.friction.threshold)
+x = 0
+
+
+[State 0, StateTypeSet]
+type = StateTypeSet
+trigger1 = pos y != 0
+statetype = A
+[State 0, VelSet]
+type = VelSet
+trigger1 = pos y != 0
+y = 0
+
+[State 0, VarSet]
+type = VarSet
+trigger1 = time = 0
+sysvar(1) = 0
+[State 0, VarSet]
+type = VarSet
+trigger1 = command = "holdback" && aiLevel=0
+sysvar(1) = -1
+[State 0, VarSet]
+type = VarSet
+trigger1 = (command = "holdfwd" && aiLevel=0) || aiLevel>0
+sysvar(1) = 1
+
+[State 0, VelSet]
+type = VelSet
+trigger1 = animtime = 0
+x = ifelse(sysvar(1) = 0, const(velocity.jump.neu.x), ifelse(sysvar(1) = 1, ifelse(prevstateno = 100, ifelse(power=powermax,const(velocity.runjump.fwd.x)*map(speedBuff), const(velocity.runjump.fwd.x)), ifelse(power=powermax, const(velocity.jump.fwd.x)*map(speedBuff), const(velocity.jump.fwd.x))), ifelse(power=powermax,const(velocity.jump.back.x)*map(speedBuff),const(velocity.jump.back.x))))*ifelse(command="holdup", 1, 1.334)*ifelse(var(55) && map(spitballEffect) = 1, .8, 1)
+y = target,vel y + (p2dist y *.05)
+
+[State 0, Explod]
+type = Explod
+trigger1 = animtime = 0
+anim = 20060
+pos = 0,0
+postype = p1  ;p2,front,back,left,right
+facing = ifelse(vel x >= 0,1, -1)
+vfacing = 1
+bindtime = 0
+vel = -vel x /3,0
+removetime = -2
+sprpriority = 3
+ontop = 0
+ownpal = 1
+
+[State 0, ChangeState]
+type = ChangeState
+trigger1 = animtime=0 
+value = 50
+ctrl = 1
+ 
+
 
 
 ;---------------------------------
@@ -4073,7 +4154,7 @@ type = VarSet
 trigger1 = abs(fvar(8))<=0.3
 trigger1= !numtarget && movetype !=A 
 trigger2= statetype =A
-trigger3 = stateno =811 || stateno=1000
+trigger3=(target,stateno=[622,624])
 fv = 9
 value = 0
 ignorehitpause = 1
