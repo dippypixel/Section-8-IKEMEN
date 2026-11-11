@@ -1175,6 +1175,7 @@ trigger2 = random <= 100 && (p2stateno = [5100,5150]) || random <= 100 && statet
 
 [State -1, Standing Grab]
 type = ChangeState
+triggerall = random < 150 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = (roundstate = 2) && (var(59) > 0)
 triggerall = p2stateno != 7600 && prevstateno != 800 && p2statetype != A
 triggerall = (Ctrl) && (statetype = S) && (p2bodydist x <= 35)
@@ -1223,6 +1224,7 @@ trigger1 = p2bodydist y <= 60 && (p2bodydist x = [-5,75]) && random <= 500
 [State -1, AI Run Fwd]
 type = ChangeState
 value = 100
+triggerall = random < 200 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = (roundstate = 2) && var(59) > 0
 triggerall = stateno != 20 && stateno != 100 
 triggerall = !inguarddist
@@ -1234,6 +1236,7 @@ trigger1 = random < 300
 
 [State -1, Air Chain Combo]
 type = ChangeState
+triggerall = random < 200 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = (roundstate = 2) && (var(59) > 0)
 triggerall = (Ctrl) && (statetype = A)
 triggerall = stateno != 100 && stateno != 105 
@@ -1244,6 +1247,7 @@ value = 101
 
 [State -1, Standing Chain Combo]
 type = ChangeState
+triggerall = random < 200 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = (roundstate = 2) && (var(59) > 0)
 triggerall = p2stateno != 7600
 triggerall = (Ctrl) && (statetype != A)
@@ -1287,6 +1291,7 @@ trigger4 = movecontact && !movehit && p2bodydist x <= 35
 
 [State -1, Standing Chain Combo]
 type = ChangeState
+triggerall = random < 100 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = (roundstate = 2) && (var(59) > 0)
 triggerall = p2stateno != 7600 && p2statetype != L
 triggerall = (Ctrl) && (statetype = S)
@@ -1304,6 +1309,7 @@ value = 1000
 
 [State -1, Standing Chain Combo]
 type = ChangeState
+triggerall = random < 100 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = (roundstate = 2) && (var(59) > 0)
 triggerall = (p2bodydist x <= 60)
 trigger1 = (stateno = 1000) && movecontact
@@ -1335,6 +1341,7 @@ value = 1050
 
 [State -1, Standing Chain End 1 (Finish Combo2)]
 type = ChangeState
+triggerall = random < 100 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = (roundstate = 2) && (var(59) > 0)
 triggerall = (p2bodydist x <= 60) && p2movetype = H
 trigger1 = (stateno = 1020) && random < 999 || (stateno = 610) && random < 800 || (stateno = 640) && random < 800 || (stateno = 650) && random < 800 && (abs(p2bodydist x) <= 20)
@@ -1351,6 +1358,7 @@ value = 1030
 
 [State -1, Standing Chain Combo]
 type = ChangeState
+triggerall = random < 100 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = (roundstate = 2) && (var(59) > 0)
 triggerall = p2stateno != 7600
 triggerall = (Ctrl) && (statetype = S)
@@ -1433,6 +1441,7 @@ trigger3 = random < 100
 [State -1,AI Crouch Weak Kick]
 type = ChangeState
 value = 430
+triggerall = random < 100 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = (roundstate = 2) && var(59) > 0
 triggerall = p2statetype != A
 triggerall = p2bodydist y = 0
@@ -1450,6 +1459,7 @@ trigger3 = movecontact && !movehit && p2bodydist x <= 20
 [State -1,AI Crouch Medium Kick]
 type = ChangeState
 value = 440
+triggerall = random < 100 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = var(59) > 0;&& p2movetype != A
 trigger1 = stateno = 430 || stateno = 400
 trigger1 = movehit
@@ -1472,6 +1482,7 @@ trigger5 = random < 999
 [State -1,AI Crouch Strong Kick]
 type = ChangeState
 value = 450
+triggerall = random < 100 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = var(59) > 0
 triggerall = p2bodydist x = [-2,50]
 triggerall = P2MoveType != A
@@ -1501,6 +1512,7 @@ value = 60
 
 [State -1, Air Chain Combo]
 type = ChangeState
+triggerall = random < 500 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = (roundstate = 2) && (var(59) > 0)
 triggerall = (statetype = A)
 triggerall = (Ctrl) || stateno = 101 || stateno = 102
@@ -1523,6 +1535,7 @@ type = ChangeState
 triggerall = (roundstate = 2) && (var(59) > 0)
 triggerall = p2bodydist x <= 25
 trigger1 = (stateno = 610) && movecontact && (random = [0,500])
+trigger2 = (statetype = A) && ctrl && random <= 250
 value = 620
 
 [State -1, Air Chain Combo]
@@ -1541,8 +1554,10 @@ value = 640
 
 [State -1, Air Chain Combo]
 type = ChangeState
+triggerall = random < 100 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = (roundstate = 2) && (var(59) > 0)
 triggerall = statetype = A
+triggerall = random < 100 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 trigger1 = p2bodydist x <= 25
 trigger1 = (stateno = 640) && movecontact
 trigger2 = random < 50 && ctrl
@@ -1556,6 +1571,7 @@ value = 650
 ;===========================================================================
 [State -1, Standing Chain Combo]
 type = ChangeState
+triggerall = random < 100 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = (roundstate = 2) && (var(59) > 0)
 triggerall = (Ctrl) && (statetype != A)
 triggerall = (p2stateno != [120,155]) && (p2stateno != [5100,5150]) & p2statetype != L & p2bodydist y > -20 
@@ -1569,6 +1585,7 @@ value = 1100+((random%2)*10)
 
 [State -1, Standing Chain Combo]
 type = ChangeState
+triggerall = random < 100 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = (roundstate = 2) && (var(59) > 0)
 triggerall = (Ctrl) && (statetype != A)
 triggerall = (p2stateno != [120,155]) && (p2stateno != [5100,5150]) & p2statetype != L & p2bodydist y > -20 
@@ -1585,6 +1602,7 @@ value = 1120
 [State -1]
 type = ChangeState
 value = 3000
+triggerall = random < 100 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = (roundstate = 2) && (var(59) > 0)
 triggerall = (P2life != 0)
 triggerall = power > 1000 && (p2bodydist x <= 100)
@@ -1596,6 +1614,7 @@ trigger3 = movehit & stateno < 1000 && random < 100
 [State -1]
 type = ChangeState
 value = 3010
+triggerall = random < 100 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = (roundstate = 2) && (var(59) > 0)
 triggerall = (P2life != 0)
 triggerall = power > 1000 && (p2bodydist x <= 100) && (abs(p2bodydist y) <= 35)-20
@@ -1610,6 +1629,7 @@ trigger3 = movehit && stateno >= 600 && stateno <= 650 && random < 100
 [State -1]
 type = ChangeState
 value = 3100
+triggerall = random < 100 && enemynear, ailevel = 0  || enemynear, ailevel != 0 
 triggerall = numhelper(3101) = 0
 triggerall = (roundstate = 2) && (var(59) > 0)
 triggerall = (P2life != 0)
