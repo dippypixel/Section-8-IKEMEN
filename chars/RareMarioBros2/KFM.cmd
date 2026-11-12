@@ -307,6 +307,14 @@ triggerall = command = "QCF_y"
 triggerall = numhelper(1011) < 2
 trigger1 = var(1) ;Use combo condition (above)
 
+;Projectile 2.5 - Vomit
+[State -1, Projectile 2.5 - Vomit]
+type = ChangeState
+value = 1015
+triggerall = command = "QCF_x" || command = "QCF_y"
+triggerall = numhelper(1016) < 2
+trigger1 = var(3) ;Use combo condition (above)
+
 ;Light Kung Fu Palm
 [State -1, Light Kung Fu Palm]
 type = ChangeState
