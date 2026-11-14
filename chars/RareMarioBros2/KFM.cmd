@@ -196,6 +196,37 @@ name = "holdb"
 command = /b
 time = 1
 
+;---------------------------------------------------------------------------------------------
+;2/3 button combination
+[Command]
+name = "x+y"
+command = x+y
+time = 1
+
+[Command]
+name = "x+z"
+command = x+z
+time = 5
+
+[Command]
+name = "y+z"
+command = y+z
+time = 5
+
+[Command]
+name = "a+b"
+command = a+b
+time = 5
+
+[Command]
+name = "b+c"
+command = b+c
+time = 5
+
+[Command]
+name = "a+c"
+command = a+c
+time = 5
 [Statedef -1]
 
 ;===================================================;
@@ -346,6 +377,16 @@ trigger1 = var(1) || var(3) ;Use combo condition (above)
 ;===================================================;
 ;                  NORMAL MOVES                     ;
 ;===================================================;
+
+;Kung Fu Throw
+[State -1, Kung Fu Throw]
+type = ChangeState
+value = 800
+triggerall = command = "x+z"
+triggerall = statetype = S
+triggerall = ctrl
+trigger1 = command = "holdfwd" || command = "holdback"
+
 ; Stand Light Punch
 [State -1, Stand Light Punch]
 type = ChangeState
