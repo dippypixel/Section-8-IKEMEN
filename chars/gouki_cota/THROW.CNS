@@ -1,0 +1,466 @@
+;---------------------------------------------------------------------------
+[Statedef 800]
+type    = S
+movetype= A
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 800
+sprpriority = 2
+
+[State 1]
+type = HitDef
+Trigger1 = Time = 0
+attr = S, NT
+hitflag = MAF
+priority = 1, Miss
+sparkno = -1
+sprpriority = 1
+p1facing = 1
+p2facing = 1
+p1stateno = 801
+p2stateno = 802
+guard.dist = 0
+fall = 1
+fall.recover = 0
+
+[State F]
+type = ChangeState
+Trigger1 = Time = 1
+trigger1 = movehit = 0
+value = 215
+
+[State F]
+type = ChangeState
+Trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+
+[Statedef 801];55-•ûŒü
+type    = S
+movetype= A
+physics = N
+anim = 801
+poweradd = 60
+
+[State 0, NotHitBy]; just to be safe! snk boss type projectiles can cause this to softlock
+type = NotHitBy
+trigger1 = 1
+value = SCA
+
+[State 0]
+type = VarSet
+trigger1 = Time = 0
+var(55) = command = "holdfwd"
+
+[State 0]
+type = turn
+trigger1 = time = 0
+trigger1 = command = "holdback"
+
+[State 0]
+type = TargetBind
+trigger1 = AnimElemTime(2) < 0
+pos = -47, -73
+
+[State 1]
+type = TargetBind
+trigger1 = AnimElemTime(2) >= 0 && AnimElemTime(3) < 0
+pos = -42,-80
+
+[State 1]
+type = TargetBind
+trigger1 = AnimElemTime(3) >= 0 && AnimElemTime(4) < 0
+pos = -22,-80
+
+[State 1]
+type = TargetBind
+trigger1 = AnimElemTime(4) >= 0 && AnimElemTime(5) < 0
+pos = 40,-74
+
+[State 1]
+type = TargetBind
+trigger1 = AnimElemTime(5) >= 0 && AnimElemTime(6) < 0
+pos = 50,-30
+
+[State 1]
+type = PlaySnd
+trigger1 = AnimElem = 5
+value = 10,0
+
+[State 1]
+type = TargetLifeAdd
+trigger1 = AnimElem = 5
+value = -98*enemynear,const(movement.yaccel)
+
+[State 1]
+type = PlaySnd
+trigger1 = AnimElem = 5,=2
+value = 8,1 + (Enemy,const(movement.yaccel) > 0.46)
+
+[State 1]
+type = envshake
+trigger1 = AnimElem = 5,=2
+time = 8
+ampl = 4
+
+[State 1]
+type = TargetState
+trigger1 = Animelem = 6
+value = 803
+
+[State 1]
+type = ctrlset
+trigger1 = Animelem = 6
+value = 1
+
+[State F]
+type = ChangeState
+trigger1 = AnimTime = 0 && !ailevel
+value = 0
+ctrl = 1
+[State F]
+type = ChangeState
+trigger1 = ctrl && ailevel
+value = 100
+ctrl = 1
+;---------------------------------------------------------------------------
+
+[Statedef 802]
+type    = A
+movetype= H
+physics = N
+velset = 0,0
+
+[State 0]
+type = turn
+trigger1 = time = 0
+trigger1 = enemynear,command = "holdback"
+
+[State 0]
+type = ChangeAnim2
+Trigger1 = Time = 0
+value = 802
+
+;[State 2]
+;type = SelfState
+;trigger1 = !gethitvar(isbound)
+;value = 5050
+
+;---------------------------------------------------------------------------
+
+[Statedef 803]
+type    = A
+movetype= H
+physics = N
+
+[State 0]
+type = changeanim
+trigger1 = time= 8
+value = 5002
+
+[State 0]
+type = posfreeze
+trigger1 = time < 7
+
+[State 0]
+type = velset
+trigger1 = time = 8
+x = -3.8
+y = -7.6
+
+[State 0]
+type = gravity
+Trigger1 = 1
+
+[State 1]
+type = selfState
+triggerall = Vel Y > 0
+triggerall = Pos Y >= -20
+triggerall = alive
+triggerall = CanRecover
+trigger1 = time >= 7
+trigger1 = Command = "recovery"
+value = 5200
+
+[State 1]
+type = SelfState
+triggerall = Vel Y > 0
+triggerall = alive
+triggerall = CanRecover
+trigger1 = time >= 7
+trigger1 = Command = "recovery"
+value = 5210
+
+[State 1]
+type = changeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 804
+
+[Statedef 804]
+type    = L
+movetype= H
+physics = N
+
+[State 1]
+type = ChangeAnim
+triggerall = time = 0
+trigger1 = (anim != [5051,5059]) && (anim != [5061,5069])
+trigger2 = !SelfAnimExist(5100 + (anim % 10))
+value = 5100
+
+[State 1]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 1]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 1]
+type = VelMul
+trigger1 = Time = 0
+x = 0.75
+
+[State 0]
+type = Lifeadd
+trigger1 = Time = 0
+value = const(movement.yaccel)
+
+[State 5100, 7]
+type = selfState
+trigger1 = Time = 0
+value = 5110 ;HIT_LIEDOWN
+
+[State 5100, 8]
+type = GameMakeAnim
+trigger1 = Time = 1
+;value = 61
+;pos = 0, 0
+;under = 1
+value = 60 + (sysvar(1) > 5) + (sysvar(1) > 14)
+pos = 0, 0
+under = sysvar(1) <= 10
+
+[State 1]
+type = PlaySnd
+trigger1 = Time = 1
+;value = F7, 0 ;Hit ground
+value = F7, (sysvar(1) > 5) + (sysvar(1) > 14)
+
+[State 1]
+type = PosFreeze
+trigger1 = 1
+
+[State F]
+type = selfState
+trigger1 = AnimTime = 0
+value = 5101
+
+[State 5100, 13]
+type = ForceFeedback
+trigger1 = Time = 0
+waveform = sinesquare
+ampl = 128,-3,-.2,.005
+time = 20
+
+
+;---------------------------------------------------------------------------
+[Statedef 820]
+type    = A
+movetype= A
+physics = N
+ctrl = 0
+anim = 820
+sprpriority = 2
+
+[State 1]
+type = HitDef
+Trigger1 = Time = 0
+attr = A,NT
+hitflag = AF
+guardflag = -
+priority = 1, Miss
+sparkno = -1
+sprpriority = 1
+p1facing = 1
+p2facing = 1
+p1stateno = 821
+p2stateno = 822
+guard.dist = 0
+fall = 1
+fall.recover = 0
+
+[State F]
+type = ChangeState
+Trigger1 = Time = 1
+trigger1 = movehit = 0
+value = 610
+
+[State F]
+type = ChangeState
+Trigger1 = AnimTime = 0
+value = 50
+ctrl = 1
+
+;---------------------------------------------------------------------------
+
+[Statedef 821]
+type    = A
+movetype= A
+physics = N
+anim = 821
+velset = 0,0
+poweradd = 60
+
+[State 0]
+type = veladd
+trigger1 = time > 6
+y = 0.23
+
+[State 1]
+type = PlaySnd
+trigger1 = AnimElem = 2
+value = 10,3
+
+[State 0]
+type = TargetBind
+trigger1 = AnimElemTime(2) < 0
+pos = -50, -65
+
+[State 1]
+type = TargetBind
+trigger1 = AnimElemTime(2) >= 0 && AnimElemTime(3) < 0
+pos = 20,-58
+
+[State 1]
+type = TargetBind
+trigger1 = AnimElemTime(3) >= 0
+pos = 66,-5
+
+[State 1]
+type = changeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 0
+value = 823
+
+[Statedef 822]
+type    = A
+movetype= H
+physics = N
+velset = 0,0
+
+[State 0]
+type = ChangeAnim2
+Trigger1 = Time = 0
+value = 822
+
+;[State 820, 2]
+;type = SelfState
+;trigger1 = !gethitvar(isbound)
+;value = 5050
+
+[Statedef 823]
+type = A
+movetype = A
+
+[State 0]
+type = TargetBind
+trigger1 = AnimElemTime(1) >= 0
+trigger1 = time < 9
+pos = 10, 0
+
+[State 1]
+type = TargetLifeAdd
+trigger1 = time = 0
+value = -98*enemynear,const(movement.yaccel)
+
+[State 0]
+type = envshake
+trigger1 = time = 1
+time = 8
+ampl = 4
+
+[State 1]
+type = PlaySnd
+trigger1 = time = 1
+value = 8,1 + (Enemy,const(movement.yaccel) > 0.46)
+
+[State 0]
+type = posfreeze
+trigger1 = time < 10
+
+[State 0]
+type = velset
+trigger1 = time = 11
+x = -4
+y = -7
+
+[State 0]
+type = changeanim
+trigger1 = time = 11
+value = 5040
+
+[State 1]
+type = targetState
+trigger1 = time = 1
+value = 824
+
+[State 1]
+type = statetypeset
+trigger1 = time = 11
+physics = A
+
+[State 1]
+type = veladd
+trigger1 = time >= 10
+y = -0.1
+
+[Statedef 824]
+type = A
+movetype = H
+
+[State 0]
+type = velset
+trigger1 = time = 10
+x = -5
+y = -7
+
+[State 0]
+type = changeanim2
+trigger1 = time < 0
+value = 823
+
+[State 0]
+type = changeanim
+trigger1 = time = 10
+value = 5061
+
+[State 0]
+type = posfreeze
+trigger1 = time < 9
+
+[State 1]
+type = selfState
+trigger1 = time = 10
+value = 5050
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
