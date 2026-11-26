@@ -1,0 +1,406 @@
+
+[Statedef -3]
+
+;スタンドゲージ本体ヘルパー
+;ﾊﾞﾄﾙが始まってすぐこのﾍﾙﾊﾟｰ君を出す!
+[State -3]
+type = Helper
+trigger1 = !NumHelper(20032)
+trigger1 = roundstate = 2
+stateno = 20032
+id = 20032
+pos = 160,255
+postype = Back
+pausemovetime = 9999999999
+sprpriority = -10
+
+;ゲージ量初期化
+[State -3]
+type = Varset
+;trigger1 = fvar(1) != 80
+trigger1 = roundstate = 0 || roundstate = 1
+fv = 1
+value = 80
+;　0: Pre-intro　- 試合前、画面がフェードインしている状態です。
+;　1: Intro　- 登場モーション中です。
+;「||」は、どちらかの条件が満たされたとき
+
+;スタンドパワー減少させる（食らい）
+[State -3]
+type = Varadd
+trigger1 = stateno != 150 &&  stateno != 152 && stateno != 154
+;↑ガーキャン以外ってことかなぁ？
+trigger1 = var(49) = 10000;スタンドモード時
+trigger1 = roundstate = 2 ;バトル中
+trigger1 = alive          ;生きてる
+trigger1 = movetype = H   ;喰らい状態
+trigger1 = fvar(1) != 0   ;ゲージが０じゃない
+trigger1 = time = 0
+trigger1 = hitshakeover = 0;ヒットシェイク中
+fv = 1
+value = -(gethitvar(damage)/4)
+ignorehitpause = 1
+
+;スタンドパワー減少させる←ガーキャンのとき？
+[State -3]
+type = Varadd
+trigger1 = stateno = 150 ||  stateno = 152 || stateno = 154
+trigger1 = var(49) = 10000;スタンドモード時
+trigger1 = roundstate = 2
+trigger1 = alive
+trigger1 = fvar(1) != 0
+trigger1 = time = 0
+trigger1 = hitshakeover = 0
+fv = 1
+value = -gethitvar(damage)/4
+ignorehitpause = 1
+
+;本体モード時、スタンドパワー回復
+[State -3]
+type = VarAdd
+trigger1 = var(49) = 0
+trigger1 = fvar(1) < 80
+trigger1 = stateno != 16010;地上ｽﾀﾝﾄﾞｸﾗｯｼｭの時は回復しない
+;空中もいれないと
+fv = 1
+value = 0.51
+
+;最大値固定
+[State -3]
+type = VarSet
+trigger1 = fvar(1) > 80
+fv = 1
+value = 80
+
+;最小値固定
+[State -3]
+ type = VarSet
+trigger1 = fvar(1) < 0
+fv = 1
+value = 0
+
+;スタンド発現可にする。リセット
+[State -3, 0]
+type = varset
+trigger1 = fvar(1) >= 80
+var(7) = 0
+
+;●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●
+
+;スタンドゲージヘルパー
+;ﾊﾞﾄﾙが始まってすぐこのﾍﾙﾊﾟｰ君を出すことで、
+;いま左向きか右向きかに関係なく、常に１P側(2P側)に色々表示できる!
+[Statedef 20032]
+type = S
+sprpriority = -10
+anim = 9999
+
+;スタンドゲージ - 枠（20032）
+[State 20026, 0]
+type = Explod
+trigger1 = !NumExplod(20032);このｹﾞｰｼﾞ枠が出てないとき
+trigger1 = 1
+anim = 16000
+id = 20032
+pos = 120,45;140,40
+bindtime = 999999999999999
+pausemovetime = 999999999999999
+sprpriority = -3
+postype = Back
+ownpal = 1
+scale = 1,1
+
+;スタンドゲージ - 青ゲージ（20033）
+[State 20026, 0]
+type = null;Explod
+trigger1 = !NumExplod(20033)
+trigger1 = 1
+anim = ifelse((parent,stateno=[5000,5081]),16004,16001)
+;ifelseにparent,～的なのは使えないのか・・
+id = 20033
+pos = 120,45
+bindtime = 999999999999999
+pausemovetime = 999999999999999
+sprpriority = -2
+postype = Back
+ownpal = 1
+scale = 1,1
+
+;スタンドゲージ - 青ゲージ（20033）
+[State 20026, 0]
+type = Explod
+trigger1 = !NumExplod(20033)
+trigger1 = 1
+trigger1 = parent,stateno != [5000,5081]
+anim = 16001
+id = 20033
+pos = 120,45
+bindtime = 999999999999999
+pausemovetime = 999999999999999
+sprpriority = -2
+postype = Back
+ownpal = 1
+scale = 1,1
+;スタンドゲージ - 赤ゲージ（20035）
+[State 20026, 0]
+type = Explod
+triggerall = !NumExplod(20035)
+triggerall = 1
+trigger1 = parent,stateno = [5000,5081] ;くらいｽﾃｰﾄ
+trigger1 = parent,var(49) = 10000 ;スタンドモード時
+trigger2 = parent,fvar(1) <= 10   ;ｹﾞｰｼﾞが10以下の時
+anim = 16004
+id = 20035
+pos = 120,45
+bindtime = 999999999999999
+pausemovetime = 999999999999999
+sprpriority = -1
+postype = Back
+ownpal = 1
+scale = 1,1
+
+[State -3];standの文字
+type = explod
+trigger1 = parent,var(49) = 10000
+trigger1 = numexplod(16004) = 0 ;このstandの文字が出てないとき
+bindtime = -1
+anim = 16002
+id = 16004
+sprpriority = -1
+pos = 120,45;125,50
+postype = back
+ownpal = 1
+supermovetime = -1
+pausemovetime = -1
+facing = ifelse(facing=1,1,-1)
+scale = 0.5,0.5
+
+;青ゲージ増減ロジック
+[State 20026, 0]
+type = ModifyExplod
+trigger1 = parent,fvar(1) < 80
+trigger1 = roundstate = 2
+id = 20033
+scale = parent,fvar(1)*0.0125,1
+
+;赤ゲージ増減ロジック
+[State 20026, 0]
+type = ModifyExplod
+trigger1 = parent,fvar(1) < 80
+trigger1 = roundstate = 2
+id = 20035
+scale = parent,fvar(1)*0.0125,1
+
+[State 20026, 0]
+type = RemoveExplod
+trigger1 = win
+trigger2 = lose
+id = 20032
+
+[State 20026, 0]
+type = RemoveExplod
+trigger1 = win
+trigger2 = lose
+id = 20033
+
+[State 20026, 0];赤ゲージ（20035
+type = RemoveExplod
+trigger1 = parent,stateno != [5000,5081] ;くらいｽﾃｰﾄじゃなくて
+trigger1 = parent,fvar(1) >= 10   ;ｹﾞｰｼﾞが10以上の時
+trigger2 = win
+trigger3 = lose
+id = 20035
+
+[State -3];スタンドの文字を消す
+type = removeexplod
+trigger1 = parent,var(49) = 0
+trigger2 = win
+trigger3 = lose
+id = 16004
+
+[State 20026, 0]
+type = DestroySelf
+trigger1 = win
+trigger2 = lose
+
+;スタンドゲージに罰印つける
+[State 20026, 0]
+type = Explod
+trigger1 = !NumExplod(20034)
+trigger1 = parent,var(7) = 1;スタンド発現不可のとき
+anim = 16003
+id = 20034
+pos = 120,45
+postype = back
+bindtime = 999999999999999
+pausemovetime = 999999999999999
+ownpal = 1
+sprpriority = 0
+
+[State -3];罰印を消す
+type = removeexplod
+trigger1 = parent,var(7) = 0;スタンド発現可のとき
+id = 20034
+
+;STAND CRUSH!のﾒｯｾｰｼﾞｱｲｺﾝ
+[State 1000, 0]
+type = helper
+trigger1 = !NumHelper(20028)     ;=0と同じような意味っぽいですね。
+trigger1 = parent,stateno = 16010;スタンドクラッシュ立ち食らい
+ID = 20028
+stateno = 20028
+pos = 0,0
+pausemovetime = 99999
+
+;DANGER!のﾒｯｾｰｼﾞｱｲｺﾝ
+[State -3]
+type = helper
+trigger1 = parent,var(49) = 10000 ;スタンドモード時
+trigger1 = parent,fvar(1) <= 10   ;ｹﾞｰｼﾞが10以下になった時
+trigger1 = parent,movetype = H    ;くらい状態
+trigger1 = NumHelper(20030) = 0   ;これがでてないとき
+ID = 20030
+stateno = 20030
+pos = 0,0
+pausemovetime = 999
+
+;STAND ON!のﾒｯｾｰｼﾞｱｲｺﾝ
+[State 1000, 0]
+type = helper
+trigger1 = parent,stateno = [10820,10822];スタンド発現ｽﾃｰﾄ
+trigger1 = NumHelper(20026) = 0
+ID = 20026
+stateno = 20026
+pos = 0,0
+pausemovetime = 999
+
+;●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●
+
+;ヘルパーのヘルパーで上3つのﾒｯｾｰｼﾞｱｲｺﾝを。
+
+;STAND ON!の表示。ヘルパーでやります
+[Statedef 20026]
+type = S
+sprpriority = 3
+anim = 9999
+
+[State 20026, 0];消えてる
+type = Explod
+trigger1 = time = 0
+id = 20026
+pos = -90,70
+;30,70までもってく
+postype = back
+;自分が背を向けている方向の画面上端。画面中央方向が正数
+anim = ifelse(facing=1,20026,20027)
+ownpal = 1
+ontop = 1
+bindtime = -1
+scale = 0.5,0.5
+facing = facing ;これ神だｗｷｬﾗが右向きで1、左向きで-1を返すっぽい！
+;ちなみに、１でｷｬﾗと同じ向きに表示、-1で逆に表示
+;ｴｸｽﾌﾟﾛｯﾄﾞは左向きのとき反転表示されるので重要
+;まぁifelse(facing=1,△,◎)でいいけど
+
+[State 20026, 0];でてくる
+type = ModifyExplod
+trigger1 = time >= 0 && time <= 15
+trigger1 = Numexplod(20026)
+Id = 20026
+postype = back
+;自分が背を向けている方向の画面上端。画面中央方向が正数
+pos = ceil(-90+(time*8)),70;ceil切り上げ整数化
+facing = facing
+
+[State 20026, 0]
+type = RemoveExplod
+triggerall = Numexplod(20026)
+trigger1 = time = 60
+trigger2 = NumHelper(20036);STAND CRUSH!
+trigger3 = NumHelper(20030);DANGER!
+ID = 20026
+
+[State 20026, 0]
+type = DestroySelf
+trigger1 = time = 60
+
+;-------------------------------------------------
+;STAND CRUSH!ヘルパー
+[Statedef 20028]
+type = S
+sprpriority = -2
+anim = 9999
+
+[State 20026, 0];きえてる
+type = Explod
+trigger1 = time = 0
+id = 20036
+pos = -90,70
+postype = back
+anim = ifelse(facing=1,20036,20037)
+ownpal = 1
+ontop = 1
+sprpriority = -2
+bindtime = -1
+scale = 0.5,0.5
+facing = facing
+
+[State 20026, 0];でてくる
+type = ModifyExplod
+trigger1 = time >= 0 && time <= 15
+trigger1 = Numexplod(20036)
+Id = 20036
+postype = back
+pos = ceil(-90+(time*8)),70
+facing = facing
+
+[State 20026, 0]
+type = RemoveExplod
+triggerall = Numexplod(20036)
+trigger1 = time = 62
+ID = 20036
+
+[State 20026, 0]
+type = DestroySelf
+trigger1 = time = 62
+
+;-------------------------------------------------
+;DANGER!ヘルパー
+[Statedef 20030]
+type = S
+sprpriority = -2
+anim = 9999
+
+[State 20026, 0];きえてる
+type = Explod
+trigger1 = time = 0
+id = 20030
+pos = -90,70
+postype = back
+anim = ifelse(facing=1,20038,20039)
+ownpal = 1
+ontop = 1
+sprpriority = -2
+bindtime = -1
+scale = 0.5,0.5
+facing = facing
+
+[State 20026, 0];でてくる
+type = ModifyExplod
+trigger1 = time >= 0 && time <= 15
+trigger1 = Numexplod(20030)
+Id = 20030
+postype = back
+pos = ceil(-90+(time*8)),70
+facing = facing
+
+[State 20026, 0]
+type = RemoveExplod
+triggerall = Numexplod(20030)
+trigger1 = time = 60
+trigger2 = NumHelper(20028);STAND CRUSH!
+ID = 20030
+
+[State 20026, 0]
+type = DestroySelf
+trigger1 = time = 60

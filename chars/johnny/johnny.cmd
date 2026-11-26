@@ -487,6 +487,19 @@ command = c
 time = 1
 
 [Command]
+name = "QCB_b"
+command = c
+time = 1
+
+[Command]
+name = "QCB_b"
+command = ~D, ~DF, ~F, x+y+z
+
+[Command]
+name = "QCB_b"
+command = ~D, ~DF, ~F, x+y
+
+[Command]
 name = "x"
 command = x
 time = 1
@@ -615,7 +628,7 @@ value = 3000
 triggerall = !ishelper && roundstate=2
 triggerall = var(59) <= 0
 triggerall = numhelper(3610)=0
-triggerall = (command = "c") || (helper(99999),var(20))
+triggerall = (command = "QCB_b") || (helper(99999),var(20))
 triggerall = power >= 2000
 trigger1 = statetype != A
 trigger1 = ctrl

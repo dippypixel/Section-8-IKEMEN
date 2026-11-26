@@ -92,7 +92,7 @@ time = 20
 
 [Command]
 name = "C-MOON"
-command = ~D, DB, B, x+y+z
+command = ~D,D,a
 time = 20
 
 [Command]

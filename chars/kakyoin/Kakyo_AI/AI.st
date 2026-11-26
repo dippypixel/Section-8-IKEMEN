@@ -1,0 +1,978 @@
+;------------------------------------------------------------------------------------------
+;AIWalkí èÌ
+[Statedef 17]
+type = S
+physics = S
+ctrl = 0
+anim = 20+var(0)
+sprpriority = 0
+
+
+[State 0, vel]
+type = velset
+triggerall = var(59) = 1
+trigger1 = vel X = 0
+trigger1 = time = 0
+trigger1 = random < (p2bodydist X)
+trigger2 = vel X > 0
+trigger3 = vel X = 0
+trigger3 = time = 0
+trigger3 = (BackEdgeBodyDist<11) || (p2bodydist X>=210) 
+x = const(velocity.walk.fwd.x)
+
+[State 0, vel]
+type = velset
+triggerall = var(59) = 1
+triggerall = BackEdgeBodyDist >= 5
+trigger1 = vel X = 0
+trigger1 = time = 0
+trigger1 = random >= (p2bodydist X)*2
+trigger2 = vel X < 0
+trigger3 = vel X = 0
+trigger3 = time = 0
+trigger3 = enemynear,statetype = L
+;trigger1 = command = "holdback"
+x = const(velocity.walk.back.x)
+
+
+[State 0, í‚é~] 
+type = ChangeState 
+triggerall = var(59) = 1
+trigger1 = movetype != H
+trigger1 = vel X = 0 
+trigger2 = enemynear,movetype = A 
+trigger2 = enemynear,HitDefAttr = SCA, NA,SA,HA
+trigger2 = p2bodydist X < 80
+trigger3 = inguarddist
+trigger4 = roundstate != 2
+trigger5 = enemynear,movetype = H
+trigger6 = vel X != 0
+trigger6 = random < (360 - (p2bodydist X))/12
+trigger6 = time > 30
+trigger7 = p2dist x < 0
+;trigger8 = numhelper(76767) > 0
+;trigger8 = helper(76767),InGuardDist
+value = 0 
+ctrl = 1 
+
+
+
+[State 0, anim]
+type = changeanim
+triggerall = vel x > 0
+trigger1 = anim != (20+var(0)) && anim != (5+var(0))
+trigger2 = anim = (5+var(0)) && (!animtime)
+value = 20+var(0)
+
+[State 0, anim]
+type = changeanim
+triggerall = vel x < 0
+trigger1 = anim != (21+var(0)) && anim != (5+var(0))
+trigger2 = anim = (5+var(0)) && (!animtime)
+value = 21+var(0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+;------------------------------------------------------------------------------------------
+;WalkãNÇ´çUÇﬂ
+[Statedef 18]
+type = S
+physics = S
+ctrl = 0
+anim = 20+var(0)
+sprpriority = 0
+
+[State 0, vel]
+type = velset
+triggerall = var(59) = 1
+trigger1 = p2bodydist X >60 ;command = "holdfwd"
+x = const(velocity.walk.fwd.x)
+
+[State 0, vel]
+type = velset
+triggerall = var(59) = 1
+trigger1 = p2bodydist X <=60 ;command = "holdback"
+x = const(velocity.walk.back.x)
+
+[State 0, í‚é~] 
+type = ChangeState 
+triggerall = var(59) = 1
+trigger1 = movetype != H
+trigger1 = vel X = 0 
+trigger2 = enemynear,movetype = A 
+trigger2 = enemynear,HitDefAttr = SCA, NA,SA,HA
+trigger2 = p2bodydist X < 80
+trigger3 = inguarddist
+trigger4 = roundstate != 2
+trigger5 = p2bodydist X = [58,62]
+trigger6 = p2dist x < 0
+trigger7 = var(47) = 0
+value = 0 
+ctrl = 1 
+
+
+[State 0, anim]
+type = changeanim
+triggerall = vel x > 0
+trigger1 = anim != (20+var(0)) && anim != (5+var(0))
+trigger2 = anim = (5+var(0)) && (!animtime)
+value = 20+var(0)
+
+[State 0, anim]
+type = changeanim
+triggerall = vel x < 0
+trigger1 = anim != (21+var(0)) && anim != (5+var(0))
+trigger2 = anim = (5+var(0)) && (!animtime)
+value = 21+var(0)
+
+
+;------------------------------------------------------------------------------------------
+;AIWalkÅiåãäEÅj
+[Statedef 19]
+type = S
+physics = S
+ctrl = 0
+anim = 20+var(0)
+sprpriority = 0
+
+
+[State 0, vel]
+type = velset
+triggerall = var(59) = 1
+trigger1 = vel X = 0
+trigger1 = time = 0
+trigger1 = pos X < helper(1155+var(2)),pos X
+trigger1 = EnemyNear,pos X >= helper(1155+var(2)),pos X
+trigger1 = random < 200
+trigger2 = vel X = 0
+trigger2 = time = 0
+trigger2 = pos X >= helper(1155+var(2)),pos X
+trigger2 = EnemyNear,pos X < helper(1155+var(2)),pos X
+trigger2 = random < 200
+trigger3 = vel X = 0
+trigger3 = time = 0
+trigger3 = pos X <= helper(1155+var(2)),pos X
+trigger3 = EnemyNear,pos X < pos X
+trigger3 = random < 100
+trigger4 = vel X = 0
+trigger4 = time = 0
+trigger4 = pos X >= helper(1155+var(2)),pos X
+trigger4 = EnemyNear,pos X > pos X
+trigger4 = random < 100
+trigger5 = vel X = 0
+trigger5 = time = 0
+trigger5 = pos X <= helper(1155+var(2)),pos X
+trigger5 = EnemyNear,pos X =[pos X,(helper(1155+var(2)),pos X)]
+trigger5 = EnemyNear,pos X < helper(1155+var(2)),pos X
+trigger5 = random < 800
+trigger6 = vel X = 0
+trigger6 = time = 0
+trigger6 = pos X > helper(1155+var(2)),pos X
+trigger6 = EnemyNear,pos X =[(helper(1155+var(2)),pos X),pos X]
+trigger6 = EnemyNear,pos X >= helper(1155+var(2)),pos X
+trigger6 = random < 800
+trigger7 = vel X > 0
+;trigger1 = command = "holdfwd"
+x = const(velocity.walk.fwd.x)
+
+[State 0, vel]
+type = velset
+triggerall = var(59) = 1
+triggerall = BackEdgeBodyDist >= 5
+trigger1 = vel X = 0
+trigger1 = time = 0
+trigger1 = pos X < helper(1155+var(2)),pos X
+trigger1 = EnemyNear,pos X >= helper(1155+var(2)),pos X
+trigger1 = random >= 200
+trigger2 = vel X = 0
+trigger2 = time = 0
+trigger2 = pos X >= helper(1155+var(2)),pos X
+trigger2 = EnemyNear,pos X < helper(1155+var(2)),pos X
+trigger2 = random >= 200
+trigger3 = vel X = 0
+trigger3 = time = 0
+trigger3 = pos X <= helper(1155+var(2)),pos X
+trigger3 = EnemyNear,pos X < pos X
+trigger3 = random >= 100
+trigger4 = vel X = 0
+trigger4 = time = 0
+trigger4 = pos X >= helper(1155+var(2)),pos X
+trigger4 = EnemyNear,pos X > pos X
+trigger4 = random >= 100
+trigger5 = vel X = 0
+trigger5 = time = 0
+trigger5 = pos X <= helper(1155+var(2)),pos X
+trigger5 = EnemyNear,pos X =[pos X,(helper(1155+var(2)),pos X)]
+trigger5 = EnemyNear,pos X < helper(1155+var(2)),pos X
+trigger5 = random >= 800
+trigger6 = vel X = 0
+trigger6 = time = 0
+trigger6 = pos X > helper(1155+var(2)),pos X
+trigger6 = EnemyNear,pos X =[(helper(1155+var(2)),pos X),pos X]
+trigger6 = EnemyNear,pos X >= helper(1155+var(2)),pos X
+trigger6 = random >= 800
+trigger7 = vel X < 0
+;trigger1 = command = "holdback"
+x = const(velocity.walk.back.x)
+
+
+
+[State 0, í‚é~] 
+type = ChangeState 
+triggerall = var(59) = 1
+trigger1 = movetype != H
+trigger1 = vel X = 0 
+trigger2 = enemynear,movetype = A 
+trigger2 = enemynear,HitDefAttr = SCA, NA,SA,HA
+trigger2 = p2bodydist X < 80
+trigger3 = inguarddist
+trigger4 = roundstate != 2
+trigger5 = enemynear,movetype = H
+trigger6 = vel X != 0
+trigger6 = random < (360 - (p2bodydist X))/12
+trigger7 = p2dist x < 0
+;trigger8 = numhelper(76767) > 0
+;trigger8 = helper(76767),InGuardDist
+value = 0 
+ctrl = 1 
+
+
+[State 0, anim]
+type = changeanim
+triggerall = vel x > 0
+trigger1 = anim != (20+var(0)) && anim != (5+var(0))
+trigger2 = anim = (5+var(0)) && (!animtime)
+value = 20+var(0)
+
+[State 0, anim]
+type = changeanim
+triggerall = vel x < 0
+trigger1 = anim != (21+var(0)) && anim != (5+var(0))
+trigger2 = anim = (5+var(0)) && (!animtime)
+value = 21+var(0)
+
+
+
+;------------------------------------------------------------------------------------------
+;Walk;ÉfÉÄóp
+[Statedef 22]
+type = S
+physics = S
+ctrl = 0
+anim = 20+var(0)
+sprpriority = 0
+
+[State 0, vel]
+type = velset
+triggerall = var(59) = 1
+trigger1 = 1;command = "holdfwd"
+x = const(velocity.walk.fwd.x)
+
+[State 0, vel]
+type = velset
+triggerall = var(59) = 1
+trigger1 = 0;command = "holdback"
+x = const(velocity.walk.back.x)
+
+[State 0, í‚é~] 
+type = ChangeState 
+triggerall = var(59) = 1
+triggerall = var(31) = 1
+trigger1 = movetype != H
+trigger1 = vel X = 0
+trigger2 = p2bodydist X < 10 
+trigger3 = roundstate != 2
+trigger4 = p2dist x < 0
+trigger5 = enemynear,movetype = A 
+trigger5 = enemynear,HitDefAttr = SCA, NA,SA,HA
+trigger5 = p2bodydist X < 80
+trigger6 = inguarddist
+value = 0 
+ctrl = 1
+
+[State 0, í‚é~] 
+type = ChangeState 
+triggerall = var(59) = 1
+triggerall = var(31) = 0
+trigger1 = movetype != H
+trigger1 = vel X = 0
+trigger2 = roundstate != 2
+trigger3 = p2dist x < 0
+trigger4 = enemynear,movetype = A 
+trigger4 = enemynear,HitDefAttr = SCA, NA,SA,HA
+trigger4 = p2bodydist X < 80
+trigger5 = inguarddist
+value = 0 
+ctrl = 1  
+
+[State 0, anim]
+type = changeanim
+triggerall = vel x > 0
+trigger1 = anim != (20+var(0)) && anim != (5+var(0))
+trigger2 = anim = (5+var(0)) && (!animtime)
+value = 20+var(0)
+
+[State 0, anim]
+type = changeanim
+triggerall = vel x < 0
+trigger1 = anim != (21+var(0)) && anim != (5+var(0))
+trigger2 = anim = (5+var(0)) && (!animtime)
+value = 21+var(0)
+
+
+;------------------------------------------------------------------------------------------
+;Jump Startí èÌ
+[Statedef 35]
+type = S
+physics = S
+ctrl = 0
+anim = 40+var(0)
+velset = 0,0
+sprpriority = 0
+
+[State 0, sysvar]
+type = varset
+triggerall = var(59) = 1
+triggerall = !time
+trigger1 = p2bodydist X < 60
+trigger1 = random < 100
+trigger2 = p2bodydist X >= 60
+trigger2 = p2bodydist X < 120 
+trigger2 = random < 100
+trigger3 = p2bodydist X >= 120
+trigger3 = random = [100,300]
+sysvar(1) = 0;command = "holdfwd"-command = "holdback"
+
+[State 0, sysvar]
+type = varset
+triggerall = var(59) = 1
+triggerall = !time
+trigger1 = p2bodydist X < 60
+trigger1 = random > 300
+trigger2 = p2bodydist X >= 60
+trigger2 = p2bodydist X < 120 
+trigger2 = random > 300
+trigger3 = p2bodydist X >= 120
+trigger3 = random > 300
+sysvar(1) = 1;command = "holdfwd"-command = "holdback"
+
+[State 0, sysvar]
+type = varset
+triggerall = var(59) = 1
+triggerall = !time
+trigger1 = p2bodydist X < 60
+trigger1 = random = [100,300]
+trigger2 = p2bodydist X >= 60
+trigger2 = p2bodydist X < 120 
+trigger2 = random = [100,300]
+trigger3 = p2bodydist X >= 120
+trigger3 = random < 100
+sysvar(1) = -1;command = "holdfwd"-command = "holdback"
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+triggerall = !time
+trigger1 = sysvar(1) >= 0
+trigger1 = p2bodydist X < 60
+trigger1 = random < 500
+trigger2 = p2bodydist X >= 60
+trigger2 = p2bodydist X < 120
+trigger2 = random >= 650 
+var(4) = 0
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+triggerall = !time
+;trigger1 = prevstateno = 100 || prevstateno = 105
+;trigger2 = command = "highjump"
+trigger1 = sysvar(1) >= 0
+trigger1 = p2bodydist X < 60
+trigger1 = random > 500
+trigger2 = p2bodydist X >= 60
+trigger2 = p2bodydist X < 120
+trigger2 = random < 650 
+trigger3 = p2bodydist X < 60
+trigger3 = random > 500
+trigger4 = prevstateno = 100 || prevstateno = 105
+var(4) = 1
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+triggerall = !time
+trigger1 = p2bodydist X < 60
+trigger1 = random >= 250
+var(5) = 0
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+;trigger1 = command != "holdup"
+trigger1 = sysvar(1) = 0
+trigger2 = p2bodydist X < 60
+trigger2 = random < 750
+trigger3 = p2bodydist X >= 60
+trigger3 = random < 500
+trigger3 = p2bodydist X < 120
+trigger4 = random < 250
+trigger4 = p2bodydist X >= 120
+trigger4 = p2bodydist X < 180
+trigger5 = random < 125
+trigger5 = p2bodydist X >= 180 
+var(5) = 1
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+x = ifelse(!sysvar(1),0,ifelse(sysvar(1)=1,const(velocity.jump.fwd.x),const(velocity.jump.back.x)))*ifelse(var(4)&&(!var(0)||(var(0)&&!var(5))),1.54,1)
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+y = const(velocity.jump.y)*ifelse(var(5),.8,1)*ifelse(var(4),ifelse(!var(0),1.12,1.25),1)
+
+[State 0, end]
+type = changestate
+trigger1 = !animtime
+value = 50
+ctrl = 1
+
+
+
+
+;------------------------------------------------------------------------------------------
+;Jump StartÉRÉìÉ{óp
+[Statedef 36]
+type = S
+physics = S
+ctrl = 0
+anim = 40+var(0)
+velset = 0,0
+sprpriority = 0
+
+[State 0, sysvar]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+sysvar(1) =1
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+trigger1 = 1
+var(4) = 0
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+triggerall = !time
+trigger1 = 0
+;trigger1 = prevstateno = 100 || prevstateno = 105
+;trigger2 = command = "highjump"
+var(4) = 1
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+trigeer1 = 0
+var(5) = 0
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = 1;command != "holdup"
+var(5) = 1
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+x = ifelse(!sysvar(1),0,ifelse(sysvar(1)=1,const(velocity.jump.fwd.x),const(velocity.jump.back.x)))*ifelse(var(4)&&(!var(0)||(var(0)&&!var(5))),1.54,1)
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+y = const(velocity.jump.y)*ifelse(var(5),.8,1)*ifelse(var(4),ifelse(!var(0),1.12,1.25),1)
+
+[State 0, end]
+type = changestate
+trigger1 = !animtime
+value = 50
+ctrl = 1
+
+
+
+;------------------------------------------------------------------------------------------
+;Jump StartîÚÇ—âzÇµóp
+[Statedef 37]
+type = S
+physics = S
+ctrl = 0
+anim = 40+var(0)
+velset = 0,0
+sprpriority = 0
+
+[State 0, sysvar]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+sysvar(1) =1
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+var(4) = 0
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+triggerall = !time
+trigger1 = 0
+;trigger1 = prevstateno = 100 || prevstateno = 105
+;trigger2 = command = "highjump"
+var(4) = 1
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+var(5) = 0
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = 0;command != "holdup"
+var(5) = 1
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+x = ifelse(!sysvar(1),0,ifelse(sysvar(1)=1,const(velocity.jump.fwd.x),const(velocity.jump.back.x)))*ifelse(var(4)&&(!var(0)||(var(0)&&!var(5))),1.54,1)
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+y = const(velocity.jump.y)*ifelse(var(5),.8,1)*ifelse(var(4),ifelse(!var(0),1.12,1.25),1)
+
+[State 0, end]
+type = changestate
+trigger1 = !animtime
+value = 50
+ctrl = 1
+
+
+;------------------------------------------------------------------------------------------
+;Jump StartÉ^ÉCÉâÉbÉvÅ®åãäEïﬂälópÅïÉfÉÄå„ÇÃåãäEópºﬁ¨øÃﬂ
+[Statedef 38]
+type = S
+physics = S
+ctrl = 0
+anim = 40+var(0)
+velset = 0,0
+sprpriority = 0
+
+[State 0, sysvar]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+sysvar(1) = 0;command = "holdfwd"-command = "holdback"
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+var(4) = 0
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+triggerall = !time
+trigger1 = prevstateno = 100 || prevstateno = 105
+;trigger2 = command = "highjump"
+var(4) = 1
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+;triggerall = var(34)=1
+trigger1 = !time
+trigger1 = 0
+var(5) = 0
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+;triggerall = var(34)=0
+trigger1 = 1;command != "holdup"
+var(5) = 1
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+x = ifelse(!sysvar(1),0,ifelse(sysvar(1)=1,const(velocity.jump.fwd.x),const(velocity.jump.back.x)))*ifelse(var(4)&&(!var(0)||(var(0)&&!var(5))),1.54,1)
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+y = const(velocity.jump.y)*ifelse(var(5),.8,1)*ifelse(var(4),ifelse(!var(0),1.12,1.25),1)
+
+[State 0, end]
+type = changestate
+trigger1 = !animtime
+value = 50
+ctrl = 1
+
+
+
+;------------------------------------------------------------------------------------------
+;AIJump StartåãäEÉqÉbÉgíÜ
+[Statedef 39]
+type = S
+physics = S
+ctrl = 0
+anim = 40+var(0)
+velset = 0,0
+sprpriority = 0
+
+[State 0, sysvar]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+trigger1 = p2bodydist X > 40
+sysvar(1) = 1;command = "holdfwd"-command = "holdback"
+
+[State 0, sysvar]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+trigger1 = p2bodydist X = [0,40]
+sysvar(1) = 0;command = "holdfwd"-command = "holdback"
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+var(4) = 0
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+triggerall = !time
+trigger1 = 0
+;trigger1 = prevstateno = 100 || prevstateno = 105
+;trigger2 = command = "highjump"
+var(4) = 1
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+var(5) = 0
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = 0
+;trigger1 = command != "holdup"
+var(5) = 1
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+x = ifelse(!sysvar(1),0,ifelse(sysvar(1)=1,const(velocity.jump.fwd.x),const(velocity.jump.back.x)))*ifelse(var(4)&&(!var(0)||(var(0)&&!var(5))),1.54,1)
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+y = const(velocity.jump.y)*ifelse(var(5),.8,1)*ifelse(var(4),ifelse(!var(0),1.12,1.25),1)
+
+[State 0, end]
+type = changestate
+trigger1 = !animtime
+value = 50
+ctrl = 1
+
+;------------------------------------------------------------------------------------------
+
+;AIJump StartÉGÉÅÉâÉãÉh
+[Statedef 41]
+type = S
+physics = S
+ctrl = 0
+anim = 40+var(0)
+velset = 0,0
+sprpriority = 0
+
+[State 0, sysvar]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+sysvar(1) = 1
+
+;íZÇ¢
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+triggerall = !time
+trigger1 = var(31)=1
+trigger2 = var(26);=1
+trigger2 = p2bodydist X <70
+var(4) = 0
+
+;í∑Ç¢
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+triggerall = !time
+triggerall = var(31)=0
+trigger1 = var(26);=1
+trigger1 = p2bodydist X =[70,90]
+;trigger1 = prevstateno = 100 || prevstateno = 105
+;trigger2 = command = "highjump"
+var(4) = 1
+
+;çÇÇ¢
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+triggerall = !time
+triggerall = var(31)=0
+trigger1 = var(26);=1
+trigger1 = p2bodydist X >90
+var(5) = 0
+
+;í·Ç¢
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = var(31)=1
+trigger2 = var(26);=1
+trigger2 = p2bodydist X <=90
+;trigger1 = command != "holdup"
+var(5) = 1
+
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+x = ifelse(!sysvar(1),0,ifelse(sysvar(1)=1,const(velocity.jump.fwd.x),const(velocity.jump.back.x)))*ifelse(var(4)&&(!var(0)||(var(0)&&!var(5))),1.54,1)
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+y = const(velocity.jump.y)*ifelse(var(5),.8,1)*ifelse(var(4),ifelse(!var(0),1.12,1.25),1)
+
+[State 0, end]
+type = changestate
+trigger1 = !animtime
+value = 50
+ctrl = 1
+
+
+;------------------------------------------------------------------------------------------
+;Jump Startå„
+[Statedef 42]
+type = S
+physics = S
+ctrl = 0
+anim = 40+var(0)
+velset = 0,0
+sprpriority = 0
+
+[State 0, sysvar]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+sysvar(1) = -1
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+var(4) = 0
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+triggerall = !time
+trigger1 = prevstateno = 100 || prevstateno = 105
+trigger2 = command = "highjump"
+var(4) = 1
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+var(5) = 0
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = command != "holdup"
+var(5) = 1
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+x = ifelse(!sysvar(1),0,ifelse(sysvar(1)=1,const(velocity.jump.fwd.x),const(velocity.jump.back.x)))*ifelse(var(4)&&(!var(0)||(var(0)&&!var(5))),1.54,1)
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+y = const(velocity.jump.y)*ifelse(var(5),.8,1)*ifelse(var(4),ifelse(!var(0),1.12,1.25),1)
+
+[State 0, end]
+type = changestate
+trigger1 = !animtime
+value = 50
+ctrl = 1
+
+;------------------------------------------------------------------------------------------
+;Jump StartëO
+[Statedef 43]
+type = S
+physics = S
+ctrl = 0
+anim = 40+var(0)
+velset = 0,0
+sprpriority = 0
+
+[State 0, sysvar]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+sysvar(1) = 1
+
+[State 0, var]
+type = null;varset
+triggerall = var(59) = 1
+trigger1 = !time
+var(4) = 0
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+triggerall = !time
+trigger1 = prevstateno = 100 || prevstateno = 105
+trigger2 = command = "highjump"
+var(4) = 1
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+var(5) = 0
+
+[State 0, var]
+type = null;varset
+triggerall = var(59) = 1
+trigger1 = command != "holdup"
+var(5) = 1
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+x = ifelse(!sysvar(1),0,ifelse(sysvar(1)=1,const(velocity.jump.fwd.x),const(velocity.jump.back.x)))*ifelse(var(4)&&(!var(0)||(var(0)&&!var(5))),1.54,1)
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+y = const(velocity.jump.y)*ifelse(var(5),.8,1)*ifelse(var(4),ifelse(!var(0),1.12,1.25),1)
+
+[State 0, end]
+type = changestate
+trigger1 = !animtime
+value = 50
+ctrl = 1
+
+
+;------------------------------------------------------------------------------------------
+;Air Jump Start
+[Statedef 46]
+type = A
+physics = N
+ctrl = 0
+anim = 40+var(0)
+velset = 0,0
+sprpriority = 0
+
+[State 0, sysvar]
+type = varset
+triggerall = var(59) = 1
+triggerall = var(48) || 1
+trigger1 = !time
+sysvar(1) = -1;(command = "holdfwd"-command = "holdback")*((p2dist x >= 0)-(p2dist x < 0))
+
+[State 0, turn]
+type = turn
+trigger1 = !time
+trigger1 = p2dist x < 0
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+var(4) = 0
+
+[State 0, var]
+type = null;varset
+triggerall = var(59) = 1
+triggerall = !time
+trigger1 = command = "highjump"
+var(4) = 1
+
+[State 0, var]
+type = varset
+triggerall = var(59) = 1
+trigger1 = !time
+var(5) = 0
+
+[State 0, var]
+type = null;varset
+triggerall = var(59) = 1
+trigger1 = command != "holdup"
+var(5) = 1
+
+[State 0, var]
+type = varset
+trigger1 = !time
+var(17) = 1
+
+[State 0, snd]
+type = playsnd
+trigger1 = time = 1
+value = 2,0
+channel = 0
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+x = ifelse(!sysvar(1),0,ifelse(sysvar(1)=1,const(velocity.jump.fwd.x),const(velocity.jump.back.x)))*ifelse(var(4)&&(!var(0)||(var(0)&&!var(5))),1.54,1)
+
+[State 0, vel]
+type = velset
+trigger1 = !animtime
+y = const(velocity.jump.y)*ifelse(var(5),.8,1)*ifelse(var(4),ifelse(!var(0),1.12,1.25),1)
+
+[State 0, end]
+type = changestate
+trigger1 = !animtime
+value = 60
+ctrl = 1
+
+
+                                                                                                          ;AI for "Kakyoin Noriaki" coded by KeyakiÅ@ver.0813

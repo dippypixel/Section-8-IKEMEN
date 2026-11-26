@@ -1,0 +1,251 @@
+[Statedef -3]
+
+;スタンドクラッシュ（地上）
+[State -3]
+type = ChangeState
+trigger1 = var(49) = 10000;スタンドモード時
+trigger1 = fvar(1) <= 0   ;ｹﾞｰｼﾞが０以下になった時
+trigger1 = statetype != A ;sca
+value = 16010
+ignorehitpause = 1
+
+;スタンドクラッシュ（空中）
+[State -3]
+type = ChangeState
+trigger1 = var(49) = 10000;スタンドモード時
+trigger1 = fvar(1) <= 0
+trigger1 = statetype = A
+value = 16011
+ignorehitpause = 1
+
+;●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●
+
+;スタンドクラッシュ地上
+[Statedef 16010]
+type    = S 
+movetype= H ;hit状態
+physics = S
+velset = 0,0
+anim = ifelse((prevstateno = [5000,5001]),16012,ifelse((prevstateno = [5070,5071]),16014,16013))
+;立ち食らいなら立ち食らい、足払いなら足払い、違うならしゃがみ。
+;ﾌﾞﾁｬのやられｱﾆﾒです。
+;このｽﾃｰﾄからﾌﾞﾁｬ操作に切り替える！
+
+[State 16010]
+type = pause;画面上の全てのスプライト、キャラクター、背景を止める
+trigger1 = time = 0
+time = 2    ;停止時間
+
+[State 16010, Effect]
+type = AssertSpecial
+trigger1 = NumExplod(20035)
+flag = NoFG   ;背景の手前のレイヤーを非表示にします
+flag2 = NoBG  ;背景を非表示にします。
+
+[State 16010, 仮面];Explodのleftは左上が原点、helperは左下っぽい。
+type = Explod      ;いや違うような。。
+trigger1 = time = 0
+id = 20035
+postype = left
+pos = 0,0   ;0,239
+anim = 16011
+sprpriority = -1
+ownpal = 0
+bindtime = -1
+pausemovetime = 999999
+removeongethit = 1;1にすると、プレイヤーが攻撃を受けた場合、消滅します
+removetime = 10
+;scale = 0.785,0.75    ;0.833,1.07
+
+[State 16010]
+type = PlaySnd
+trigger1 = time = 0
+value = 3, 13     ;ﾊﾞﾘｰﾝ
+
+[State 16010]  ;-2でｸﾗｯｼｭ時(49)=0にしてるから別にいらんとは思う。
+type = varset  ;ってたのに、これ必須です！ここで即(49)=0にする！
+trigger1 = time = 0       ;じゃないとこのｽﾃｰﾄがｴﾝﾄﾞﾚｽで発動ｗ
+var(49) = 0
+
+[State 16010];スタンド発現不可にする。
+type = varset
+trigger1 = time = 0
+trigger1 = var(7) = 0
+var(7) = 1
+
+[State 16010];SF操作からﾌﾞﾁｬ操作に変わるので
+type = PosAdd
+trigger1 = time = 0
+x = -10
+
+[State 16010];SFがしびれ→消滅のｱﾆﾒ
+type = Explod
+trigger1 = time = 0
+anim = 16010
+postype = p1
+pos = 10,0
+removeongethit = 1;1にすると、プレイヤーが攻撃を受けた場合、消滅します
+sprpriority = 0
+
+[State 16010, 音を鳴らす]
+type = PlaySnd
+trigger1 = time = 28
+value = 3, 12     ;ｽﾀﾝﾄﾞ消滅
+
+[State 16010];しびれのあと、ﾋｯﾄﾊﾞｯｸとかの値をもっかいｾｯﾄする
+type = Velset
+trigger1 = AnimElem = 25
+x = gethitvar(xvel)*facing
+y = gethitvar(yvel)
+persistent = 0
+
+[State 16010];うちあげ系を食らってｸﾗｯｼｭしてた場合
+type = ChangeState
+trigger1 = GetHitVar(yvel) != 0      ;上に浮く攻撃くらった時で、
+trigger1 = prevstateno != [5070,5071];足払いじゃないとき
+trigger1 = AnimElem = 25             ;velSetと同じﾀｲﾐﾝｸﾞで
+value = 5050                         ;吹っ飛びｽﾃｰﾄへ。
+
+[State 16010];足払いを食らって
+type = ChangeState
+trigger1 = prevstateno = [5070,5071]
+trigger1 = AnimElem = 25
+value = 5071;足払いでこけるｽﾃｰﾄへ
+ctrl = 1;これはいらないかも。
+
+[State 16010];たち
+type = ChangeState      ;しびれｱﾆﾒが終わってから立ちに移行する
+trigger1 = AnimTime = 0 ;5000や5001はvel0,0設定なのでとまってしまうから。
+trigger1 = prevstateno = [5000,5001];立ちくらい
+trigger1 = GetHitVar(yvel) = 0      ;上に浮く攻撃じゃない場合
+value = 0
+ctrl = 1
+
+[State 16010];しゃがみ
+type = ChangeState      ;同じく
+trigger1 = AnimTime = 0
+trigger1 = prevstateno = [5010,5011];しゃがみくらい
+value = 11
+ctrl = 1
+
+;--------------------------------------------------------------------------
+;スタンドクラッシュ空中
+[Statedef 16011]
+type    = A ;air
+movetype= H ;hit状態
+physics = N ;重力も摩擦もかかりません
+velset = 0,0;ぴたっと止まる。
+anim = 16014
+;ﾌﾞﾁｬのやられｱﾆﾒです。
+;このｽﾃｰﾄからﾌﾞﾁｬ操作に切り替える！
+
+[State 16011]
+type = pause;画面上の全てのスプライト、キャラクター、背景を止める
+trigger1 = time = 0
+time = 2    ;停止時間
+
+[State 16011, Effect]
+type = AssertSpecial
+trigger1 = NumExplod(20035)
+flag = NoFG   ;背景の手前のレイヤーを非表示にします
+flag2 = NoBG  ;背景を非表示にします。
+
+[State 16011, 仮面];Explodのleftは左上が原点、helperは左下っぽい。
+type = Explod      ;いや違うような。。
+trigger1 = time = 0
+id = 20035
+postype = left
+pos = 0,0   ;0,239
+anim = 16011
+sprpriority = -1
+ownpal = 0
+bindtime = -1
+pausemovetime = 999999
+removeongethit = 1;1にすると、プレイヤーが攻撃を受けた場合、消滅します
+removetime = 10
+;scale = 0.785,0.75    ;0.833,1.07
+
+[State 16011]
+type = PlaySnd
+trigger1 = time = 0
+value = 3, 13     ;ﾊﾞﾘｰﾝ
+
+[State 16011]  ;-2でｸﾗｯｼｭ時(49)=0にしてるから別にいらんとは思う。
+type = varset  ;ってたのに、これ必須です！ここで即(49)=0にする！
+trigger1 = time = 0       ;じゃないとこのｽﾃｰﾄがｴﾝﾄﾞﾚｽで発動ｗ
+var(49) = 0
+
+[State 16011];スタンド発現不可にする。
+type = varset
+trigger1 = time = 0
+trigger1 = var(7) = 0
+var(7) = 1
+
+[State 16011];SF操作からﾌﾞﾁｬ操作に変わるので
+type = PosAdd
+trigger1 = time = 0
+x = -10
+
+[State 16011];SFがしびれ→消滅のｱﾆﾒ
+type = Explod
+trigger1 = time = 0
+anim = 16010
+postype = p1
+pos = 10,0
+removeongethit = 1;1にすると、プレイヤーが攻撃を受けた場合、消滅します
+sprpriority = 0
+
+[State 16011, 音を鳴らす]
+type = PlaySnd
+trigger1 = time = 28
+value = 3, 12     ;ｽﾀﾝﾄﾞ消滅
+
+[State 16011];しびれのあと、ﾋｯﾄﾊﾞｯｸとかの値をもっかいｾｯﾄする
+type = Velset
+trigger1 = AnimElem = 25
+x = gethitvar(xvel)*facing
+y = gethitvar(yvel)
+persistent = 0
+
+[State 16011];重力をかける
+type = Gravity
+trigger1 = Time >= 48;現在のステートに移行して48フレーム後
+trigger1 = 1         ;ずっと
+
+[State 16011];ふっとば
+type = ChangeAnim
+trigger1 = AnimElem = 25
+value = 5035
+
+[State 16011];されるよ。ｱﾆﾒを変える。
+type = ChangeAnim
+trigger1 = anim = 5035
+trigger1 = animTime = 0
+value = 5050
+
+;physics = N ;重力も摩擦もかかりません
+;のままなので(Airではないので)、着地ｽﾃｰﾄがいります。
+
+[State 5050, 4] ;Recover near ground
+type = ChangeState
+triggerall = Vel Y > 0
+triggerall = Pos Y >= -20
+triggerall = alive
+trigger1 = CanRecover   ;ﾘｶﾊﾞｰ可でﾘｶﾊﾞｰ入力したらﾘｶﾊﾞｰ
+trigger1 = Command = "recovery"
+value = 5200 ;HITFALL_RECOVER
+
+[State 5050, 5]; Recover in mid air
+type = ChangeState
+triggerall = Vel Y > -1
+triggerall = alive
+trigger1 = CanRecover   ;おなじく
+trigger1 = Command = "recovery"
+value = 5210 ;HITFALL_AIRRECOVER
+
+[State 5050, 6];吹っ飛び後地面に激突
+type = ChangeState
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= ifelse((anim = [5050+var(49),5059+var(49)]) || (anim = [5061+var(49),5069+var(49)]), 0, 25)
+trigger1 = var(49) = 0
+value = 5100 ;HIT_BOUNCE;吹っ飛び後地面に激突
