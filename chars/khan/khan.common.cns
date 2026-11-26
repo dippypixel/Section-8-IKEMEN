@@ -390,6 +390,7 @@ physics = N
 anim = 40+var(0)
 ctrl = 0
 velset = 0,0
+facep2 = 1
 
 [State ã≠êßë“ã@]
 Type = ChangeState
@@ -480,12 +481,12 @@ value = SCA, NA,SA,HA,NP,SP,HP
 
 [State 40, 1]
 type = VarSet
-trigger1 = (var(37) = [1,2])
-sysvar(1) = ifelse((p2bodydist x = [0,38]),0,1)
+trigger1 = (var(38) = [1,2])
+sysvar(1) = ifelse((p2bodydist x = [0,38])&&random<400,0,1)
 
 [State 40, 1]
 type = VarSet
-trigger1 = var(37) = 3
+trigger1 = var(38) = 3
 sysvar(1) = -1
 
 [State 40, 1]
@@ -501,53 +502,54 @@ sysvar(1) = ifelse(p2bodydist x>35),1,0)
 [State 40, 4]
 type = VarSet
 trigger1 = Time = 0
-var(6) = (var(6)|4|8)-4-8
+var(4) = 0
 
 [State 40, 4]
 type = null;VarSet
 triggerall = Time = 0
 trigger1 = PrevStateNo != 100 && PrevStateNo != 105
 trigger1 = Command = "longjump"
-var(6) = (var(6)|4)
+var(4) = 1
 
 [State 40, 4]
 type = VarSet
 triggerall = Time = 0
 trigger1 = PrevStateNo = 100 || PrevStateNo = 105
-var(6) = (var(6)|8)
+var(4) = 2
 
 [State 40, 4]
 type = VarSet
 trigger1 = Time = 0
-var(6)=(var(6)|16)-16
+var(5) = 0
 
 [State 40, 5]
 type = VarSet
 triggerall = time = 1
-trigger1 = (var(37) = [1,2]) && random < 800-(p2statetype=A)*200
-trigger2 = var(37) = 3 && random < 700-(p2statetype=A)*200
-trigger3 = var(37) = 4
-var(6) = (var(6)|16)
+trigger1 = (var(38) = [1,2]) && random < 600-(p2statetype=A)*200
+trigger2 = var(38) = 3 && random < 400-(p2statetype=A)*200
+trigger3 = prevstateno = 100 && random < 800
+trigger4 = var(38) = 4
+var(5) = 1
 
 [State 40, 6]
 type = VelSet
 trigger1 = time = 0 && !var(0)
-x = ifelse(!sysvar(1), 0, ifelse(sysvar(1)=1, const(velocity.jump.fwd.x), const(velocity.jump.back.x)))*ifelse((var(6)&4)&&sysvar(1)=1,1.6,ifelse((var(6)&8)&&prevstateno=100,1.6,1))
+x = ifelse(!sysvar(1), 0, ifelse(sysvar(1)=1, const(velocity.jump.fwd.x), const(velocity.jump.back.x)))*ifelse(var(4)=1,.9,ifelse(var(4)=2,1.33,1))
 
 [State 40, 6]
 type = VelSet
 trigger1 = time = 0 && var(0)
-x = ifelse(!sysvar(1), 0, ifelse(sysvar(1)=1, const(velocity.jump.fwd.x), const(velocity.jump.back.x)))*ifelse((var(6)&4)&&sysvar(1)=-1,1.6,ifelse((var(6)&8)&&prevstateno=100,1.6,1))
+x = ifelse(!sysvar(1), 0, ifelse(sysvar(1)=1, const(velocity.jump.fwd.x), const(velocity.jump.back.x)))*ifelse(var(4)=1,.9,ifelse(var(4)=2,1.33,1))
 
 [State 40, 8]
 type = VelSet
 trigger1 = time = 0
-y = const(velocity.jump.y)-(var(0)=10000)*.5-((((var(6)&4)||(var(6)&8))&&var(0))||(var(6)&4))*2.5
+y = const(velocity.jump.y)*ifelse(var(4)=1,1.1,1);*ifelse(!var(4),1.1,1)
 
 [State 40, 8]
 type = VelMul
-trigger1 = (var(6)&16)
-y = ifelse(!var(0),.65,.8)
+trigger1 = var(5)
+y = .64
 persistent = 0
 
 [State 40, 10]
@@ -684,6 +686,7 @@ flag2 = NoAutoTurn
 type = changestate
 trigger1 = !var(59)
 trigger1 = command = "holdup"
+trigger2 = var(59) && enemynear, numproj
 value = 40
 
 [State 0, anim]
@@ -694,6 +697,14 @@ trigger1 = time > 9
 trigger1 = command != "holdfwd" || command = "holdback"
 trigger2 = !var(0) && !animtime
 trigger3 = var(0) && !animtime
+value = 101
+
+[State 0, anim]
+type = changeanim
+triggerall = var(59)
+triggerall = anim = 100+var(0)
+triggerall = time > 9
+trigger1 = p2bodydist x < 0
 value = 101
 
 [State 0, vel]
@@ -729,6 +740,16 @@ velset = 0,0
 ctrl = 0
 sprpriority = 0
 
+[State -1, òAâÿéaAIR]
+type = ChangeState
+triggerall = anim = 105
+trigger1 = !var(59)
+trigger1 = roundstate = 2
+trigger1 = pos y != 0
+trigger1 = command = "a" || (var(35)&2**3)
+trigger1 = !var(34)
+value = 1350
+
 [State 0, pos]
 type = posset
 trigger1 = !time
@@ -737,18 +758,18 @@ y = 0
 
 [State 0, vel]
 type = velset
-trigger1 = animelemtime(3) = 0
+trigger1 = animelemtime(2) = 0
 x = -9.5
 y = -2.5
 
 [State 0, vel]
 type = veladd
-trigger1 = animelemtime(3) >= 0
+trigger1 = animelemtime(2) >= 0
 y = .45
 
 [State 0, vel]
 type = statetypeset
-trigger1 = animelemtime(3) = 0
+trigger1 = animelemtime(2) = 0
 statetype = A
 
 [State 100, 2]
@@ -783,133 +804,184 @@ value = 1
 
 [State 0, end]
 type = changestate
+trigger1 = !var(59) && anim = 106
+trigger1 = command = "holdup"
+value = 40
+
+[State 0, end]
+type = changestate
 triggerall = anim = 106+var(0)
 trigger1 = !animtime
 value = 0
 ctrl = 1
 
-;---------------------------------------------------------------------------
-; GUARD (start)
+;===========================================================================
+;Guard(start)
 [Statedef 120]
-type = U    ;Leave state type unchanged
-physics = U ;Leave physics unchanged
+type = U
+physics = U
+ctrl = !var(59)
 
-[State 120, 1]
-type = ChangeAnim
-trigger1 = Time = 0
+[State 0, anim]
+type = changeanim
+trigger1 = !time
 trigger1 = statetype != A
-value = 120 + (statetype = C) +var(0)
+value = 120 + (statetype = C) + var(0)
 
-[State 120, 2]
-type = StateTypeSet
-trigger1 = Time = 0 && statetype = S
+[State 0, state]
+type = statetypeset
+trigger1 = !time
+trigger1 = statetype = S
+type = S
 physics = S
 
-[State 120, 3]
-type = StateTypeSet
-trigger1 = Time = 0 && statetype = C
+[State 0, state]
+type = statetypeset
+trigger1 = !time
+trigger1 = statetype = C
+type = C
 physics = C
 
-[State 120, 4]
-type = StateTypeSet
-trigger1 = Time = 0 && statetype = A
+[State 0, state]
+type = statetypeset
+trigger1 = !time
+trigger1 = statetype = A
 physics = A
-
-[State 120, Hi to Lo]
-type = StateTypeSet
-trigger1 = statetype = S && command = "holddown"
-statetype = C
-physics = C
 
 [State 120, Lo to Hi]
 type = StateTypeSet
+trigger1 = !var(59)
 trigger1 = statetype = C && command != "holddown"
+trigger2 = numhelper(50000)
+trigger2 = var(59)
+trigger2 = statetype = C && P2statetype = A
+trigger2 = P2bodydist x <= 100
+trigger2 = random < 500+(var(59)=7)*400
+trigger3 = numhelper(50000)
+trigger3 = var(59)
+trigger3 = statetype = C
+trigger3 = (helper(50000),var(5) = p2stateno && helper(50000),var(5))
 statetype = S
 physics = S
 
-[State 120, 5]
-type = ChangeState
-trigger1 = AnimTime = 0
+[State 120, Hi to Lo]
+type = StateTypeSet
+trigger1 = !var(59)
+trigger1 = statetype = S && command = "holddown"
+trigger2 = numhelper(50000)
+trigger2 = var(59)
+trigger2 = statetype = S && P2statetype != A
+trigger2 = !(helper(50000),var(5) = p2stateno && helper(50000),var(5))
+statetype = C
+physics = C
+
+[State 0, end]
+type = changestate
+trigger1 = !animtime
 value = 130 + (statetype = C) + (statetype = A)*2
 
 [State 120, Stop Guarding]
 type = ChangeState
+trigger1 = !var(59)
 trigger1 = command != "holdback"
-trigger2 = !inguarddist
+trigger2 = var(59)
+trigger2 = time > 10
+trigger2 = random < 100
+trigger3 = !inguarddist
 value = 140
 
 ;---------------------------------------------------------------------------
-; STAND GUARD (guarding)
+;Stand Guard
 [Statedef 130]
-type    = S
+type = S
 physics = S
+ctrl = !var(59)
 
-[State 130, 1]
-type = ChangeAnim
-trigger1 = Anim != 130+var(0)
+[State 0, anim]
+type = changeanim
+trigger1 = anim != 130+var(0)
 value = 130+var(0)
 
 [State 130, Hi to Lo]
 type = ChangeState
+trigger1 = !var(59)
 trigger1 = command = "holddown"
+trigger2 = numhelper(50000)
+trigger2 = var(59)
+trigger2 = P2statetype != A
+trigger2 = !(helper(50000),var(5) = p2stateno && helper(50000),var(5))
 value = 131
 
 [State 130, Stop Guarding]
 type = ChangeState
+trigger1 = !var(59)
 trigger1 = command != "holdback"
-trigger2 = !inguarddist
+trigger2 = var(59)
+trigger2 = time > 10
+trigger2 = random < 100
+trigger3 = !inguarddist
 value = 140
 
 ;---------------------------------------------------------------------------
-; CROUCH GUARD (guarding)
+;Crouch Guard
 [Statedef 131]
 type = C
 physics = C
+ctrl = !var(59)
 
-[State 131, 1]
-type = ChangeAnim
-trigger1 = Anim != 131+var(0)
+[State 0, anim]
+type = changeanim
+trigger1 = anim != 131+var(0)
 value = 131+var(0)
 
 [State 131, Lo to Hi]
 type = ChangeState
+trigger1 = !var(59)
 trigger1 = command != "holddown"
+trigger2 = numhelper(50000)
+trigger2 = var(59)
+trigger2 = P2statetype = A
+trigger2 = P2bodydist x <= 100
+trigger2 = random < 500+(var(59)=7)*400
+trigger3 = numhelper(50000)
+trigger3 = var(59)
+trigger3 = (helper(50000),var(5) = p2stateno && helper(50000),var(5))
 value = 130
 
 [State 131, Stop Guarding]
 type = ChangeState
+trigger1 = !var(59)
 trigger1 = command != "holdback"
-trigger2 = !inguarddist
+trigger2 = var(59)
+trigger2 = time > 10
+trigger2 = random < 100
+trigger3 = !inguarddist
 value = 140
 
 ;---------------------------------------------------------------------------
-; AIR GUARD (guarding)
+;Air Guard
 [Statedef 132]
-type    = A
+type = A
 physics = N
+;anim = 132+var(0)
 
-[State 132, 1]
-type = null;ChangeAnim
-trigger1 = Anim != 132+var(0)
-value = 132+var(0)
-
-[State 132, 2]
-type = VelAdd
+[State 0, vel]
+type = veladd
 trigger1 = 1
-y = Const(movement.yaccel)
+y = const(movement.yaccel)
 
-[State 132, 3]
-type = VarSet
-trigger1 = 1
+[State 0, sysvar]
+type = varset
+trigger1 = 1	
 sysvar(0) = (pos y >= 0) && (vel y > 0)
 
-[State 132, 4]
-type = VelSet
+[State 0, vel]
+type = velset
 trigger1 = sysvar(0)
 y = 0
 
-[State 132, 5]
-type = PosSet
+[State 0, pos]
+type = posset
 trigger1 = sysvar(0)
 y = 0
 
@@ -917,7 +989,9 @@ y = 0
 type = ChangeState
 triggerall = sysvar(0)
 triggerall = inguarddist
+trigger1 = !var(59)
 trigger1 = command = "holdback"
+trigger2 = var(59)
 value = 130
 
 [State 132, 7]
@@ -927,107 +1001,155 @@ value = 52
 
 [State 132, Stop Guarding]
 type = ChangeState
+trigger1 = !var(59)
 trigger1 = command != "holdback"
-trigger2 = !inguarddist
+trigger2 = var(59)
+trigger2 = time > 10
+trigger2 = random < 100
+trigger3 = !inguarddist
 value = 140
 
 ;---------------------------------------------------------------------------
-; GUARD (end)
+;Guard(end)
 [Statedef 140]
-type = U    ;Leave state type unchanged
-physics = U ;Leave physics unchanged
+type = U
+physics = U
 ctrl = 1
 
-[State 140, 1]
-type = ChangeAnim
-trigger1 = Time = 0
+[State 0, anim]
+type = changeanim
+trigger1 = !time
 trigger1 = statetype != A
-value = 140 + (statetype = C) +var(0)
+value = 140 + (statetype = C) + var(0)
 
-[State 140, 2]
-type = StateTypeSet
-trigger1 = Time = 0 && statetype = S
+[State 0, state]
+type = statetypeset
+trigger1 = !time
+trigger1 = statetype = S
+type = S
 physics = S
 
-[State 140, 3]
-type = StateTypeSet
-trigger1 = Time = 0 && statetype = C
+[State 0, state]
+type = statetypeset
+trigger1 = !time
+trigger1 = statetype = C
+type = C
 physics = C
 
-[State 140, 4]
-type = StateTypeSet
-trigger1 = Time = 0 && statetype = A
+[State 0, state]
+type = statetypeset
+trigger1 = !time
+trigger1 = statetype = A
 physics = A
 
 [State 140, Hi to Lo]
 type = StateTypeSet
-trigger1 = statetype = S && command = "holddown"
+trigger1 = !var(59)
+trigger1 = Statetype = S && command = "holddown"
+trigger2 = numhelper(50000)
+trigger2 = var(59)
+trigger2 = Statetype = S && P2statetype != A
+trigger2 = !(helper(50000),var(5) = p2stateno && helper(50000),var(5))
 statetype = C
 physics = C
 
 [State 140, Lo to Hi]
 type = StateTypeSet
+trigger1 = !var(59)
 trigger1 = statetype = C && command != "holddown"
+trigger2 = numhelper(50000)
+trigger2 = var(59)
+trigger2 = statetype = C && P2statetype = A
+trigger2 = P2bodydist x <= 100
+trigger2 = random < 500+(var(59)=7)*400
+trigger3 = numhelper(50000)
+trigger3 = var(59)
+trigger3 = statetype = C
+trigger3 = (helper(50000),var(5) = p2stateno && helper(50000),var(5))
 statetype = S
 physics = S
 
-;[State 140, 5] ;Implemented within engine
-;type = ChangeState
-;trigger1 = AnimTime = 0
-;value = (statetype = C)*11 + (statetype = A)*51
+[State 140, end]
+type = null;changestate
+trigger1 = !animtime
+value = (statetype=C)*11 + (statetype=A)*51
 
 ;---------------------------------------------------------------------------
-; SGUARDHIT (shaking)
+;SGUARDHIT(shaking)
 [Statedef 150]
-type    = S
+type = S
 movetype = H
 physics = N
 velset = 0,0
 
-[State 150, 1]
-type = ChangeAnim
+[State 0, anim]
+type = changeanim
 trigger1 = 1
-value = 150+var(0)
+value = 150 + var(0)
+persistent = 0
 
 [State 150, 2]
 type = ChangeState
+trigger1 = !var(59)
 trigger1 = HitShakeOver
 value = 151 + 2*(command = "holddown")
 
+[State 150, 2]
+type = ChangeState
+trigger1 = var(59)
+trigger1 = HitShakeOver
+value = 151 + 2*(P2statetype = C || P2bodydist x > 100)
+
 [State 150, Hi to Lo]
 type = StateTypeSet
-trigger1 = statetype = S && command = "holddown"
+trigger1 = !var(59)
+trigger1 = Statetype = S && command = "holddown"
+trigger2 = numhelper(50000)
+trigger2 = var(59)
+trigger2 = Statetype = S && P2statetype != A
+trigger2 = !(helper(50000),var(5) = p2stateno && helper(50000),var(5))
 statetype = C
 physics = C
 
 [State 150, Lo to Hi]
 type = StateTypeSet
+trigger1 = !var(59)
 trigger1 = statetype = C && command != "holddown"
+trigger2 = numhelper(50000)
+trigger2 = var(59)
+trigger2 = statetype = C && P2statetype = A
+trigger2 = P2bodydist x <= 100
+trigger2 = random < 500+(var(59)=7)*400
+trigger3 = numhelper(50000)
+trigger3 = var(59)
+trigger3 = statetype = C
+trigger3 = (helper(50000),var(5) = p2stateno && helper(50000),var(5))
 statetype = S
 physics = S
 
-[State 150, 3]
-type = ForceFeedback
-trigger1 = time = 0
+[State 0, ffb]
+type = forcefeedback
+trigger1 = !time
 waveform = square
 time = 3
 
 ;---------------------------------------------------------------------------
-; SGUARDHIT2 (knocked back)
+;SGUARDHIT2(knocked back)
 [Statedef 151]
-type    = S
+type = S
 movetype = H
 physics = S
+velset = 0,0
 anim = 150+var(0)
 
-[State 151, 1]
-type = HitVelSet
-trigger1 = Time = 0
+[State 0, hitvel]
+type = hitvelset
+trigger1 = !time
 x = 1
 
-[State 151, 2]
-type = VelSet
-trigger1 = Time = GetHitVar(slidetime)
+[State 0, vel]
+type = velset
+trigger1 = time = GetHitVar(slidetime)
 trigger2 = HitOver
 trigger3 = numhelper(715)
 trigger3 = prevstateno = 710
@@ -1043,13 +1165,28 @@ value = 1
 
 [State 151, Hi to Lo]
 type = StateTypeSet
-trigger1 = statetype = S && command = "holddown"
+trigger1 = !var(59)
+trigger1 = Statetype = S && command = "holddown"
+trigger2 = numhelper(50000)
+trigger2 = var(59)
+trigger2 = Statetype = S && P2statetype != A
+trigger2 = !(helper(50000),var(5) = p2stateno && helper(50000),var(5))
 statetype = C
 physics = C
 
 [State 151, Lo to Hi]
 type = StateTypeSet
+trigger1 = !var(59)
 trigger1 = statetype = C && command != "holddown"
+trigger2 = numhelper(50000)
+trigger2 = var(59)
+trigger2 = statetype = C && P2statetype = A
+trigger2 = P2bodydist x <= 100
+trigger2 = random < 500+(var(59)=7)*400
+trigger3 = numhelper(50000)
+trigger3 = var(59)
+trigger3 = statetype = C
+trigger3 = (helper(50000),var(5) = p2stateno && helper(50000),var(5))
 statetype = S
 physics = S
 
@@ -1074,7 +1211,7 @@ trigger3 = helper(20032),var(14) + helper(20032),var(15) > helper(20032),var(13)
 value = 711
 
 ;---------------------------------------------------------------------------
-; CGUARDHIT (shaking)
+;CGUARDHIT(shaking)
 [Statedef 152]
 type = C
 movetype = H
@@ -1088,38 +1225,61 @@ value = 151+var(0)
 
 [State 152, 3]
 type = ChangeState
+trigger1 = !var(59)
 trigger1 = HitShakeOver
 value = 151 + 2*(command = "holddown")
 
+[State 152, 3]
+type = ChangeState
+trigger1 = var(59)
+trigger1 = HitShakeOver
+value = 153
+
 [State 152, Hi to Lo]
 type = StateTypeSet
-trigger1 = statetype = S && command = "holddown"
+trigger1 = !var(59)
+trigger1 = Statetype = S && command = "holddown"
+trigger2 = numhelper(50000)
+trigger2 = var(59)
+trigger2 = Statetype = S && P2statetype != A
+trigger2 = !(helper(50000),var(5) = p2stateno && helper(50000),var(5))
 statetype = C
 physics = C
 
 [State 152, Lo to Hi]
 type = StateTypeSet
+trigger1 = !var(59)
 trigger1 = statetype = C && command != "holddown"
+trigger2 = numhelper(50000)
+trigger2 = var(59)
+trigger2 = statetype = C && P2statetype = A
+trigger2 = P2bodydist x <= 100
+trigger2 = random < 500+(var(59)=7)*400
+trigger3 = numhelper(50000)
+trigger3 = var(59)
+trigger3 = statetype = C
+trigger3 = (helper(50000),var(5) = p2stateno && helper(50000),var(5))
 statetype = S
 physics = S
 
-[State 152, 4]
-type = ForceFeedback
-trigger1 = time = 0
+[State 0, ffb]
+type = forcefeedback
+trigger1 = !time
 waveform = square
 time = 4
 
 ;---------------------------------------------------------------------------
-; CGUARDHIT2 (knocked back)
+;CGUARDHIT2(knocked back)
 [Statedef 153]
 type = C
 movetype = H
 physics = C
+velset = 0,0
 anim = 151+var(0)
 
-[State 153, 1]
-type = HitVelSet
-trigger1 = Time = 0
+[State 0, hitvel]
+type = hitvelset
+trigger1 = !time
 x = 1
 
 [State 0, vel]
@@ -1139,13 +1299,28 @@ value = 1
 
 [State 153, Hi to Lo]
 type = StateTypeSet
-trigger1 = statetype = S && command = "holddown"
+trigger1 = !var(59)
+trigger1 = Statetype = S && command = "holddown"
+trigger2 = numhelper(50000)
+trigger2 = var(59)
+trigger2 = Statetype = S && P2statetype != A
+trigger2 = !(helper(50000),var(5) = p2stateno && helper(50000),var(5))
 statetype = C
 physics = C
 
 [State 153, Lo to Hi]
 type = StateTypeSet
+trigger1 = !var(59)
 trigger1 = statetype = C && command != "holddown"
+trigger2 = numhelper(50000)
+trigger2 = var(59)
+trigger2 = statetype = C && P2statetype = A
+trigger2 = P2bodydist x <= 100
+trigger2 = random < 500+(var(59)=7)*400
+trigger3 = numhelper(50000)
+trigger3 = var(59)
+trigger3 = statetype = C
+trigger3 = (helper(50000),var(5) = p2stateno && helper(50000),var(5))
 statetype = S
 physics = S
 
@@ -1231,11 +1406,13 @@ type = posset
 trigger1 = sysvar(0)
 y = 0
 
-[State 0, end]
-type = changestate
-trigger1 = sysvar(0)
-trigger1 = inguarddist
-trigger1 = command = "holddown"
+[State 155, 7]
+type = ChangeState
+triggerall = sysvar(0)
+triggerall = inguarddist
+trigger1 = !var(59)
+trigger1 = command = "holdback"
+trigger2 = var(59)
 value = 130
 
 [State 0, end]
@@ -1736,23 +1913,37 @@ y = GetHitVar(yaccel)
 
 [State 0, end]
 type = changestate
-triggerall = helper(20032),fvar(6)
+triggerall = var(11) = 2
 triggerall = HitOver
 triggerall = alive
 triggerall = vel y > 0
 triggerall = pos y >= -20
 trigger1 = !var(59)
 trigger1 = command = "recovery"
+Trigger2 = Var(59)
+Trigger2 = Var(55) = [0,64]
+Trigger2 = P2MoveType != A
+Trigger3 = Var(59)
+Trigger3 = Var(55) = [0,89]
+Trigger3 = P2MoveType = A
+Trigger3 = InguardDist
 value = 5200
 
 [State 0, end]
 type = changestate
-triggerall = helper(20032),fvar(6)
+triggerall = var(11) = 2
 triggerall = HitOver
 triggerall = alive
 triggerall = vel y > -1
 trigger1 = !var(59)
 trigger1 = command = "recovery"
+Trigger2 = Var(59)
+Trigger2 = Var(55) = [0,64]
+Trigger2 = P2MoveType != A
+Trigger3 = Var(59)
+Trigger3 = Var(55) = [0,89]
+Trigger3 = P2MoveType = A
+Trigger3 = InguardDist
 value = 5210
 
 [State 0, end]
@@ -1798,6 +1989,13 @@ triggerall = vel y > 0
 triggerall = pos y >= -20
 trigger1 = !var(59)
 trigger1 = command = "recovery"
+Trigger2 = Var(59)
+Trigger2 = Var(55) = [0,64]
+Trigger2 = P2MoveType != A
+Trigger3 = Var(59)
+Trigger3 = Var(55) = [0,89]
+Trigger3 = P2MoveType = A
+Trigger3 = InguardDist
 value = 5200
 
 [State 0, end]
@@ -1807,6 +2005,13 @@ triggerall = alive
 triggerall = vel y > -1
 trigger1 = !var(59)
 trigger1 = command = "recovery"
+Trigger2 = Var(59)
+Trigger2 = Var(55) = [0,64]
+Trigger2 = P2MoveType != A
+Trigger3 = Var(59)
+Trigger3 = Var(55) = [0,89]
+Trigger3 = P2MoveType = A
+Trigger3 = InguardDist
 value = 5210
 
 [State 0, end]

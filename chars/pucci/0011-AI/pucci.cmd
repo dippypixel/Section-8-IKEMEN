@@ -4851,7 +4851,6 @@ value = 123321
 [State -3, tag]
 type = varset
 trigger1 = NumEnemy >= 0
-trigger1 = RoundState = 2
 var(53) = IfElse((!EnemyNear,Alive && NumEnemy = 2),1,0)
 
 ;コンボルートリセット
@@ -4882,8 +4881,8 @@ var(57) = 0+(life <= 950)+(life <= 750)+(life <= 500)
 [State -3, tag]
 type = DisplayToClipboard
 trigger1 = 1
-text = "%d";var(59) = %d var(57) = %d helper(55002),var(52) = %d\npower = %d,
-params = var(53);var(59),var(57),var(52),power,
+text = "var(59) = %d var(57) = %d helper(55002),var(52) = %d\npower = %d"
+params = var(59),var(57),var(52),power
 
 [State -3, tag]
 type = null;DisplayToClipboard
@@ -4893,26 +4892,6 @@ params = var(19),helper(235711),var(2),helper(55002),var(15),helper(55002),var(8
 ;---------------------------------------------------------------------------
 ;11 メイド・イン・ヘブン
 ;---------------------------------------------------------------------------
-
-;「二手」遅れたようだな・・・・・・ S
-[State -1, Stand Strong Punch]
-type = ChangeState
-value = 47000
-TriggerAll = Var(59)=1 && RoundState = 2
-triggerall = power >= 1000
-triggerall = var(3) = 2
-triggerall = var(57) = 3
-triggerall = var(20) = 0
-triggerall = P2BodyDist X <= 75+enemynear(var(53)),vel x
-triggerall = P2BodyDist X > -20
-triggerall = P2Statetype != A
-triggerall = enemynear(var(53)),vel x > 0
-triggerall = enemynear(var(53)),time > 0
-triggerall = P2MoveType != H
-triggerall = random <= 14
-trigger1 = ctrl
-trigger2 = stateno = [40200,40699]
-
 ;///コンボ
 
 ;飛んでくる・・・・・・ s
@@ -5609,7 +5588,7 @@ trigger1 = ctrl
 
 [State -1, 投げ];からの投げ
 type = ChangeState
-value = 800+(random <= 749)*(40050 - 800)
+value = 800
 TriggerAll = Var(59)=1 && RoundState = 2
 triggerall = var(49) = 10000
 triggerall = statetype != A
@@ -5624,7 +5603,7 @@ trigger1 = 1 || var(52) := 100
 
 [State -1, 時は加速する];いつの間に目の前にッ！
 type = ChangeState
-value = 40000+(random <= 749)*50
+value = 40000
 TriggerAll = Var(59)=1 && RoundState = 2
 triggerall = var(49) = 10000
 triggerall = var(3) = 2
@@ -5877,127 +5856,6 @@ triggerall = helper(55002),var(18) != 1
 trigger1 = helper(55002),var(25) = 1
 trigger1 = P2BodyDist X <= 83
 
-[State -1, 私の肉体が『基本』だ]
-type = ChangeState
-value = 31200
-TriggerAll = Var(59)=1 && RoundState = 2
-triggerall = NumHelper(1900) = 0 
-triggerall = NumHelper(1600) = 0 
-triggerall = numhelper(1001) = 0
-triggerall = NumHelper(2) = 0 
-triggerall = var(49) != 10000
-triggerall = var(3) = 1
-triggerall = P2BodyDist X <= 125+enemynear(var(53)),vel x
-triggerall = P2BodyDist X > 30
-triggerall = P2Statetype = S
-triggerall = enemynear(var(53)),vel x > 0
-triggerall = enemynear(var(53)),time > 4
-triggerall = P2MoveType != H
-TriggerAll = var(52) != 10
-triggerall = (var(52) <= 12)
-triggerall = random < 333
-trigger1 = statetype != A
-trigger1 = ctrl
-trigger2 = stateno = 200 && (time > 6)
-trigger3 = stateno = 210 && (time > 4)
-trigger4 = stateno = 242 && (time > 13)
-trigger5 = stateno = 215 && (time > 13)
-trigger6 = stateno = 400 && (time > 3)
-trigger7 = stateno = 412 && (time > 6)
-trigger8 = stateno = 3900 && time < 7
-
-[State -1, 私の肉体が『基本』だ]
-type = ChangeState
-value = 31210
-TriggerAll = Var(59)=1 && RoundState = 2
-triggerall = numhelper(4321) = 0
-triggerall = var(49) = 10000
-triggerall = var(3) = 1
-triggerall = P2BodyDist X <= 125+enemynear(var(53)),vel x
-triggerall = P2BodyDist X > 30
-triggerall = P2Statetype = S
-triggerall = enemynear(var(53)),vel x > 0
-triggerall = enemynear(var(53)),time > 4
-triggerall = P2MoveType != H
-TriggerAll = var(52) != 10
-triggerall = (var(52) <= 12)
-triggerall = random <= 249
-trigger1 = statetype != A
-trigger1 = ctrl
-trigger2 = stateno = 30200 && (time > 4)
-trigger3 = stateno = 30210 && (time > 7)
-trigger4 = stateno = 30240 && (time > 11)
-trigger5 = stateno = 30400 && (time > 4)
-trigger6 = stateno = 30411 && (time > 6)
-trigger7 = stateno = 30440 && (time > 9)
-trigger8 = stateno = 30220 && (time > 3)
-trigger9 = stateno = 30255 && (time > 6)
-trigger10 = stateno = 30270 && (time > 11)
-trigger11 = stateno = 30420 && (time > 4)
-trigger12 = stateno = 30450 && (time > 6)
-trigger13 = stateno = 30470 && (time > 9)
-
-;自分の肉体までも・・・
-[State -1, Stand Strong Punch]
-type = ChangeState
-value = 33500
-TriggerAll = Var(59)=1 && RoundState = 2
-triggerall = power >= 1000
-triggerall = NumHelper(1900) = 0 
-triggerall = NumHelper(2) = 0 
-triggerall = var(49) != 10000
-triggerall = var(3) = 1
-triggerall = NumHelper(1001) = 0 
-triggerall = P2BodyDist X <= 125+enemynear(var(53)),vel x
-triggerall = P2BodyDist X > 30
-triggerall = P2Statetype = S
-triggerall = enemynear(var(53)),vel x > 0
-triggerall = enemynear(var(53)),time > 4
-triggerall = P2MoveType != H
-triggerall = ((random <= 499)*(power >= 4000) + (random <= 249)*(power >= 1500)*(var(58) = 1) + (random <= 499)*(var(58) = 1)*helper(55002),var(18)) > 0
-trigger1 = statetype = S
-trigger1 = ctrl
-trigger2 = stateno = 200 && (time > 6)
-trigger3 = stateno = 210 && (time > 5)
-trigger4 = stateno = 242 && (time > 13)
-trigger5 = stateno = 215 && (time > 6)
-trigger6 = stateno = 400 && (time > 3)
-trigger7 = stateno = 412 && (time > 6)
-trigger8 = stateno = 445 && (time > 8)
-
-;自分の肉体までも・・・ S
-[State -1, Stand Strong Punch]
-type = ChangeState
-value = 33500
-TriggerAll = Var(59)=1 && RoundState = 2
-triggerall = power >= 1000
-triggerall = NumHelper(1001) = 0 
-triggerall = NumHelper(2) = 0 
-triggerall = var(49) = 10000
-triggerall = var(3) = 1
-triggerall = helper(1),movetype != H
-triggerall = P2BodyDist X <= 125+enemynear(var(53)),vel x
-triggerall = P2BodyDist X > 30
-triggerall = P2Statetype = S
-triggerall = enemynear(var(53)),vel x > 0
-triggerall = enemynear(var(53)),time > 4
-triggerall = P2MoveType != H
-triggerall = ((random <= 499)*(power >= 4000) + (random <= 249)*(power >= 1500)*(var(58) = 1) + (random <= 499)*(var(58) = 1)*helper(55002),var(18)) > 0
-trigger1 = statetype = S
-trigger1 = ctrl
-trigger2 = stateno = 30200 && (time > 4)
-trigger3 = stateno = 30210 && (time > 7)
-trigger4 = stateno = 30240 && (time > 10)
-trigger5 = stateno = 30400 && (time > 4)
-trigger6 = stateno = 30411 && (time > 6)
-trigger7 = stateno = 30440 && (time > 9)
-trigger8 = stateno = 30220 && (time > 3)
-trigger9 = stateno = 30255 && (time > 6)
-trigger10 = stateno = 30270 && (time > 11)
-trigger11 = stateno = 30420 && (time > 4)
-trigger12 = stateno = 30450 && (time > 6)
-trigger13 = stateno = 30470 && (time > 9)
-
 ;---------------------------------------------------------------------------
 ;8 コンボ　3ゲージでスパコン→進化（AI性格0の場合）　1ゲージでスパコンし、進化しない（AI性格1の場合）
 ;---------------------------------------------------------------------------
@@ -6029,10 +5887,10 @@ TriggerAll = Var(59)=1 && RoundState = 2
 triggerall = power >= 1000+(var(58) = 0)*2000
 triggerall = var(49) = 10000
 triggerall = var(3) = 0
-triggerall = (stateno = 10440) || ((P2BodyDist x > 65 - 2*8) && (stateno = 10410))
+triggerall = (stateno = 10440)
 triggerall = movehit
 ;triggerall = (numhelper(6600) && helper(6600),anim = 14006 && (helper(6600),animelemtime(2) >= 100)) || (numhelper(6600) = 0) || (numhelper(6600) && helper(6600),anim != 14006)
-trigger1 = var(52) = 30 || ((P2BodyDist x > 65 - 2*8) && (stateno = 10410))
+trigger1 = var(52) = 30
 trigger1 = 1 || var(52) := 0
 ;CM Soff　なし
 ;CM Son
@@ -6298,19 +6156,6 @@ trigger2 = 1 || var(52) := 25;B
 ;（画面端）屈弱>屈中>立強>十字架>S発現>立弱
 ;空中ウシャー>銃>立弱>立強>S発現
 ;ジャンプ強>空中ウシャー
-
-;立ち中　s　CM
-[State -1, Stand Strong Punch]
-type = ChangeState
-value = 30210
-TriggerAll = Var(59)=1 && RoundState = 2
-triggerall = var(49) = 10000
-triggerall = var(3) = 1
-triggerall = numhelper(4321) = 0
-trigger1 = statetype != A
-trigger1 = stateno = 30200 && !movehit && (time > 4)
-trigger1 = helper(55002),var(1) = 31100 || helper(55002),var(2) = 31100 || helper(55002),var(3) = 31100 || helper(55002),var(4) = 31100
-trigger1 = 1 || var(52) := 32
 
 ;立ち弱　s　CM
 [State -1, Stand Strong Punch]
@@ -6582,12 +6427,8 @@ trigger1 = stateno = 10440 && time > 5
 trigger1 = var(52) = 30 || (var(52) <= 22)
 trigger1 = movehit >= 4
 trigger1 = 1 || var(52) := 30
-trigger2 = var(52) = 29
-trigger2 = P2BodyDist x > 65 - 2*8
-trigger2 = stateno = 10410 && (movehit >= 4)
-trigger2 = 1 || var(52) := 30
 
-[State -1, しゃがみ強];キャンセル屈強 距離65以内の場合 2:吹っ飛び速度 7:発生
+[State -1, しゃがみ強];キャンセル屈強
 type = ChangeState
 value = 10440
 TriggerAll = Var(59)=1 && RoundState = 2
@@ -6595,7 +6436,6 @@ triggerall = var(49) = 10000
 triggerall = numhelper(4321) = 0
 triggerall = var(3) = 0
 triggerall = var(52) = 29
-trigger1 = P2BodyDist x <= 65 - 2*8
 trigger1 = stateno = 10410 && (movehit >= 4)
 trigger1 = 1 || var(52) := 30
 
@@ -7334,37 +7174,7 @@ value = 14005
 ;////
 ;Soff
 ;発現屈強(WS)発現屈中(CM)
-;基本
 ;////
-
-[State -1, 私の肉体が『基本』だ]
-type = ChangeState
-value = 31200
-TriggerAll = Var(59)=1 && RoundState = 2
-triggerall = NumHelper(1900) = 0 
-triggerall = NumHelper(1600) = 0 
-triggerall = numhelper(1001) = 0
-triggerall = NumHelper(2) = 0 
-triggerall = var(49) != 10000
-triggerall = var(3) = 1
-triggerall = helper(55002),var(26) >= 25
-triggerall = P2BodyDist X <= 95+enemynear(var(53)),vel x
-triggerall = P2BodyDist X > -10
-triggerall = P2BodyDist Y >= -150+enemynear(var(53)),vel y
-triggerall = P2BodyDist Y < -70+enemynear(var(53)),vel y
-triggerall = P2MoveType != H
-TriggerAll = var(52) != 10
-triggerall = (var(52) <= 12)
-triggerall = random < 333
-trigger1 = statetype != A
-trigger1 = ctrl
-trigger2 = stateno = 200 && (time > 6)
-trigger3 = stateno = 210 && (time > 4)
-trigger4 = stateno = 242 && (time > 13)
-trigger5 = stateno = 215 && (time > 13)
-trigger6 = stateno = 400 && (time > 3)
-trigger7 = stateno = 412 && (time > 6)
-trigger8 = stateno = 3900 && time < 7
 
 [State -1, 発現しゃがみ強];対空
 type = ChangeState
@@ -7416,26 +7226,6 @@ trigger2 = stateno = [100,105]
 ;屈強
 ;////
 
-[State -1, モラッタゾッ！];対空
-type = ChangeState
-value = 6600
-TriggerAll = Var(59)=1 && RoundState = 2
-triggerall = var(49) = 10000
-triggerall = var(3) = 0
-triggerall = NumHelper(4321) = 0 
-triggerall = helper(55002),var(26) >= 25
-triggerall = P2BodyDist X <= 60+enemynear(var(53)),vel x
-triggerall = P2BodyDist X > -10
-triggerall = P2BodyDist Y >= -200+enemynear(var(53)),vel y
-triggerall = P2BodyDist Y < -100+enemynear(var(53)),vel y
-triggerall = P2MoveType != H
-TriggerAll = var(52) != 10
-triggerall = (var(52) <= 12)
-triggerall = random <= 749
-trigger1 = statetype != A
-trigger1 = ctrl
-trigger2 = stateno = [100,105]
-
 [State -1, しゃがみ強S];対空
 type = ChangeState
 value = 10440
@@ -7457,41 +7247,8 @@ trigger2 = stateno = [100,105]
 
 ;////
 ;C-MOON
-;両腕
 ;屈中
-;基本
 ;////
-
-[State -1, 私の肉体が『基本』だ];対空
-type = ChangeState
-value = 31210
-TriggerAll = Var(59)=1 && RoundState = 2
-triggerall = numhelper(4321) = 0
-triggerall = var(49) = 10000
-triggerall = var(3) = 1
-triggerall = helper(55002),var(26) >= 25
-triggerall = P2BodyDist X <= 85+enemynear(var(53)),vel x
-triggerall = P2BodyDist X > -10
-triggerall = P2BodyDist Y >= -150+enemynear(var(53)),vel y
-triggerall = P2BodyDist Y < -70+enemynear(var(53)),vel y
-triggerall = P2MoveType != H
-TriggerAll = var(52) != 10
-triggerall = (var(52) <= 12)
-triggerall = random <= 124
-trigger1 = statetype != A
-trigger1 = ctrl
-trigger2 = stateno = 30200 && (time > 4)
-trigger3 = stateno = 30210 && (time > 7)
-trigger4 = stateno = 30240 && (time > 11)
-trigger5 = stateno = 30400 && (time > 4)
-trigger6 = stateno = 30411 && (time > 6)
-trigger7 = stateno = 30440 && (time > 9)
-trigger8 = stateno = 30220 && (time > 3)
-trigger9 = stateno = 30255 && (time > 6)
-trigger10 = stateno = 30270 && (time > 11)
-trigger11 = stateno = 30420 && (time > 4)
-trigger12 = stateno = 30450 && (time > 6)
-trigger13 = stateno = 30470 && (time > 9)
 
 [State -1, 両腕];対空
 type = ChangeState
