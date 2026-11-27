@@ -1,0 +1,204 @@
+;AI(専用動作)
+;---------------------------------------------------------------------------
+; 待機(AI)
+[Statedef 99900]
+type = S
+physics = S
+sprpriority = 0
+velset = 0,0
+ctrl = 0
+
+[State 99900, 1]
+type = ChangeAnim
+trigger1 = Anim != 0+var(49) && Anim != 5+var(49)
+trigger2 = Anim = 5+var(49) && AnimTime = 0 ;Turn anim over
+value = 0+var(49)
+
+[State 99900, 1]
+type = ChangeAnim
+trigger1 = Anim = 0 && animelem = 11 && random < 500
+value = anim
+elem = 1
+
+[State 99900, 2]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 99900, 3] ;Stop moving if low velocity or 4 ticks pass
+type = VelSet
+trigger1 = abs(vel x) < 2
+trigger2 = Time = 4
+x = 0
+
+[State 99900, 4] ;Are you dead?
+type = ChangeState
+trigger1 = !alive
+value = 5050
+
+[State 99900, 5]
+type = CtrlSet
+trigger1 = roundstate != 2
+trigger2 = p2statetype = L
+trigger3 = p2statetype = A
+trigger4 = inguarddist
+trigger5 = var(8) != 3
+trigger6 = p2movetype != H
+trigger7 = !var(59)
+value = 1
+
+;---------------------------------------------------------------------------
+;歩き(AI)
+[Statedef 21]
+type = S
+physics = S
+sprpriority = 0
+ctrl = 0
+velset = 0,0
+
+[State 21, 1]
+type = VelSet
+triggerall = var(59)
+trigger1 = !vel X
+trigger2 = vel X > 0
+x = const(velocity.walk.fwd.x)
+
+[State 21, 2]
+type = VelSet
+triggerall = var(59)
+trigger1 = !vel X
+trigger2 = vel X < 0
+x = const(velocity.walk.back.x)
+
+[State 21, 3]
+type = ChangeAnim
+triggerall = vel x > 0
+trigger1 = Anim != 20+var(49) && Anim != 5+var(49)
+trigger2 = Anim = 5+var(49) && AnimTime = 0
+value = 20+var(49)
+
+[State 21, 4]
+type = ChangeAnim
+triggerall = vel x < 0
+trigger1 = Anim != 21+var(49) && Anim != 5+var(49)
+trigger2 = Anim = 5+var(49) && AnimTime = 0
+value = 21+var(49)
+
+[State 21, 4]
+type = changestate
+trigger1 = time > 20
+trigger2 = inguarddist
+trigger3 = roundstate != 2
+value = 0
+ctrl = 1
+
+;---------------------------------------------------------------------------
+;ジャンプ開始(AI)
+[Statedef 41]
+type    = S
+physics = S
+anim = 40+var(49)
+ctrl = 0
+velset = 0,0
+
+[State 41, HitBy]
+type = HitBy
+trigger1 = 1
+value = SCA, NA,SA,HA,NP,SP,HP
+
+[State 41, 1]
+type = VarSet
+triggerall = var(59)
+trigger1 = Time = 0
+sysvar(1) = 1
+
+[State 41, 1]
+type = VarSet
+triggerall = var(59)
+triggerall = var(49)
+trigger1 = Time = 0
+trigger1 = p2bodydist x < 60
+trigger1 = p2movetype != H
+trigger1 = random < 666
+sysvar(1) = -1
+
+[State 41, 4]
+type = VarSet
+trigger1 = Time = 0
+var(3) = 0
+
+[State 41, 4]
+type = VarSet
+triggerall = var(59)
+triggerall = Time = 0
+trigger1 = PrevStateNo = 100 || PrevStateNo = 101
+trigger2 = var(8) || var(41)
+trigger3 = Random = [0,720]
+trigger4 = p2bodydist X > 90
+trigger5 = p2movetype = H
+var(3) = 1
+
+[State 41, 4]
+type = VarSet
+trigger1 = Time = 0
+var(4) = 0
+
+[State 41, 5]
+type = VarSet
+triggerall = !var(59)
+trigger1 = command != "holdup"
+var(4) = 1
+
+[State 41, 5]
+type = VarSet
+triggerall = var(59)
+trigger1 = time = 0
+var(4) = 1
+
+[State 41, 5]
+type = VarSet
+triggerall = var(59)
+triggerall = time = 0
+trigger1 = !var(49)
+trigger1 = p2bodydist X > 160 || p2bodydist Y < -60
+trigger2 = var(49)
+trigger2 = (p2bodydist x = [81,120]); || random < 333
+var(4) = 0
+
+[State 41, 5]
+type = VarSet
+triggerall = var(59)
+triggerall = time = 0
+trigger1 = !var(49)
+trigger1 = p2bodydist X <= 160 && p2bodydist Y >= -60
+trigger2 = var(49)
+trigger2 = (p2bodydist x != [81,120]) || !enemynear,ctrl
+trigger2 = random >= 333 || (p2movetype = H && (p2bodydist x > 50+20 || p2statetype = C))
+var(4) = 1
+
+[State 41, 5]
+type = VarSet
+triggerall = var(59)
+triggerall = time = 0
+trigger1 = !var(49)
+trigger1 = inguarddist
+trigger1 = enemynear,hitdefattr = SCA,AT
+trigger2 = var(47) = 8
+trigger2 = p2movetype = H
+var(4) = 0
+
+[State 41, 6]
+type = VelSet
+trigger1 = AnimTime = 0
+x = ifelse(!sysvar(1), 0, ifelse(sysvar(1)=1, const(velocity.jump.fwd.x), const(velocity.jump.back.x)))*ifelse(var(3)&&(!var(49)||(var(49)&&!var(4))),1.5,1)
+
+[State 41, 8]
+type = VelSet
+trigger1 = AnimTime = 0
+y = const(velocity.jump.y)*ifelse(var(4),.8,1)*ifelse(var(3)&&!sysvar(1),1.15,1)*ifelse(var(49),.4,1)
+
+[State 41, 10]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 50
+ctrl = 1

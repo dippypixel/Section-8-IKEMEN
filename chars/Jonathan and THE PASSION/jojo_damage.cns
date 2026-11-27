@@ -1,0 +1,395 @@
+;===========================================================================
+;スタンドクラッシュ
+[Statedef 6000]
+type = U
+movetype = H
+physics = N
+ctrl = 0
+velset = 0,0
+
+[State -2]
+type = VarSet
+trigger1 = time = 0
+var(0) = 0
+ignorehitpause = 0
+
+[State -2]
+type = VarSet
+trigger1 = time = 0
+var(29) = 20
+ignorehitpause = 0
+
+[State 5000, 1] ;Anim for HIT_LIGHT to HIT_HARD
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = GetHitVar(animtype) != [3,5]
+value = ifelse((GetHitVar(groundtype) = 1),5000,5010) + GetHitVar(animtype)
+
+[State 5000, 2] ;Anim for HIT_BACK
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = GetHitVar(animtype) = [3,5]
+value = 5030
+
+[State 5000, 3] ;Anim for HIT_UP/HIT_DIAGUP (only if it exists)
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = (GetHitVar(animtype) = [4,5]) && (SelfAnimExist(5047 + GetHitVar(animtype)))
+value = 5047 + GetHitVar(animtype) ;5051 - 4 + type
+
+[State -2]
+type = Pause
+trigger1 = time = 0
+time = 6
+movetime = 6
+
+[State -1, VarAdd]
+type = VarAdd
+trigger1 = var(33)
+var(33) = -1
+ignorehitpause = 1
+
+[State 6000]
+type = VarAdd
+trigger1 = time = 0
+var(33) = 27
+ignorehitpause = 1
+
+[State -1, VarSet]
+type = VarSet
+trigger1 = time = 0
+var(34) = gethitvar(hittime)
+ignorehitpause = 1
+
+[State 6000]
+type = PlaySnd
+trigger1 = time = 0
+value = 6000,0
+
+[State 6000]
+type = Explod
+trigger1 = time = 0
+anim = 7300
+id = 7300
+postype = Left
+pos = 160,104
+ownpal = 1
+bindtime = -1
+ignorehitpause = 1
+sprpriority = -105
+pausemovetime = 9999
+supermovetime = 9999
+removetime = 7
+scale = const(size.xscale),const(size.yscale)
+;------------------------------------
+[State 6000]
+type = ChangeState
+triggerall = time > 1
+trigger1 = !var(33)
+trigger1 = GetHitVar(yvel) = 0 && !GetHitVar(fall)
+value = 6001 ;HITG_SLIDE
+
+[State 6000]
+type = ChangeState
+triggerall = time > 1
+trigger1 = !var(33)
+value = 6030
+;===========================================================================
+;スタンドクラッシュ(ヒットバック)
+[Statedef 6001]
+type = S
+movetype = H
+physics = N
+
+[State -1, VarAdd]
+type = VarAdd
+trigger1 = !var(33) && var(34)
+var(34) = -1
+ignorehitpause = 1
+
+[State 5001, 1]
+type = VelSet
+trigger1 = !var(33)
+x = -8
+persistent = 0
+
+[State 5001, 2]
+type = ChangeAnim
+triggerall = prevstateno = 6000
+trigger1 = !var(33)
+trigger1 = anim != 5007 + (GetHitVar(groundtype)=2)*10
+value = 5007 + (GetHitVar(groundtype)=2)*10
+
+[State 5001, 2]
+type = ChangeAnim
+triggerall = prevstateno = 6100
+trigger1 = var(33)
+value = anim
+
+[State 5001, 3] ;Stop sliding back
+type = VelMul
+trigger1 = !var(33)
+x = .9
+
+[State 5001, 4]
+type = VelSet
+trigger1 = !var(34)
+x = 0
+
+[State 5001, 5]
+type = DefenceMulSet
+trigger1 = !var(34)
+value = 1
+
+[State 5001, 6]
+type = ChangeState
+trigger1 = !var(34)
+value = 0
+ctrl = 1
+===========================================================================
+;HITA_UP (initial going up)（ダウン）
+[Statedef 6030]
+type = A
+movetype = H
+physics = N
+ctrl = 0
+
+[State 5030, 1]
+type = Gravity
+trigger1 = 1
+
+[State 5030, 2]
+type = HitVelSet
+triggerall = prevstateno = 6000
+trigger1 = Time = 0
+x = 1
+y = 1
+
+[State 5030, 2]
+type = VelMul
+triggerall = prevstateno = 6000
+trigger1 = Time = 0
+y = 1.1
+
+[State 5030, 2]
+type = VelSet
+triggerall = prevstateno = 6100
+trigger1 = Time = 0
+x = -2.5
+y = -2.5
+
+[State 5030, 3]
+type = ChangeState
+triggerall = !HitFall
+trigger1 = !var(34)
+trigger2 = Vel Y > 0    ;Hit ground
+trigger2 = Pos Y >= 10  ;.
+value = 5040 ;HITA_RECOV
+
+[State 5030, 4]
+type = ChangeState
+triggerall = HitFall
+trigger1 = !var(34)
+trigger2 = Vel Y > 0    ;Hit ground
+trigger2 = Pos Y >= 10  ;.
+value = 5050 ;HITA_FALL
+
+[State 5030, 5]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 6035 ;HITA_UP (transition)
+===========================================================================
+; HITA_UP_T (transition)
+[Statedef 6035]
+type = A
+movetype = H
+physics = N
+
+[State 5035, 1]
+type = ChangeAnim
+trigger1 = Time = 0
+trigger1 = SelfAnimExist(5035)
+trigger1 = Anim != [5051,5059] ;Not if in hit up anim
+trigger1 = Anim != 5090 ;Not if hit off ground anim
+value = 5035
+
+[State 5035, 1]
+type = Gravity
+trigger1 = 1
+
+[State 5035, 3]
+type = ChangeState
+triggerall = !HitFall
+trigger1 = !var(34)  ;Hit is over
+trigger2 = AnimTime = 0 ;Animation over
+trigger3 = Vel Y > 0    ;Hit ground
+trigger3 = Pos Y >= 10  ;.
+trigger4 = Time = 0     ;No transition anim
+trigger4 = Anim != 5035 ;.
+value = 5040 ;HITA_RECOV
+
+[State 5035, 4]
+type = ChangeState
+triggerall = HitFall
+trigger1 = !var(34)  ;Hit is over
+trigger2 = AnimTime = 0 ;Anim is over
+trigger3 = Vel Y > 0    ;Hit ground
+trigger3 = Pos Y >= 10  ;.
+trigger4 = Time = 0     ;No transition anim
+trigger4 = Anim != 5035 ;.
+value = 5050 ;HITA_FALL
+;===========================================================================
+;HITG_SHAKE（ガード時）
+[Statedef 6100]
+type = U
+movetype = H
+physics = N
+velset = 0,0
+
+[State -2]
+type = VarSet
+trigger1 = time = 0
+var(0) = 0
+ignorehitpause = 0
+
+[State -2]
+type = VarSet
+trigger1 = time = 0
+var(29) = 20
+ignorehitpause = 0
+;------------------------------------
+;行動不能時間
+[State 6000]
+type = VarAdd
+trigger1 = var(33)
+var(33) = -1
+ignorehitpause = 1
+
+[State 6000]
+type = VarSet
+trigger1 = time = 0
+var(33) = 41
+ignorehitpause = 1
+;------------------------------------
+[State 6000]
+type = ChangeAnim
+trigger1 = time = 0
+trigger1 = statetype != A
+value = 5800
+
+[State 6000]
+type = ChangeAnim
+trigger1 = time = 0
+trigger1 = statetype = A
+value = 5030
+
+[State 6000]
+type = ChangeAnim
+trigger1 = 1
+value = anim
+elem = 1
+
+[State 6000]
+type = Pause
+trigger1 = time = 0
+time = 6
+movetime = 6
+
+[State 6000];スタンドクラッシュSE
+type = PlaySnd
+trigger1 = time = 0
+value = 6000,0
+
+[State 20000]
+type = DisplayToClipboard
+trigger1 = 1
+text = "var(33) = %d"
+params = var(33)
+;------------------------------------
+[State 6000];背景
+type = Explod
+trigger1 = time = 0
+anim = 7300
+id = 7300
+postype = Left
+pos = 160,104
+ownpal = 1
+bindtime = -1
+ignorehitpause = 1
+sprpriority = -105
+pausemovetime = 99999999
+supermovetime = 99999999
+removetime = 7
+scale = const(size.xscale),const(size.yscale)
+;------------------------------------
+[State 6000]
+type = ChangeState
+triggerall = time > 1
+trigger1 = !var(33)
+trigger1 = GetHitVar(yvel) = 0 && !GetHitVar(fall)
+value = 6101 ;HITG_SLIDE
+
+[State 6000]
+type = ChangeState
+triggerall = time > 1
+trigger1 = !var(33)
+value = 6030
+;===========================================================================
+;スタンドクラッシュ(ヒットバック)
+[Statedef 6101]
+type = S
+movetype = H
+physics = N
+
+[State 5001, 1]
+type = VelSet
+trigger1 = !var(33)
+x = -8
+persistent = 0
+
+[State 5001, 2]
+type = ChangeAnim
+triggerall = prevstateno = 6000
+trigger1 = !var(33)
+trigger1 = anim != 5007 + (GetHitVar(groundtype)=2)*10
+value = 5007 + (GetHitVar(groundtype)=2)*10
+
+[State 5001, 2]
+type = ChangeAnim
+triggerall = prevstateno = 6100
+trigger1 = var(33)
+value = anim
+
+[State 5001, 3] ;Stop sliding back
+type = VelMul
+trigger1 = !var(33)
+x = .9
+
+[State 6000]
+type = VarAdd
+trigger1 = var(34)
+var(34) = -1
+ignorehitpause = 1
+
+[State 6000]
+type = VarAdd
+trigger1 = time = 0
+var(34) = 35
+ignorehitpause = 1
+
+[State 5001, 4]
+type = VelSet
+trigger1 = !var(34)
+x = 0
+
+[State 5001, 5]
+type = DefenceMulSet
+trigger1 = !var(34)
+value = 1
+
+[State 5001, 6]
+type = ChangeState
+trigger1 = !var(34)
+value = 0
+ctrl = 1
+

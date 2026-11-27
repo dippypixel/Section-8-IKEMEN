@@ -1,0 +1,2958 @@
+
+;===========================================================================
+;AIヘルパー@@@
+[Statedef 99999]
+Type = A
+MoveType = I
+Physics = N
+Ctrl = 0
+Anim = 9999
+SprPriority = -5
+
+;AI コンフィグ===========================================================
+;設定を変える場合、var(○) = の後に続く数字をいじってください。
+
+
+
+[State 99999, AIレベル]
+;　数値が大きいほど強いです。
+;　小さいと消極的になったり、無駄な行動が増えたり、コンボしなくなったりします。
+;　0はAIなし。むやみにガー不技を振らない分レベル0より1のほうが弱いことも・・・
+type = VarSet
+trigger1 = 1
+var(55) = 10 ;0～10
+
+
+
+
+[state 99999, ガード精度]
+;　相手の攻撃をガードしようとする確率　10でも100%ガードするとは限りません。
+;　（むしろ緩いくらいかもしれません 基本攻撃重視なので）
+type = VarSet
+trigger1 = 1
+var(58) = 8; 0～10
+
+
+
+
+[state 99999, ガード揺さぶり耐性]
+;　中下段などの揺さぶりに対応しようとする確立　10でも100%成功するとは限りません。
+;　0だと下段ガードしなくなります。
+type = VarSet
+trigger1 = 1
+var(57) = 9; 0～10
+
+
+
+
+[State 99999, AIループ回数]
+;　ループコンボを使用した場合の、ワンコンボでの最大ループ回数
+;　設定次第で（多分）永久に繋がります。
+;　ただし、AIレベルが低くなるほど途中でミスりやすくなります。
+;　0だとループコンボを使用しません。
+type = varset
+trigger1 = 1
+var(59) = 2; 0～お好きなだけ
+
+
+
+
+[State 99999, AIループコンボルート選択]
+;　①屈弱→6弱→屈弱・・・
+;　②屈弱→小ジャンプ昇りJ中→J強→屈弱・・・
+;　AIがどちらのループコンボを使うか選べます。
+;　②は高火力ですが相手にある程度高さがないと当たらないので、
+;　スカった場合しゃがんでいる相手には使わなくなり、立っている相手に当たらなければ封印します。
+;　なお、どちらでも永久が可能です。
+;	0 ①のみ使う
+;	1 30%の確率で②を使う
+;	2 50%の確率で②を使う
+;	3 70%の確率で②を使う
+;	4 基本的に②のみ使う
+;
+;	5 体力負けしている時に30%の確率で②を使う
+;	6 体力負けしている時に50%の確率で②を使う
+;	7 体力負けしている時に70%の確率で②を使う
+;	8 体力負けしている時に②を使う
+type = VarSet
+trigger1 = 1
+var(56) = 7 ;0～8
+
+
+
+
+[State 99999, 当身使用率]
+;　AIの各種当身技の使用率を設定できます。
+;　0で使用しない、数字が大きいほど高確率。
+;　場合によってはガン攻め過ぎて当身はほとんど見ないかも。
+;　ただし6だけは例外。基本何もせずガン待ちして当身を狙ってきます。
+type = VarSet
+trigger1 = 1
+var(35) = 2 ;0～5 or 6
+
+
+
+
+[State 99999, スパコンぶっぱ率]
+;　セブラルナイフス（弱強版除く）及び「エアロスミス」をくらえ　をぶっぱなす確率
+;　数字が大きいほど高確率です。
+type = varset
+trigger1 = 1
+var(46) = 1; 0～10
+
+
+
+
+[state 99999, 弱強セブラルナイフス AI使用頻度]
+;　ガード不能、長時間持続のナイフを大量に設置するスパコン。
+;　相手が人間だろうがAIだろうが地上じゃほとんどロクに動けなくしてしまう。（AIは認識できずに突っ込んでダウンする）
+;　ただし相手を転ばせるのでこちらのコンボも中断されてしまう。でも本体が高性能なので十分フォローできる。
+;　相手によっては完全封殺も可能な極端な技なので、AIレベルや他のスパコンとは別に使用率を設定できるようになっています。
+;　0なら全く使いません。逆に11は出し惜しみしません。
+;　11は基本的にゲージ全てコレにまわすので逆に爆発力がなくなって弱いかも。
+;　強すぎるという人やAI殺しが嫌いな人は0でいいと思います。
+type = VarSet
+trigger1 = 1
+var(25) = 2 ;0～10 or 11
+
+
+
+
+[state 99999,  ガー不技 AI使用設定]
+;「死んでもらうッ！」、soff「磁力ナイフ」について、AIが使用するタイミングを設定できます
+;	0 食らい中の相手にのみ使う
+;	1 磁力ナイフのみガード中の相手にも使うが、特定の通常技からのみキャンセルする
+:	2 ↑に加え、通常技を空中ガードした相手を死んでもらうッ！で落とす
+:	3 両方の技でガードを崩してくるが、地上の相手には特定の通常技からのみキャンセルする
+;	4 あらゆる通常技からキャンセルしてくる自重なしモード（と言いつつぶっぱしないだけ自重してたり）
+type = VarSet
+trigger1 = 1
+var(27) = 2 ;0～4
+
+
+
+
+[state 99999, ガー不起き攻めナイフ AI使用設定]
+;　soff磁力ナイフによる起き攻めの最大連続使用回数を設定できます
+;　「起き攻めの回数」ではないので注意。（一回の起き攻めで大体１～２本）
+;　あくまで「最大」回数であり、必ずこの回数だけ出すとは限りません。
+;　…それにしてもちょっと精度が低いですがご容赦ください。
+type = VarSet
+trigger1 = 1
+var(28) = 3 ;0～5ぐらい？
+
+
+
+
+
+
+
+
+
+;AI コンフィグ ここまで===========================================================
+;ここから↓触るべからず===========================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[State -3, AIフラグセット]
+type = parentVarSet
+triggerall = root,var(59) = 0
+triggerall = RoundState = 2
+Trigger1 = root,var(37) = 0
+trigger2 = numhelper(99999)
+var(59) = 1
+
+[State -3, AIフラグセット]
+type = parentVarSet
+triggerall = root,var(59)
+Trigger1 = root,var(37) = [1,2]
+trigger2 = var(55) = 0
+var(59) = 0
+
+[state 99999, ]
+type = destroyself
+trigger1 = root,var(59) = 0
+
+[State 99999, AssertSpecial]
+Type = AssertSpecial
+Trigger1 = 1
+flag = Invisible
+flag2 = Noshadow 
+ignorehitpause = 1
+
+[State 99999, NotHitBy]
+Type = NotHitBy
+Value = SCA
+Trigger1 = 1
+IgnoreHitPause = 1
+
+[State 99999, Turn]
+Type = turn
+Trigger1 = Facing != root,Facing
+
+[State 99999, Posset in Root]
+Type = Posset
+Trigger1 = 1
+X = Root,Pos X
+
+[State 99999, Posadd 100];座標+100（本体から+100へずらす）
+Type = Posadd
+Trigger1 = 1
+X = 100
+
+[State 99999, Front GuardDist varset];前側のInGuardDistを代入
+Type = Varset
+var(40) = InGuardDist
+Trigger1 = 1
+
+[State 99999, Posadd -200];座標-200（本体から-100へずらす）
+Type = Posadd
+Trigger1 = 1
+X = -200
+
+[State 99999, Back GuardDist varset];後ろ側のInGuardDistを代入
+Type = Varset
+var(41) = InGuardDist
+Trigger1 = 1
+
+[State 99999, Posadd 100];座標+100（本体と同座標にもどす）
+Type = Posadd
+Trigger1 = 1
+X = 100
+
+
+;===========================================================
+
+[State 99999,1]
+type = varset
+triggerall = PlayerID(root,var(49)),Movetype = A
+tirgger1 = var(15) != 0
+trigger1 = var(15) = PlayerID(root,var(49)),Stateno
+tirgger2 = var(16) != 0
+trigger2 = var(16) = PlayerID(root,var(49)),Stateno
+tirgger3 = var(17) != 0
+trigger3 = var(17) = PlayerID(root,var(49)),Stateno
+tirgger4 = var(18) != 0
+trigger4 = var(18) = PlayerID(root,var(49)),Stateno
+tirgger5 = var(19) != 0
+trigger5 = var(19) = PlayerID(root,var(49)),Stateno
+var(0) = 1
+ignorehitpause = 1
+
+[State 99999]
+type = varset
+trigger1 = PlayerID(root,var(49)),Movetype != A
+var(0) = 0
+ignorehitpause = 1
+
+[State 99999]
+type = null
+trigger1 = var(5) = 0
+trigger1 = var(1) := 1
+trigger2 = var(5)
+trigger2 = var(6) = 0
+trigger2 = var(1) := 2
+trigger3 = var(5)
+trigger3 = var(6)
+trigger3 = var(7) = 0
+trigger3 = var(1) := 3
+trigger4 = var(5)
+trigger4 = var(6)
+trigger4 = var(7)
+trigger4 = var(8) = 0
+trigger4 = var(1) := 4
+trigger5 = var(5)
+trigger5 = var(6)
+trigger5 = var(7)
+trigger5 = var(8)
+trigger5 = var(9) = 0
+trigger5 = var(1) := 5
+ignorehitpause = 1
+
+[State 99999]
+type = null
+trigger1 = var(10) = 0
+trigger1 = var(2) := 1
+trigger2 = var(10)
+trigger2 = var(11) = 0
+trigger2 = var(2) := 2
+trigger3 = var(10)
+trigger3 = var(11)
+trigger3 = var(12) = 0
+trigger3 = var(2) := 3
+trigger4 = var(10)
+trigger4 = var(11)
+trigger4 = var(12)
+trigger4 = var(13) = 0
+trigger4 = var(2) := 4
+trigger5 = var(10)
+trigger5 = var(11)
+trigger5 = var(12)
+trigger5 = var(13)
+trigger5 = var(14) = 0
+trigger5 = var(2) := 5
+ignorehitpause = 1
+
+[State 99999]
+type = varset
+trigger1 = root,movetype != H
+trigger2 = root,stateno = [120,153]
+var(3) = playerID(root,var(49)),Stateno
+ignorehitpause = 1
+
+[State 99999];地上中段＆空中下段学習用　屈ガード
+type = varset
+triggerall = root,stateno = [120,153]
+triggerall = root,statetype = C
+trigger1 = playerID(root,var(49)),statetype = C
+trigger2 = var(3) = var(10)
+trigger3 = var(3) = var(11)
+trigger4 = var(3) = var(12)
+trigger5 = var(3) = var(13)
+trigger6 = var(3) = var(14)
+var(4) = 1
+ignorehitpause = 1
+
+[State 99999];地上中段＆空中下段学習用　立ガード
+type = varset
+triggerall = root,stateno = [120,153]
+triggerall = root,statetype = S
+trigger1 = playerID(root,var(49)),statetype != C
+trigger2 = var(3) = var(5)
+trigger3 = var(3) = var(6)
+trigger4 = var(3) = var(7)
+trigger5 = var(3) = var(8)
+trigger6 = var(3) = var(9)
+var(4) = -1
+ignorehitpause = 1
+
+[State 99999];地上＆空中下段中段学習用
+type = varset
+trigger1 = root,stateno != [120,153];!((root,stateno = [130,131])||(root,stateno = [150,153]))
+trigger1 = root,time >= 2
+trigger2 = var(52) = 0
+var(4) = 0
+ignorehitpause = 1
+
+[State 99999];中段学習用1
+type = varset
+trigger1 = var(4)=1
+trigger1 = !var(5)
+trigger1 = root,movetype = H
+trigger1 = root,stateno >= 200
+trigger1 = var(1) = 1
+trigger1 = playerID(root,var(49)),Movetype = A
+var(5) = var(3)
+ignorehitpause = 1
+
+
+
+[State 99999];中段学習用1.2
+type = varset
+triggerall = var(5)
+trigger1 = var(5) = var(15)
+trigger2 = var(5) = var(16)
+trigger3 = var(5) = var(17)
+trigger4 = var(5) = var(18)
+trigger5 = var(5) = var(19)
+var(5) = 0
+ignorehitpause = 1
+
+[State 99999];中段学習用2
+type = varset
+trigger1 = var(4)=1
+trigger1 = !var(6)
+trigger1 = var(5) != var(3)
+trigger1 = root,movetype = H
+trigger1 = root,stateno >= 200
+trigger1 = var(1) = 2
+trigger1 = playerID(root,var(49)),Movetype = A
+var(6) = var(3)
+ignorehitpause = 1
+
+
+[State 99999];中段学習用2.2
+type = varset
+triggerall = var(6)
+trigger1 = var(6) = var(15)
+trigger2 = var(6) = var(16)
+trigger3 = var(6) = var(17)
+trigger4 = var(6) = var(18)
+trigger5 = var(6) = var(19)
+var(6) = 0
+ignorehitpause = 1
+
+[State 99999];中段学習用3
+type = varset
+trigger1 = var(4)=1
+trigger1 = !var(7)
+trigger1 = var(5) != var(3)
+trigger1 = var(6) != var(3)
+trigger1 = root,movetype = H
+trigger1 = root,stateno >= 200
+trigger1 = var(1) = 3
+trigger1 = playerID(root,var(49)),Movetype = A
+var(7) = var(3)
+ignorehitpause = 1
+
+
+
+[State 99999];中段学習用3.2
+type = varset
+triggerall = var(7)
+trigger1 = var(7) = var(15)
+trigger2 = var(7) = var(16)
+trigger3 = var(7) = var(17)
+trigger4 = var(7) = var(18)
+trigger5 = var(7) = var(19)
+var(7) = 0
+ignorehitpause = 1
+
+[State 99999];中段学習用4
+type = varset
+trigger1 = var(4)=1
+trigger1 = !var(8)
+trigger1 = var(5) != var(3)
+trigger1 = var(6) != var(3)
+trigger1 = var(7) != var(3)
+trigger1 = root,movetype = H
+trigger1 = root,stateno >= 200
+trigger1 = var(1) = 4
+trigger1 = playerID(root,var(49)),Movetype = A
+var(8) = var(3)
+ignorehitpause = 1
+
+
+
+[State 99999];中段学習用4.2
+type = varset
+triggerall = var(8)
+trigger1 = var(8) = var(15)
+trigger2 = var(8) = var(16)
+trigger3 = var(8) = var(17)
+trigger4 = var(8) = var(18)
+trigger5 = var(8) = var(19)
+var(8) = 0
+ignorehitpause = 1
+
+[State 99999];中段学習用5
+type = varset
+trigger1 = var(4)=1
+trigger1 = !var(9)
+trigger1 = var(8) != var(3)
+trigger1 = var(7) != var(3)
+trigger1 = var(6) != var(3)
+trigger1 = var(5) != var(3)
+trigger1 = root,movetype = H
+trigger1 = root,stateno >= 200
+trigger1 = var(1) = 5
+trigger1 = playerID(root,var(49)),Movetype = A
+var(9) = var(3)
+ignorehitpause = 1
+
+
+
+[State 99999];中段学習用5.2
+type = varset
+triggerall = var(9)
+trigger1 = var(9) = var(15)
+trigger2 = var(9) = var(16)
+trigger3 = var(9) = var(17)
+trigger4 = var(9) = var(18)
+trigger5 = var(9) = var(19)
+var(9) = 0
+ignorehitpause = 1
+
+[State 99999];下段学習用1
+type = varset
+trigger1 = var(4)=-1
+trigger1 = !var(10)
+trigger1 = root,movetype = H
+trigger1 = root,stateno >= 200
+trigger1 = var(2) = 1
+trigger1 = playerID(root,var(49)),Movetype = A
+var(10) = var(3)
+ignorehitpause = 1
+
+
+
+[State 99999];下段学習用1.2
+type = varset
+triggerall = var(10)
+trigger1 = var(10) = var(15)
+trigger2 = var(10) = var(16)
+trigger3 = var(10) = var(17)
+trigger4 = var(10) = var(18)
+trigger5 = var(10) = var(19)
+var(10) = 0
+ignorehitpause = 1
+
+[State 99999];下段学習用2
+type = varset
+trigger1 = var(4)=-1
+trigger1 = !var(11)
+trigger1 = var(10) != var(3)
+trigger1 = root,movetype = H
+trigger1 = root,stateno >= 200
+trigger1 = var(2) = 2
+trigger1 = playerID(root,var(49)),Movetype = A
+var(11) = var(3)
+ignorehitpause = 1
+
+
+
+[State 99999];下段学習用2.2
+type = varset
+triggerall = var(11)
+trigger1 = var(11) = var(15)
+trigger2 = var(11) = var(16)
+trigger3 = var(11) = var(17)
+trigger4 = var(11) = var(18)
+trigger5 = var(11) = var(19)
+var(11) = 0
+ignorehitpause = 1
+
+[State 99999];下段学習用3
+type = varset
+trigger1 = var(4)=-1
+trigger1 = !var(12)
+trigger1 = var(10) != var(3)
+trigger1 = var(11) != var(3)
+trigger1 = root,movetype = H
+trigger1 = root,stateno >= 200
+trigger1 = var(2) = 3
+trigger1 = playerID(root,var(49)),Movetype = A
+var(12) = var(3)
+ignorehitpause = 1
+
+
+
+[State 99999];下段学習用3.2
+type = varset
+triggerall = var(12)
+trigger1 = var(12) = var(15)
+trigger2 = var(12) = var(16)
+trigger3 = var(12) = var(17)
+trigger4 = var(12) = var(18)
+trigger5 = var(12) = var(19)
+var(12) = 0
+ignorehitpause = 1
+
+[State 99999];下段学習用4
+type = varset
+trigger1 = var(4)=-1
+trigger1 = !var(13)
+trigger1 = var(10) != var(3)
+trigger1 = var(11) != var(3)
+trigger1 = var(12) != var(3)
+trigger1 = root,movetype = H
+trigger1 = root,stateno >= 200
+trigger1 = var(2) = 4
+trigger1 = playerID(root,var(49)),Movetype = A
+var(13) = var(3)
+ignorehitpause = 1
+
+
+
+[State 99999];下段学習用4.2
+type = varset
+triggerall = var(13)
+trigger1 = var(13) = var(15)
+trigger2 = var(13) = var(16)
+trigger3 = var(13) = var(17)
+trigger4 = var(13) = var(18)
+trigger5 = var(13) = var(19)
+var(13) = 0
+ignorehitpause = 1
+
+[State 99999];下段学習用5
+type = varset
+trigger1 = var(4)=-1
+trigger1 = !var(14)
+trigger1 = var(10) != var(3)
+trigger1 = var(11) != var(3)
+trigger1 = var(12) != var(3)
+trigger1 = var(13) != var(3)
+trigger1 = root,movetype = H
+trigger1 = root,stateno >= 200
+trigger1 = var(2) = 5
+trigger1 = playerID(root,var(49)),Movetype = A
+var(14) = var(3)
+ignorehitpause = 1
+
+
+
+[State 99999];下段学習用5.2
+type = varset
+triggerall = var(14)
+trigger1 = var(14) = var(15)
+trigger2 = var(14) = var(16)
+trigger3 = var(14) = var(17)
+trigger4 = var(14) = var(18)
+trigger5 = var(14) = var(19)
+var(14) = 0
+ignorehitpause = 1
+
+
+[State 99999];ガー不学習用1
+type = null
+triggerall = var(4)=-1
+triggerall = root,movetype = H
+;triggerall = root,stateno > 200
+triggerall = playerID(root,var(49)),Movetype = A
+triggerall = var(15) = 0
+trigger1 = var(10) != 0
+trigger1 = var(5) = var(10)
+trigger1 = var(15) := var(10)
+trigger2 = var(11) != 0
+trigger2 = var(5) = var(11)
+trigger2 = var(15) := var(11)
+trigger3 = var(12) != 0
+trigger3 = var(5) = var(12)
+trigger3 = var(15) := var(12)
+trigger4 = var(13) != 0
+trigger4 = var(5) = var(13)
+trigger4 = var(15) := var(13)
+trigger5 = var(14) != 0
+trigger5 = var(5) = var(14)
+trigger5 = var(15) := var(14)
+trigger6 = var(10) != 0
+trigger6 = var(6) = var(10)
+trigger6 = var(15) := var(10)
+trigger7 = var(11) != 0
+trigger7 = var(6) = var(11)
+trigger7 = var(15) := var(11)
+trigger8 = var(12) != 0
+trigger8 = var(6) = var(12)
+trigger8 = var(15) := var(12)
+trigger9 = var(13) != 0
+trigger9 = var(6) = var(13)
+trigger9 = var(15) := var(13)
+trigger10 = var(14) != 0
+trigger10 = var(6) = var(14)
+trigger10 = var(15) := var(14)
+trigger11 = var(10) != 0
+trigger11 = var(7) = var(10)
+trigger11 = var(15) := var(10)
+trigger12 = var(11) != 0
+trigger12 = var(7) = var(11)
+trigger12 = var(15) := var(11)
+trigger13 = var(12) != 0
+trigger13 = var(7) = var(12)
+trigger13 = var(15) := var(12)
+trigger14 = var(13) != 0
+trigger14 = var(7) = var(13)
+trigger14 = var(15) := var(13)
+trigger15 = var(14) != 0
+trigger15 = var(7) = var(14)
+trigger15 = var(15) := var(14)
+trigger16 = var(10) != 0
+trigger16 = var(8) = var(10)
+trigger16 = var(15) := var(10)
+trigger17 = var(11) != 0
+trigger17 = var(8) = var(11)
+trigger17 = var(15) := var(11)
+trigger18 = var(12) != 0
+trigger18 = var(8) = var(12)
+trigger18 = var(15) := var(12)
+trigger19 = var(13) != 0
+trigger19 = var(8) = var(13)
+trigger19 = var(15) := var(13)
+trigger20 = var(14) != 0
+trigger20 = var(8) = var(14)
+trigger20 = var(15) := var(14)
+trigger21 = var(10) != 0
+trigger21 = var(9) = var(10)
+trigger21 = var(15) := var(10)
+trigger22 = var(11) != 0
+trigger22 = var(9) = var(11)
+trigger22 = var(15) := var(11)
+trigger23 = var(12) != 0
+trigger23 = var(9) = var(12)
+trigger23 = var(15) := var(12)
+trigger24 = var(13) != 0
+trigger24 = var(9) = var(13)
+trigger24 = var(15) := var(13)
+trigger25 = var(14) != 0
+trigger25 = var(9) = var(14)
+trigger25 = var(15) := var(14)
+ignorehitpause = 1
+
+[State 99999];ガー不学習用2
+type = null
+triggerall = var(4)=-1
+triggerall = root,movetype = H
+;triggerall = root,stateno > 200
+triggerall = playerID(root,var(49)),Movetype = A
+triggerall = var(15)
+triggerall = var(16) = 0
+trigger1 = var(10) != 0
+trigger1 = var(5) = var(10)
+trigger1 = var(16) := var(10)
+trigger2 = var(11) != 0
+trigger2 = var(5) = var(11)
+trigger2 = var(16) := var(11)
+trigger3 = var(12) != 0
+trigger3 = var(5) = var(12)
+trigger3 = var(16) := var(12)
+trigger4 = var(13) != 0
+trigger4 = var(5) = var(13)
+trigger4 = var(16) := var(13)
+trigger5 = var(14) != 0
+trigger5 = var(5) = var(14)
+trigger5 = var(16) := var(14)
+trigger6 = var(10) != 0
+trigger6 = var(6) = var(10)
+trigger6 = var(16) := var(10)
+trigger7 = var(11) != 0
+trigger7 = var(6) = var(11)
+trigger7 = var(16) := var(11)
+trigger8 = var(12) != 0
+trigger8 = var(6) = var(12)
+trigger8 = var(16) := var(12)
+trigger9 = var(13) != 0
+trigger9 = var(6) = var(13)
+trigger9 = var(16) := var(13)
+trigger10 = var(14) != 0
+trigger10 = var(6) = var(14)
+trigger10 = var(16) := var(14)
+trigger11 = var(10) != 0
+trigger11 = var(7) = var(10)
+trigger11 = var(16) := var(10)
+trigger12 = var(11) != 0
+trigger12 = var(7) = var(11)
+trigger12 = var(16) := var(11)
+trigger13 = var(12) != 0
+trigger13 = var(7) = var(12)
+trigger13 = var(16) := var(12)
+trigger14 = var(13) != 0
+trigger14 = var(7) = var(13)
+trigger14 = var(16) := var(13)
+trigger15 = var(14) != 0
+trigger15 = var(7) = var(14)
+trigger15 = var(16) := var(14)
+trigger16 = var(10) != 0
+trigger16 = var(8) = var(10)
+trigger16 = var(16) := var(10)
+trigger17 = var(11) != 0
+trigger17 = var(8) = var(11)
+trigger17 = var(16) := var(11)
+trigger18 = var(12) != 0
+trigger18 = var(8) = var(12)
+trigger18 = var(16) := var(12)
+trigger19 = var(13) != 0
+trigger19 = var(8) = var(13)
+trigger19 = var(16) := var(13)
+trigger20 = var(14) != 0
+trigger20 = var(8) = var(14)
+trigger20 = var(16) := var(14)
+trigger21 = var(10) != 0
+trigger21 = var(9) = var(10)
+trigger21 = var(16) := var(10)
+trigger22 = var(11) != 0
+trigger22 = var(9) = var(11)
+trigger22 = var(16) := var(11)
+trigger23 = var(12) != 0
+trigger23 = var(9) = var(12)
+trigger23 = var(16) := var(12)
+trigger24 = var(13) != 0
+trigger24 = var(9) = var(13)
+trigger24 = var(16) := var(13)
+trigger25 = var(14) != 0
+trigger25 = var(9) = var(14)
+trigger25 = var(16) := var(14)
+ignorehitpause = 1
+
+
+[State 99999];ガー不学習用3
+type = null
+triggerall = var(4)=-1
+triggerall = root,movetype = H
+;triggerall = root,stateno > 200
+triggerall = playerID(root,var(49)),Movetype = A
+triggerall = var(15)
+triggerall = var(16)
+triggerall = var(17) = 0
+trigger1 = var(10) != 0
+trigger1 = var(5) = var(10)
+trigger1 = var(17) := var(10)
+trigger2 = var(11) != 0
+trigger2 = var(5) = var(11)
+trigger2 = var(17) := var(11)
+trigger3 = var(12) != 0
+trigger3 = var(5) = var(12)
+trigger3 = var(17) := var(12)
+trigger4 = var(13) != 0
+trigger4 = var(5) = var(13)
+trigger4 = var(17) := var(13)
+trigger5 = var(14) != 0
+trigger5 = var(5) = var(14)
+trigger5 = var(17) := var(14)
+trigger6 = var(10) != 0
+trigger6 = var(6) = var(10)
+trigger6 = var(17) := var(10)
+trigger7 = var(11) != 0
+trigger7 = var(6) = var(11)
+trigger7 = var(17) := var(11)
+trigger8 = var(12) != 0
+trigger8 = var(6) = var(12)
+trigger8 = var(17) := var(12)
+trigger9 = var(13) != 0
+trigger9 = var(6) = var(13)
+trigger9 = var(17) := var(13)
+trigger10 = var(14) != 0
+trigger10 = var(6) = var(14)
+trigger10 = var(17) := var(14)
+trigger11 = var(10) != 0
+trigger11 = var(7) = var(10)
+trigger11 = var(17) := var(10)
+trigger12 = var(11) != 0
+trigger12 = var(7) = var(11)
+trigger12 = var(17) := var(11)
+trigger13 = var(12) != 0
+trigger13 = var(7) = var(12)
+trigger13 = var(17) := var(12)
+trigger14 = var(13) != 0
+trigger14 = var(7) = var(13)
+trigger14 = var(17) := var(13)
+trigger15 = var(14) != 0
+trigger15 = var(7) = var(14)
+trigger15 = var(17) := var(14)
+trigger16 = var(10) != 0
+trigger16 = var(8) = var(10)
+trigger16 = var(17) := var(10)
+trigger17 = var(11) != 0
+trigger17 = var(8) = var(11)
+trigger17 = var(17) := var(11)
+trigger18 = var(12) != 0
+trigger18 = var(8) = var(12)
+trigger18 = var(17) := var(12)
+trigger19 = var(13) != 0
+trigger19 = var(8) = var(13)
+trigger19 = var(17) := var(13)
+trigger20 = var(14) != 0
+trigger20 = var(8) = var(14)
+trigger20 = var(17) := var(14)
+trigger21 = var(10) != 0
+trigger21 = var(9) = var(10)
+trigger21 = var(17) := var(10)
+trigger22 = var(11) != 0
+trigger22 = var(9) = var(11)
+trigger22 = var(17) := var(11)
+trigger23 = var(12) != 0
+trigger23 = var(9) = var(12)
+trigger23 = var(17) := var(12)
+trigger24 = var(13) != 0
+trigger24 = var(9) = var(13)
+trigger24 = var(17) := var(13)
+trigger25 = var(14) != 0
+trigger25 = var(9) = var(14)
+trigger25 = var(17) := var(14)
+ignorehitpause = 1
+
+[State 99999];ガー不学習用4
+type = null
+triggerall = var(4)=-1
+triggerall = root,movetype = H
+;triggerall = root,stateno > 200
+triggerall = playerID(root,var(49)),Movetype = A
+triggerall = var(15)
+triggerall = var(16)
+triggerall = var(17)
+triggerall = var(18) = 0
+trigger1 = var(10) != 0
+trigger1 = var(5) = var(10)
+trigger1 = var(18) := var(10)
+trigger2 = var(11) != 0
+trigger2 = var(5) = var(11)
+trigger2 = var(18) := var(11)
+trigger3 = var(12) != 0
+trigger3 = var(5) = var(12)
+trigger3 = var(18) := var(12)
+trigger4 = var(13) != 0
+trigger4 = var(5) = var(13)
+trigger4 = var(18) := var(13)
+trigger5 = var(14) != 0
+trigger5 = var(5) = var(14)
+trigger5 = var(18) := var(14)
+trigger6 = var(10) != 0
+trigger6 = var(6) = var(10)
+trigger6 = var(18) := var(10)
+trigger7 = var(11) != 0
+trigger7 = var(6) = var(11)
+trigger7 = var(18) := var(11)
+trigger8 = var(12) != 0
+trigger8 = var(6) = var(12)
+trigger8 = var(18) := var(12)
+trigger9 = var(13) != 0
+trigger9 = var(6) = var(13)
+trigger9 = var(18) := var(13)
+trigger10 = var(14) != 0
+trigger10 = var(6) = var(14)
+trigger10 = var(18) := var(14)
+trigger11 = var(10) != 0
+trigger11 = var(7) = var(10)
+trigger11 = var(18) := var(10)
+trigger12 = var(11) != 0
+trigger12 = var(7) = var(11)
+trigger12 = var(18) := var(11)
+trigger13 = var(12) != 0
+trigger13 = var(7) = var(12)
+trigger13 = var(18) := var(12)
+trigger14 = var(13) != 0
+trigger14 = var(7) = var(13)
+trigger14 = var(18) := var(13)
+trigger15 = var(14) != 0
+trigger15 = var(7) = var(14)
+trigger15 = var(18) := var(14)
+trigger16 = var(10) != 0
+trigger16 = var(8) = var(10)
+trigger16 = var(18) := var(10)
+trigger17 = var(11) != 0
+trigger17 = var(8) = var(11)
+trigger17 = var(18) := var(11)
+trigger18 = var(12) != 0
+trigger18 = var(8) = var(12)
+trigger18 = var(18) := var(12)
+trigger19 = var(13) != 0
+trigger19 = var(8) = var(13)
+trigger19 = var(18) := var(13)
+trigger20 = var(14) != 0
+trigger20 = var(8) = var(14)
+trigger20 = var(18) := var(14)
+trigger21 = var(10) != 0
+trigger21 = var(9) = var(10)
+trigger21 = var(18) := var(10)
+trigger22 = var(11) != 0
+trigger22 = var(9) = var(11)
+trigger22 = var(18) := var(11)
+trigger23 = var(12) != 0
+trigger23 = var(9) = var(12)
+trigger23 = var(18) := var(12)
+trigger24 = var(13) != 0
+trigger24 = var(9) = var(13)
+trigger24 = var(18) := var(13)
+trigger25 = var(14) != 0
+trigger25 = var(9) = var(14)
+trigger25 = var(18) := var(14)
+ignorehitpause = 1
+
+[State 99999];ガー不学習用5
+type = null
+triggerall = var(4)=-1
+triggerall = root,movetype = H
+;triggerall = root,stateno > 200
+triggerall = playerID(root,var(49)),Movetype = A
+triggerall = var(15)
+triggerall = var(16)
+triggerall = var(17)
+triggerall = var(18)
+triggerall = var(19) = 0
+trigger1 = var(10) != 0
+trigger1 = var(5) = var(10)
+trigger1 = var(19) := var(10)
+trigger2 = var(11) != 0
+trigger2 = var(5) = var(11)
+trigger2 = var(19) := var(11)
+trigger3 = var(12) != 0
+trigger3 = var(5) = var(12)
+trigger3 = var(19) := var(12)
+trigger4 = var(13) != 0
+trigger4 = var(5) = var(13)
+trigger4 = var(19) := var(13)
+trigger5 = var(14) != 0
+trigger5 = var(5) = var(14)
+trigger5 = var(19) := var(14)
+trigger6 = var(10) != 0
+trigger6 = var(6) = var(10)
+trigger6 = var(19) := var(10)
+trigger7 = var(11) != 0
+trigger7 = var(6) = var(11)
+trigger7 = var(19) := var(11)
+trigger8 = var(12) != 0
+trigger8 = var(6) = var(12)
+trigger8 = var(19) := var(12)
+trigger9 = var(13) != 0
+trigger9 = var(6) = var(13)
+trigger9 = var(19) := var(13)
+trigger10 = var(14) != 0
+trigger10 = var(6) = var(14)
+trigger10 = var(19) := var(14)
+trigger11 = var(10) != 0
+trigger11 = var(7) = var(10)
+trigger11 = var(19) := var(10)
+trigger12 = var(11) != 0
+trigger12 = var(7) = var(11)
+trigger12 = var(19) := var(11)
+trigger13 = var(12) != 0
+trigger13 = var(7) = var(12)
+trigger13 = var(19) := var(12)
+trigger14 = var(13) != 0
+trigger14 = var(7) = var(13)
+trigger14 = var(19) := var(13)
+trigger15 = var(14) != 0
+trigger15 = var(7) = var(14)
+trigger15 = var(19) := var(14)
+trigger16 = var(10) != 0
+trigger16 = var(8) = var(10)
+trigger16 = var(19) := var(10)
+trigger17 = var(11) != 0
+trigger17 = var(8) = var(11)
+trigger17 = var(19) := var(11)
+trigger18 = var(12) != 0
+trigger18 = var(8) = var(12)
+trigger18 = var(19) := var(12)
+trigger19 = var(13) != 0
+trigger19 = var(8) = var(13)
+trigger19 = var(19) := var(13)
+trigger20 = var(14) != 0
+trigger20 = var(8) = var(14)
+trigger20 = var(19) := var(14)
+trigger21 = var(10) != 0
+trigger21 = var(9) = var(10)
+trigger21 = var(19) := var(10)
+trigger22 = var(11) != 0
+trigger22 = var(9) = var(11)
+trigger22 = var(19) := var(11)
+trigger23 = var(12) != 0
+trigger23 = var(9) = var(12)
+trigger23 = var(19) := var(12)
+trigger24 = var(13) != 0
+trigger24 = var(9) = var(13)
+trigger24 = var(19) := var(13)
+trigger25 = var(14) != 0
+trigger25 = var(9) = var(14)
+trigger25 = var(19) := var(14)
+ignorehitpause = 1
+
+[State 99999];ガー不学習用6
+type = null
+triggerall = var(4)=1
+triggerall = root,movetype = H
+;triggerall = root,stateno > 200
+triggerall = playerID(root,var(49)),Movetype = A
+triggerall = var(15) = 0
+trigger1 = var(5) != 0
+trigger1 = var(10) = var(5)
+trigger1 = var(15) := var(5)
+trigger2 = var(6) != 0
+trigger2 = var(10) = var(6)
+trigger2 = var(15) := var(6)
+trigger3 = var(7) != 0
+trigger3 = var(10) = var(7)
+trigger3 = var(15) := var(7)
+trigger4 = var(8) != 0
+trigger4 = var(10) = var(8)
+trigger4 = var(15) := var(8)
+trigger5 = var(9) != 0
+trigger5 = var(10) = var(9)
+trigger5 = var(15) := var(9)
+trigger6 = var(5) != 0
+trigger6 = var(11) = var(5)
+trigger6 = var(15) := var(5)
+trigger7 = var(6) != 0
+trigger7 = var(11) = var(6)
+trigger7 = var(15) := var(6)
+trigger8 = var(7) != 0
+trigger8 = var(11) = var(7)
+trigger8 = var(15) := var(7)
+trigger9 = var(8) != 0
+trigger9 = var(11) = var(8)
+trigger9 = var(15) := var(8)
+trigger10 = var(9) != 0
+trigger10 = var(11) = var(9)
+trigger10 = var(15) := var(9)
+trigger11 = var(5) != 0
+trigger11 = var(12) = var(5)
+trigger11 = var(15) := var(5)
+trigger12 = var(6) != 0
+trigger12 = var(12) = var(6)
+trigger12 = var(15) := var(6)
+trigger13 = var(7) != 0
+trigger13 = var(12) = var(7)
+trigger13 = var(15) := var(7)
+trigger14 = var(8) != 0
+trigger14 = var(12) = var(8)
+trigger14 = var(15) := var(8)
+trigger15 = var(9) != 0
+trigger15 = var(12) = var(9)
+trigger15 = var(15) := var(9)
+trigger16 = var(5) != 0
+trigger16 = var(13) = var(5)
+trigger16 = var(15) := var(5)
+trigger17 = var(6) != 0
+trigger17 = var(13) = var(6)
+trigger17 = var(15) := var(6)
+trigger18 = var(7) != 0
+trigger18 = var(13) = var(7)
+trigger18 = var(15) := var(7)
+trigger19 = var(8) != 0
+trigger19 = var(13) = var(8)
+trigger19 = var(15) := var(8)
+trigger20 = var(9) != 0
+trigger20 = var(13) = var(9)
+trigger20 = var(15) := var(9)
+trigger21 = var(5) != 0
+trigger21 = var(14) = var(5)
+trigger21 = var(15) := var(5)
+trigger22 = var(6) != 0
+trigger22 = var(14) = var(6)
+trigger22 = var(15) := var(6)
+trigger23 = var(7) != 0
+trigger23 = var(14) = var(7)
+trigger23 = var(15) := var(7)
+trigger24 = var(8) != 0
+trigger24 = var(14) = var(8)
+trigger24 = var(15) := var(8)
+trigger25 = var(9) != 0
+trigger25 = var(14) = var(9)
+trigger25 = var(15) := var(9)
+ignorehitpause = 1
+
+[State 99999];ガー不学習用7
+type = null
+triggerall = var(4)=1
+triggerall = root,movetype = H
+;triggerall = root,stateno > 200
+triggerall = playerID(root,var(49)),Movetype = A
+triggerall = var(15)
+triggerall = var(16) = 0
+trigger1 = var(5) != 0
+trigger1 = var(10) = var(5)
+trigger1 = var(16) := var(5)
+trigger2 = var(6) != 0
+trigger2 = var(10) = var(6)
+trigger2 = var(16) := var(6)
+trigger3 = var(7) != 0
+trigger3 = var(10) = var(7)
+trigger3 = var(16) := var(7)
+trigger4 = var(8) != 0
+trigger4 = var(10) = var(8)
+trigger4 = var(16) := var(8)
+trigger5 = var(9) != 0
+trigger5 = var(10) = var(9)
+trigger5 = var(16) := var(9)
+trigger6 = var(5) != 0
+trigger6 = var(11) = var(5)
+trigger6 = var(16) := var(5)
+trigger7 = var(6) != 0
+trigger7 = var(11) = var(6)
+trigger7 = var(16) := var(6)
+trigger8 = var(7) != 0
+trigger8 = var(11) = var(7)
+trigger8 = var(16) := var(7)
+trigger9 = var(8) != 0
+trigger9 = var(11) = var(8)
+trigger9 = var(16) := var(8)
+trigger10 = var(9) != 0
+trigger10 = var(11) = var(9)
+trigger10 = var(16) := var(9)
+trigger11 = var(5) != 0
+trigger11 = var(12) = var(5)
+trigger11 = var(16) := var(5)
+trigger12 = var(6) != 0
+trigger12 = var(12) = var(6)
+trigger12 = var(16) := var(6)
+trigger13 = var(7) != 0
+trigger13 = var(12) = var(7)
+trigger13 = var(16) := var(7)
+trigger14 = var(8) != 0
+trigger14 = var(12) = var(8)
+trigger14 = var(16) := var(8)
+trigger15 = var(9) != 0
+trigger15 = var(12) = var(9)
+trigger15 = var(16) := var(9)
+trigger16 = var(5) != 0
+trigger16 = var(13) = var(5)
+trigger16 = var(16) := var(5)
+trigger17 = var(6) != 0
+trigger17 = var(13) = var(6)
+trigger17 = var(16) := var(6)
+trigger18 = var(7) != 0
+trigger18 = var(13) = var(7)
+trigger18 = var(16) := var(7)
+trigger19 = var(8) != 0
+trigger19 = var(13) = var(8)
+trigger19 = var(16) := var(8)
+trigger20 = var(9) != 0
+trigger20 = var(13) = var(9)
+trigger20 = var(16) := var(9)
+trigger21 = var(5) != 0
+trigger21 = var(14) = var(5)
+trigger21 = var(16) := var(5)
+trigger22 = var(6) != 0
+trigger22 = var(14) = var(6)
+trigger22 = var(16) := var(6)
+trigger23 = var(7) != 0
+trigger23 = var(14) = var(7)
+trigger23 = var(16) := var(7)
+trigger24 = var(8) != 0
+trigger24 = var(14) = var(8)
+trigger24 = var(16) := var(8)
+trigger25 = var(9) != 0
+trigger25 = var(14) = var(9)
+trigger25 = var(16) := var(9)
+ignorehitpause = 1
+
+[State 99999];ガー不学習用8
+type = null
+triggerall = var(4)=1
+triggerall = root,movetype = H
+;triggerall = root,stateno > 200
+triggerall = playerID(root,var(49)),Movetype = A
+triggerall = var(15)
+triggerall = var(16)
+triggerall = var(17) = 0
+trigger1 = var(5) != 0
+trigger1 = var(10) = var(5)
+trigger1 = var(17) := var(5)
+trigger2 = var(6) != 0
+trigger2 = var(10) = var(6)
+trigger2 = var(17) := var(6)
+trigger3 = var(7) != 0
+trigger3 = var(10) = var(7)
+trigger3 = var(17) := var(7)
+trigger4 = var(8) != 0
+trigger4 = var(10) = var(8)
+trigger4 = var(17) := var(8)
+trigger5 = var(9) != 0
+trigger5 = var(10) = var(9)
+trigger5 = var(17) := var(9)
+trigger6 = var(5) != 0
+trigger6 = var(11) = var(5)
+trigger6 = var(17) := var(5)
+trigger7 = var(6) != 0
+trigger7 = var(11) = var(6)
+trigger7 = var(17) := var(6)
+trigger8 = var(7) != 0
+trigger8 = var(11) = var(7)
+trigger8 = var(17) := var(7)
+trigger9 = var(8) != 0
+trigger9 = var(11) = var(8)
+trigger9 = var(17) := var(8)
+trigger10 = var(9) != 0
+trigger10 = var(11) = var(9)
+trigger10 = var(17) := var(9)
+trigger11 = var(5) != 0
+trigger11 = var(12) = var(5)
+trigger11 = var(17) := var(5)
+trigger12 = var(6) != 0
+trigger12 = var(12) = var(6)
+trigger12 = var(17) := var(6)
+trigger13 = var(7) != 0
+trigger13 = var(12) = var(7)
+trigger13 = var(17) := var(7)
+trigger14 = var(8) != 0
+trigger14 = var(12) = var(8)
+trigger14 = var(17) := var(8)
+trigger15 = var(9) != 0
+trigger15 = var(12) = var(9)
+trigger15 = var(17) := var(9)
+trigger16 = var(5) != 0
+trigger16 = var(13) = var(5)
+trigger16 = var(17) := var(5)
+trigger17 = var(6) != 0
+trigger17 = var(13) = var(6)
+trigger17 = var(17) := var(6)
+trigger18 = var(7) != 0
+trigger18 = var(13) = var(7)
+trigger18 = var(17) := var(7)
+trigger19 = var(8) != 0
+trigger19 = var(13) = var(8)
+trigger19 = var(17) := var(8)
+trigger20 = var(9) != 0
+trigger20 = var(13) = var(9)
+trigger20 = var(17) := var(9)
+trigger21 = var(5) != 0
+trigger21 = var(14) = var(5)
+trigger21 = var(17) := var(5)
+trigger22 = var(6) != 0
+trigger22 = var(14) = var(6)
+trigger22 = var(17) := var(6)
+trigger23 = var(7) != 0
+trigger23 = var(14) = var(7)
+trigger23 = var(17) := var(7)
+trigger24 = var(8) != 0
+trigger24 = var(14) = var(8)
+trigger24 = var(17) := var(8)
+trigger25 = var(9) != 0
+trigger25 = var(14) = var(9)
+trigger25 = var(17) := var(9)
+ignorehitpause = 1
+
+[State 99999];ガー不学習用9
+type = null
+triggerall = var(4)=1
+triggerall = root,movetype = H
+;triggerall = root,stateno > 200
+triggerall = playerID(root,var(49)),Movetype = A
+triggerall = var(15)
+triggerall = var(16)
+triggerall = var(17)
+triggerall = var(18) = 0
+trigger1 = var(5) != 0
+trigger1 = var(10) = var(5)
+trigger1 = var(18) := var(5)
+trigger2 = var(6) != 0
+trigger2 = var(10) = var(6)
+trigger2 = var(18) := var(6)
+trigger3 = var(7) != 0
+trigger3 = var(10) = var(7)
+trigger3 = var(18) := var(7)
+trigger4 = var(8) != 0
+trigger4 = var(10) = var(8)
+trigger4 = var(18) := var(8)
+trigger5 = var(9) != 0
+trigger5 = var(10) = var(9)
+trigger5 = var(18) := var(9)
+trigger6 = var(5) != 0
+trigger6 = var(11) = var(5)
+trigger6 = var(18) := var(5)
+trigger7 = var(6) != 0
+trigger7 = var(11) = var(6)
+trigger7 = var(18) := var(6)
+trigger8 = var(7) != 0
+trigger8 = var(11) = var(7)
+trigger8 = var(18) := var(7)
+trigger9 = var(8) != 0
+trigger9 = var(11) = var(8)
+trigger9 = var(18) := var(8)
+trigger10 = var(9) != 0
+trigger10 = var(11) = var(9)
+trigger10 = var(18) := var(9)
+trigger11 = var(5) != 0
+trigger11 = var(12) = var(5)
+trigger11 = var(18) := var(5)
+trigger12 = var(6) != 0
+trigger12 = var(12) = var(6)
+trigger12 = var(18) := var(6)
+trigger13 = var(7) != 0
+trigger13 = var(12) = var(7)
+trigger13 = var(18) := var(7)
+trigger14 = var(8) != 0
+trigger14 = var(12) = var(8)
+trigger14 = var(18) := var(8)
+trigger15 = var(9) != 0
+trigger15 = var(12) = var(9)
+trigger15 = var(18) := var(9)
+trigger16 = var(5) != 0
+trigger16 = var(13) = var(5)
+trigger16 = var(18) := var(5)
+trigger17 = var(6) != 0
+trigger17 = var(13) = var(6)
+trigger17 = var(18) := var(6)
+trigger18 = var(7) != 0
+trigger18 = var(13) = var(7)
+trigger18 = var(18) := var(7)
+trigger19 = var(8) != 0
+trigger19 = var(13) = var(8)
+trigger19 = var(18) := var(8)
+trigger20 = var(9) != 0
+trigger20 = var(13) = var(9)
+trigger20 = var(18) := var(9)
+trigger21 = var(5) != 0
+trigger21 = var(14) = var(5)
+trigger21 = var(18) := var(5)
+trigger22 = var(6) != 0
+trigger22 = var(14) = var(6)
+trigger22 = var(18) := var(6)
+trigger23 = var(7) != 0
+trigger23 = var(14) = var(7)
+trigger23 = var(18) := var(7)
+trigger24 = var(8) != 0
+trigger24 = var(14) = var(8)
+trigger24 = var(18) := var(8)
+trigger25 = var(9) != 0
+trigger25 = var(14) = var(9)
+trigger25 = var(18) := var(9)
+ignorehitpause = 1
+
+[State 99999];ガー不学習用10
+type = null
+triggerall = var(4)=1
+triggerall = root,movetype = H
+;triggerall = root,stateno > 200
+triggerall = playerID(root,var(49)),Movetype = A
+triggerall = var(15)
+triggerall = var(16)
+triggerall = var(17)
+triggerall = var(18)
+triggerall = var(19) = 0
+trigger1 = var(5) != 0
+trigger1 = var(10) = var(5)
+trigger1 = var(19) := var(5)
+trigger2 = var(6) != 0
+trigger2 = var(10) = var(6)
+trigger2 = var(19) := var(6)
+trigger3 = var(7) != 0
+trigger3 = var(10) = var(7)
+trigger3 = var(19) := var(7)
+trigger4 = var(8) != 0
+trigger4 = var(10) = var(8)
+trigger4 = var(19) := var(8)
+trigger5 = var(9) != 0
+trigger5 = var(10) = var(9)
+trigger5 = var(19) := var(9)
+trigger6 = var(5) != 0
+trigger6 = var(11) = var(5)
+trigger6 = var(19) := var(5)
+trigger7 = var(6) != 0
+trigger7 = var(11) = var(6)
+trigger7 = var(19) := var(6)
+trigger8 = var(7) != 0
+trigger8 = var(11) = var(7)
+trigger8 = var(19) := var(7)
+trigger9 = var(8) != 0
+trigger9 = var(11) = var(8)
+trigger9 = var(19) := var(8)
+trigger10 = var(9) != 0
+trigger10 = var(11) = var(9)
+trigger10 = var(19) := var(9)
+trigger11 = var(5) != 0
+trigger11 = var(12) = var(5)
+trigger11 = var(19) := var(5)
+trigger12 = var(6) != 0
+trigger12 = var(12) = var(6)
+trigger12 = var(19) := var(6)
+trigger13 = var(7) != 0
+trigger13 = var(12) = var(7)
+trigger13 = var(19) := var(7)
+trigger14 = var(8) != 0
+trigger14 = var(12) = var(8)
+trigger14 = var(19) := var(8)
+trigger15 = var(9) != 0
+trigger15 = var(12) = var(9)
+trigger15 = var(19) := var(9)
+trigger16 = var(5) != 0
+trigger16 = var(13) = var(5)
+trigger16 = var(19) := var(5)
+trigger17 = var(6) != 0
+trigger17 = var(13) = var(6)
+trigger17 = var(19) := var(6)
+trigger18 = var(7) != 0
+trigger18 = var(13) = var(7)
+trigger18 = var(19) := var(7)
+trigger19 = var(8) != 0
+trigger19 = var(13) = var(8)
+trigger19 = var(19) := var(8)
+trigger20 = var(9) != 0
+trigger20 = var(13) = var(9)
+trigger20 = var(19) := var(9)
+trigger21 = var(5) != 0
+trigger21 = var(14) = var(5)
+trigger21 = var(19) := var(5)
+trigger22 = var(6) != 0
+trigger22 = var(14) = var(6)
+trigger22 = var(19) := var(6)
+trigger23 = var(7) != 0
+trigger23 = var(14) = var(7)
+trigger23 = var(19) := var(7)
+trigger24 = var(8) != 0
+trigger24 = var(14) = var(8)
+trigger24 = var(19) := var(8)
+trigger25 = var(9) != 0
+trigger25 = var(14) = var(9)
+trigger25 = var(19) := var(9)
+ignorehitpause = 1
+
+[State 99999];ガー不学習修正用19
+type = varset
+trigger1 = var(19) = var(15)
+trigger2 = var(19) = var(16)
+trigger3 = var(19) = var(17)
+trigger4 = var(19) = var(18)
+var(19) = 0
+ignorehitpause = 1
+
+[State 99999];ガー不学習修正用18
+type = varset
+trigger1 = var(18) = var(15)
+trigger2 = var(18) = var(16)
+trigger3 = var(18) = var(17)
+var(18) = 0
+ignorehitpause = 1
+
+[State 99999];ガー不学習修正用17
+type = varset
+trigger1 = var(17) = var(15)
+trigger2 = var(17) = var(16)
+var(17) = 0
+ignorehitpause = 1
+
+[State 99999];ガー不学習修正用16
+type = varset
+trigger1 = var(16) = var(15)
+var(16) = 0
+ignorehitpause = 1
+
+
+[State 99999];記憶持越し
+type = varset
+trigger1 = var(10) = 0
+trigger1 = root,var(38) != 0
+var(10) = floor(root,var(38)/10000)
+ignorehitpause = 1
+
+[State 99999];記憶持越し
+type = varset
+trigger1 = var(11) = 0
+trigger1 = root,var(39) != 0
+var(11) = floor(root,var(39)/10000)
+ignorehitpause = 1
+
+[State 99999];記憶持越し
+type = varset
+trigger1 = var(12) = 0
+trigger1 = root,var(40) != 0
+var(12) = floor(root,var(40)/10000)
+ignorehitpause = 1
+
+[State 99999];記憶持越し
+type = varset
+trigger1 = var(13) = 0
+trigger1 = root,var(41) != 0
+var(13) = floor(root,var(41)/10000)
+ignorehitpause = 1
+
+[State 99999];記憶持越し
+type = varset
+trigger1 = var(14) = 0
+trigger1 = root,var(42) != 0
+var(14) = floor(root,var(42)/10000)
+ignorehitpause = 1
+
+[State 99999];記憶持越し
+type = varset
+trigger1 = var(5) = 0
+trigger1 = root,var(38) != 0
+var(5) = root,var(38)-floor((root,var(38)/10000)*10000)
+ignorehitpause = 1
+
+[State 99999];記憶持越し
+type = varset
+trigger1 = var(6) = 0
+trigger1 = root,var(39) != 0
+var(6) = root,var(39)-floor((root,var(39)/10000)*10000)
+ignorehitpause = 1
+
+[State 99999];記憶持越し
+type = varset
+trigger1 = var(7) = 0
+trigger1 = root,var(40) != 0
+var(7) = root,var(40)-floor((root,var(40)/10000)*10000)
+ignorehitpause = 1
+
+[State 99999];記憶持越し
+type = varset
+trigger1 = var(8) = 0
+trigger1 = root,var(41) != 0
+var(8) = root,var(41)-floor((root,var(41)/10000)*10000)
+ignorehitpause = 1
+
+[State 99999];記憶持越し
+type = varset
+trigger1 = var(9) = 0
+trigger1 = root,var(42) != 0
+var(9) = root,var(42)-floor((root,var(42)/10000)*10000)
+ignorehitpause = 1
+
+[State 99999];記憶持越し
+type = varset
+trigger1 = var(16) = 0
+trigger1 = root,var(43) != 0
+var(16) = floor(root,var(43)/10000)
+ignorehitpause = 1
+
+[State 99999];記憶持越し
+type = varset
+trigger1 = var(15) = 0
+trigger1 = root,var(43) != 0
+var(15) = root,var(43)-floor((root,var(43)/10000)*10000)
+ignorehitpause = 1
+
+[State 99999];記憶持越し
+type = varset
+trigger1 = var(18) = 0
+trigger1 = root,var(44) != 0
+var(18) = floor(root,var(44)/10000)
+ignorehitpause = 1
+
+[State 99999];記憶持越し
+type = varset
+trigger1 = var(17) = 0
+trigger1 = root,var(44) != 0
+var(17) = root,var(44)-floor((root,var(44)/10000)*10000)
+ignorehitpause = 1
+
+[State 99999];記憶持越し
+type = varset
+trigger1 = var(19) = 0
+trigger1 = root,var(45) != 0
+var(19) = root,var(45)-floor((root,var(45)/10000)*10000);root,var(45)
+ignorehitpause = 1
+
+[State 99999];記憶持越し
+type = varset
+trigger1 = var(18) = 0
+trigger1 = root,var(45) != 0
+var(34) = floor(root,var(45)/10000)
+ignorehitpause = 1
+
+[State 99999,本体制御50]
+type = varrandom
+trigger1 = root,stateno = [1100,1120]
+trigger2 = root,stateno = [3000,3030]
+V = 50
+range = 50*(10-var(35)),150*(10-var(35))
+ignorehitpause = 1
+
+[State 99999,本体制御50]
+type = Varadd
+trigger1 = var(50) > 0
+trigger1 = root,stateno != 1100
+trigger1 = root,stateno != 3000
+var(50) = -1
+
+[State 99999,本体制御51]
+type = Varset
+trigger1 = root,stateno = [3100,3300]
+var(51) = 700
+ignorehitpause = 1
+
+[State 99999,本体制御51]
+type = Varadd
+trigger1 = var(51) > 0
+var(51) = -1
+
+[State 99999,本体制御51]
+type = Varset
+trigger1 = var(51) > 0
+trigger1 = root,stateno = [3400,3500]
+var(51) = 0
+
+[State 99999,本体制御52]
+type = Varset
+triggerall = root,stateno != 1; && root,stateno != 130 && root,stateno != 140
+trigger1 = playerID(root,var(49)),moveguarded = 1; && random < var(57)*100
+trigger2 = !root,inguarddist
+trigger2 = !Var(40) && !(PlayerID(root,var(49)),P2Dist X<0 && Var(41))
+var(52) = ifelse(random<=var(57)*100,1,0)
+
+[State 99999,本体制御54]
+type = Varadd
+trigger1 = root,stateno = 1200 && root,time = 1
+trigger1 = root,prevstateno != 220
+var(54) = 1
+ignorehitpause = 1
+
+[State 99999,本体制御54]
+type = Varset
+trigger1 = var(54) >= var(28)
+trigger1 = playerID(root,var(49)),movetype = I
+var(54) = -1
+ignorehitpause = 1
+
+[State 99999,本体制御54]
+type = Varset
+trigger1 = var(54) = -1
+trigger1 = playerID(root,var(49)),prevstateno != [5070,5210]
+trigger1 = root,inguarddist
+trigger2 = root,movetype = H
+trigger2 = root,stateno != [120,153]
+trigger2 = playerID(root,var(49)),prevstateno != [5070,5210]
+var(54) = 0
+ignorehitpause = 1
+
+[State 99999,本体制御54]
+type = Varset
+trigger1 = root,stateno = 1600 
+var(54) = -90
+ignorehitpause = 1
+
+[State 99999,本体制御54]
+type = Varadd
+trigger1 = root,stateno != 1600 
+trigger1 = var(54) < 0
+trigger1 = root,var(12)
+var(54) = 1
+ignorehitpause = 1
+
+[State 99999,本体制御54]
+type = Varset
+trigger1 = root,stateno != 1600 
+trigger1 = var(54) < -1
+trigger1 = root,var(12) = 0
+var(54) = 0
+ignorehitpause = 1
+
+[State 99999,本体制御45 ガード失敗]
+type = Varset
+triggerall = root,stateno != [120,153]
+trigger1 = root,movetype = H
+trigger2 = !root,inguarddist
+var(45) = ifelse(random<10*var(58)*var(58),1,0)
+
+[State 99999,本体制御 アドガ]
+type = null
+triggerall = root,var(59)
+triggerall = root,p2bodydist X < 100
+trigger1 = !(helper(99997),var(2) < 80 && helper(99997),var(2) < 80)
+trigger1 = var(53) := ifelse(random<floor(root,var(55)/2),1,0)
+trigger2 = helper(99997),var(2) < 80 || helper(99997),var(2) < 80
+trigger2 = var(53) := ifelse(random<floor(root,var(55)*1.5),1,0)
+
+[State 99999,本体制御 アドガ]
+type = Varset
+trigger1 = root,var(59)
+trigger1 = numhelper(8100) > 0
+var(53) = 0
+
+[State 99999,本体制御49 コンボ]
+type = varset
+triggerall = root,var(59)
+triggerall = var(49) != -1
+trigger1 = playerID(root,var(49)),statetype = C
+trigger1 = var(34) = 1
+trigger1 = !root,movehit
+trigger2 = var(34) = 2
+var(49) = 2
+
+[State 99999,本体制御49 コンボ]
+type = null
+triggerall = root,var(59)
+;triggerall = var(49) != -1
+triggerall = var(49) = 0
+triggerall = !(var(34) = 1 && playerID(root,var(49)),statetype = C) && !(var(34) = 2)
+triggerall = root,stateno = 400 && root,movehit = 1
+trigger1 = var(56) = 1
+trigger1 = var(49) := ifelse(random<300,1,2)
+trigger2 = var(56) = 2
+trigger2 = var(49) := ifelse(random<500,1,2)
+trigger3 = var(56) = 3
+trigger3 = var(49) := ifelse(random<700,1,2)
+trigger4 = var(56) = 4
+trigger4 = var(49) := 1
+trigger5 = var(56) = 0
+trigger5 = var(49) := 2
+trigger6 = (var(49) = 3 || var(49) = 1) && root,stateno = 1000
+trigger6 = var(49) := 2
+trigger7 = var(56) = 5
+trigger7 = root,life < playerID(root,var(49)),life
+trigger7 = var(49) := ifelse(random<300,1,2)
+trigger8 = var(56) = 6
+trigger8 = root,life < playerID(root,var(49)),life
+trigger8 = var(49) := ifelse(random<500,1,2)
+trigger9 = var(56) = 7
+trigger9 = root,life < playerID(root,var(49)),life
+trigger9 = var(49) := ifelse(random<700,1,2)
+trigger10 = var(56) = 8
+trigger10 = root,life < playerID(root,var(49)),life
+trigger10 = var(49) := 1
+trigger11 = var(56) = [5,8]
+trigger11 = root,life >= playerID(root,var(49)),life
+trigger11 = var(49) := 2
+
+
+[State 99999,本体制御49 34 コンボ]
+type = null
+triggerall = var(49) != -1
+triggerall = (playerID(root,var(49)),stateno = [120,153]) || playerID(root,var(49)),movetype != H
+triggerall = root,prevstateno = 610 || (root,prevstateno = 620 && root,stateno != 610 && !root,movehit)
+trigger1 = playerID(root,var(49)),statetype = C
+trigger1 = var(34) := 1
+trigger2 = playerID(root,var(49)),statetype = S
+trigger2 = var(34) := 2
+
+[State 99999,本体制御49 コンボ]
+type = null
+trigger1 = var(49) = 1
+trigger1 = root,stateno = 400 && root,movehit
+trigger1 = var(49) := 3
+trigger2 = var(49) = 3
+trigger2 = root,stateno = 41
+trigger2 = var(49) := 1
+
+[State 99999,本体制御49 コンボ]
+type = varset
+trigger1 = playerID(root,var(49)),stateno = [1025,1027]
+trigger2 = root,stateno = 1000 && root,movehit
+trigger2 = root,var(58) = -1
+var(49) = -1
+
+[State 99999,本体制御49 コンボ]
+type = varset
+triggerall = var(49) != 0
+trigger1 = playerID(root,var(49)),movetype != H
+trigger2 = playerID(root,var(49)),Const(size.Head.Pos.Y) > -60
+trigger3 = playerID(root,var(49)),StateType = A
+trigger3 = var(49) != -1
+trigger4 = playerID(root,var(49)),Statetype = L
+trigger5 = NumHelper(3100)
+trigger5 = var(49) != -1
+var(49) = 0
+
+[State 99999,本体制御32 百分率補助]
+type = varset
+triggerall = root,var(59)
+trigger1 = playerID(root,var(49)),movetype != H
+trigger2 = playerID(root,var(49)),statetype = L
+var(32) = ifelse(random<100*var(55),1,0)
+
+[State 99999,本体制御32 百分率補助]
+type = varset
+triggerall = root,var(59)
+triggerall = random < 2*((10-var(55))**2)
+trigger1 = playerID(root,var(49)),movetype = H
+trigger1 = playerID(root,var(49)),stateno != [1025,1027]
+trigger1 = root,movehit = 0 && (root,prevstateno != [400,3500])
+trigger2 = root,stateno = 101
+trigger2 = !(projhittime(3511)>0||projhittime(3512)>0||projhittime(3513)>0)
+trigger2 = numhelper(1711)=0&&numhelper(1712)=0
+trigger3 = root,stateno = 21
+trigger4 = root,stateno = 105
+trigger5 = root,stateno = 650
+var(32) = 0
+
+[State 99999,本体制御 当身]
+type = Varset
+trigger1 = root,var(59)
+trigger1 = root,stateno = 1120
+var(48) = 300
+
+[State 99999,本体制御 当身]
+type = Varadd
+trigger1 = root,var(59)
+trigger1 = var(48) > 0
+var(48) = -1
+
+[State 99999,本体制御 当身]
+type = Varset
+trigger1 = root,stateno = 3030
+trigger1 = var(48) > 0
+var(48) = 0
+
+[State 99999,本体制御 小パン]
+type = Varadd
+trigger1 = root,var(59)
+trigger1 = root,stateno = 400
+trigger1 = playerID(root,var(49)),statetype != A
+trigger1 = !root,movecontact
+var(47) = 1
+ignorehitpause = 1
+
+[State 99999,本体制御 小パン]
+type = Varset
+triggerall = root,var(59)
+triggerall = var(47) > 0
+trigger1 = playerID(root,var(49)),movetype = H
+trigger2 = root,stateno > 400;= 1020
+var(47) = 0
+
+[State 99999,本体制御 小パン２]
+type = Varadd
+trigger1 = root,var(59)
+trigger1 = root,stateno = 400 && root,movehit = 2
+var(29) = 1
+
+[State 99999,本体制御 小パン２]
+type = Varset
+trigger1 = root,var(59)
+trigger1 = root,stateno != 400 && root,movetype = A
+var(29) = 0
+
+[State 99999,本体制御 当身２]
+type = Varset
+trigger1 = root,var(59)
+trigger1 = playerID(root,var(49)),movetype = A
+trigger1 = root,stateno = [150,155]
+var(31) = playerID(root,var(49)),stateno
+ignorehitpause = 1
+
+[State 99999,本体制御 当身２]
+type = Varset
+trigger1 = root,stateno = 120 || root,stateno = 140
+var(45) = root,facing
+ignorehitpause = 1
+
+[State 99999,本体制御 当身２]
+type = Varset
+trigger1 = root,var(59)
+trigger1 = var(31)
+trigger1 = playerID(root,var(49)),stateno != var(31)
+var(31) = 0
+ignorehitpause = 1
+
+[State 99999, クリップボード]
+type = DisplayToClipboard
+trigger1 = 1
+text = "Cancel=%d, Throw=%d, Button=%d, Body-Distance X=%d,Y=%d \n"
+params = var(5),var(6),var(10),var(33),var(49)
+
+[State 99999, クリップボード]
+type = AppendToClipboard
+trigger1 = 1
+text = "Cancel=%d, Throw=%d, Button=%d, Body-Distance X=%d,Y=%d \n"
+params = var(15),var(16),var(17),root,var(12),var(3)
+
+
+
+:------------------------------------------------------------------
+
+[Statedef 99997]
+type=A
+movetype=I
+physics=N
+ctrl=0
+anim=9999;何も表示しないAnimなら、下記完全無敵と影消し、不可視化は不要
+sprpriority=0
+;velset=5, 0;速度。projectileのものと同じにする
+
+[State 9741, Safety];一応
+type=selfstate
+trigger1=!ishelper
+value=0
+
+[State -2];常時完全無敵
+type=Nothitby
+trigger1=1
+value=SCA
+
+
+[State 30000];画面にとらわれない
+type=ScreenBound
+trigger1=1
+value=0
+movecamera=0,0
+
+[State 30000];判定用飛び道具射出
+type=Projectile
+trigger1=time=0
+trigger1=!root,numprojID(30001)
+postype=right
+offset=0, 0
+projID=30001
+projanim=9999
+velocity=5, 0;へルパーの初期速度と同じに
+projhits = 9999
+projpriority = 4
+projsprpriority = -5
+projedgebound = 999999999
+projstagebound = 0
+supermovetime = 99999999
+pausemovetime = 99999999
+
+[State -2];不可視化＆影消し。
+type=assertspecial
+trigger1=1
+flag=noshadow
+flag2=invisible
+ignorehitpause=1
+
+[State -2];飛び道具が消えたら停止。
+type=velset
+trigger1=1;!(root,numprojID(30001));ヘルパーが出したprojectileも本体管理になるので、「root,」を忘れないように
+x=root,numprojID(30001)*5;0
+y=0
+
+
+[State -2];位置
+type = null
+trigger1 = root,facing = 1
+trigger1 = var(1) := floor(pos x - root,pos x)
+;trigger1 = playerID(root,var(49)),facing = -1
+trigger1 = var(3) := floor(pos x - playerID(root,var(49)),pos x)
+trigger2 = root,facing = -1
+trigger2 = var(2) := floor(pos x - root,pos x)
+
+[State -2];位置
+type = null
+trigger1 = root,facing = -1
+trigger1 = var(1) := -9999
+;trigger1 = playerID(root,var(49)),facing = 1
+trigger1 = var(3) := 0
+
+[State -2];位置
+type = null
+trigger1 = root,facing = 1
+trigger1 = var(2) := -9999
+
+[State -2];位置
+type = null
+trigger1 = var(1) = -9999
+trigger1 = var(3) := 0
+
+[State 99997, 暗転感知用]
+type = varadd
+trigger1 = roundstate = 2
+var(4) = 1
+ignorehitpause = 1
+
+[State 99997, 暗転感知暴発防止用]
+type = varset
+;trigger1 = var(4) = helper(99998),var(4)
+;trigger1 = var(5) >= 90
+trigger1 = var(4) >=1000 
+trigger1 = var(5) = 0
+var(4) = 0 
+ignorehitpause = 1
+
+[State 99997, カウント]
+type = null
+trigger1 = var(5) >= 0
+trigger1 = var(7) := playerID(root,var(49)),stateno
+trigger2 = var(5) = 0
+trigger2 = var(7) := -1
+ignorehitpause = 1
+
+[State 99997, カウント]
+type = varset
+trigger1 = 1;var(7) != playerID(root,var(49)),stateno
+var(5) = var(4)-helper(99998),var(4)-1;helper(99998),var(4)
+ignorehitpause = 1
+
+[State 99997, カウント]
+type = null
+trigger1 = var(5) >= 20
+trigger1 = var(7) = playerID(root,var(49)),stateno
+trigger1 = var(8) := var(5)
+trigger2 = var(7) = -1
+trigger2 = var(8) := -1
+ignorehitpause = 1
+
+[State 99997, カウント]
+type = varset
+trigger1 = var(5) = 0
+var(6) = helper(99998),var(4)
+ignorehitpause = 1
+
+[State -2, AIオフ時消滅（保険）]
+type = destroyself
+trigger1 = roundstate >= 2
+trigger1 = root,var(59) = 0
+trigger1 = name != "test"
+
+[State -2, クリップボード]
+type = DisplayToClipboard
+trigger1 = 1
+text = "posx=%f, (root, pos x)=%f \n"
+params = pos x, (root,pos x)
+
+[State 99999, クリップボード]
+type = AppendToClipboard
+trigger1 = 1
+text = "root,front(1)=%d, root,back(2)=%d, enemy(3)=%d, count(4)=%d ,count(5)=%d \n"
+params = var(1),var(2),var(3),var(8),var(5)
+
+;-------------------------------------------------------------------
+
+
+[Statedef 99998]
+type=A
+movetype=I
+physics=N
+ctrl=0
+anim=9999;何も表示しないAnimなら、下記完全無敵と影消し、不可視化は不要
+sprpriority=0
+;velset=5, 0;速度。projectileのものと同じにする
+
+[State 9741, Safety];一応
+type=selfstate
+trigger1=!ishelper
+value=0
+
+[State -2];常時完全無敵
+type=Nothitby
+trigger1=1
+value=SCA
+
+[State 30000];画面にとらわれない
+type=ScreenBound
+trigger1=1
+value=0
+movecamera=0,0
+
+[State 30000];判定用飛び道具射出
+type=Projectile
+trigger1=time=0
+trigger1=!root,numprojID(30002)
+postype=left;right
+offset=0, 0
+projID=30002
+projanim=9999
+velocity=5, 0;へルパーの初期速度と同じに
+projhits = 9999
+projpriority = 4
+projsprpriority = -5
+projedgebound = 999999999
+projstagebound = 0
+supermovetime = 99999999
+pausemovetime = 99999999
+
+[State -2];不可視化＆影消し。
+type=assertspecial
+trigger1=1
+flag=noshadow
+flag2=invisible
+ignorehitpause=1
+
+[State -2];飛び道具が消えたら停止。
+type=velset
+trigger1=1;!(root,numprojID(30002));ヘルパーが出したprojectileも本体管理になるので、「root,」を忘れないように
+x=root,numprojID(30002)*5;0
+y=0
+
+[State -2];位置
+type = null
+trigger1 = root,facing = -1
+trigger1 = var(1) := abs(floor(pos x - root,pos x))
+;trigger1 = playerID(root,var(49)),facing = -1
+trigger1 = var(3) := abs(floor(pos x - playerID(root,var(49)),pos x))
+trigger2 = root,facing = 1
+trigger2 = var(2) := abs(floor(pos x - root,pos x))
+
+[State -2];位置
+type = null
+trigger1 = root,facing = 1
+trigger1 = var(1) := -9999
+trigger1 = var(3) := 0
+
+[State -2];位置
+type = null
+trigger1 = root,facing = -1
+trigger1 = var(2) := -9999
+
+[State -2];位置
+type = null
+trigger1 = var(1) = -9999
+trigger1 = var(3) := 0
+
+[State 99998, カウント]
+type = varset
+trigger1 = 1;time = 0
+var(4) = helper(99997),var(4)
+ignorehitpause = 1
+
+;[State 99998, カウント]
+;type = parentvaradd
+;trigger1 = parent,var(5) != var(4)
+;var(5) = 1
+;ignorehitpause = 1
+
+;[State 99998, カウント]
+;type = varadd
+;trigger1 = roundstate = 2
+;var(4) = 1
+;ignorehitpause = 1
+
+[State 99998, カウント]
+type = null;varset
+trigger1 = root,ctrl = 0
+trigger1 = root,stateno!=21&&root,stateno!=101
+trigger1 = var(4) != helper(99997),var(5)
+var(4) = 0
+ignorehitpause = 1
+
+[State -2, AIオフ時消滅（保険）]
+type = destroyself
+trigger1 = roundstate >= 2
+trigger1 = root,var(59) = 0
+trigger1 = name != "test"
+
+[State -2, クリップボード]
+type = DisplayToClipboard
+trigger1 = 1
+text = "posx=%f, (root, pos x)=%f \n"
+params = pos x, (root,pos x)
+
+[State 99999, クリップボード]
+type = AppendToClipboard
+trigger1 = 1
+text = "root,front(1)=%d, root,back(2)=%d, enemy(3)=%d, count(4)=%d ,count(5)=%d \n"
+params = var(1),var(2),var(3),var(4),var(5)
+
+;---------------------------------------------------
+
+;-------------------------------------------------------------------
+
+;===========================================================================
+;===========================================================================
+;===========================================================================
+;-2
+[Statedef -2]
+
+[State 191, 1]
+type = stopsnd
+trigger1 = stateno != [191,194]
+channel = 2
+
+[State -2, 3]
+type = AssertSpecial
+trigger1 = Var(12) = 1 ;&& movetype != A
+;trigger2 = Var(12) = 1 && movetype = A && var(36) > 2
+flag = Invisible
+ignorehitpause = 1
+
+
+
+[State -2, 5]
+type = VarSet
+triggerall = var(12) = 1
+;trigger1 = movetype = H
+trigger1 = Stateno = [5000,5300]
+v = 12
+value = 0
+
+
+[State -2, 6]
+type = VarSet
+trigger1 = Stateno = [170,199]
+v = 12
+value = 0
+
+
+[State -2, HyperComboFinish];通常
+type = Helper
+triggerall = LoseKo && !NumHelper(8000)
+triggerall = roundstate = 3
+trigger1 = LoseKo = 1
+trigger1 = enemy,hitdefattr = SCA,  SA, ST, SP, HA, HT, HP
+trigger2 = enemy,stateno >= 3000 && enemy,stateno != [5000,5999]
+;trigger1 = enemynear,stateno = [3000,4999]
+name = "rizotto-2"
+ID =8000
+stateno = 8000
+postype = back
+pos = 0,0
+ownpal = 1
+pausemovetime = 99999999
+supermovetime = 99999999
+ignorehitpause = 1
+
+[State -3]
+type = Helper
+trigger1 = numhelper(7900) = 0
+name = "rizotto-2"
+stateno = 7900
+id = 7900
+sprpriority = 1
+pos = 0,0
+postype = front;p1
+supermovetime = 99999999999
+pausemovetime = 99999999999
+
+[State 3010, 2]
+type = varset
+trigger1 = numhelper(8100)
+var(22) = 1
+
+[State 3010, 2]
+type = varset
+trigger1 = var(22) = 1
+trigger1 = stateno != 150 && stateno != 151 && stateno != 152 && stateno != 153
+var(22) = 0
+
+[State 0, end]
+type = changestate
+trigger1 = var(22) = 1
+trigger1 = stateno = 150 || stateno = 151 || stateno = 152 || stateno = 153
+trigger1 = numhelper(8100) = 0
+value = 140;130+(statetype = C)*1
+
+[State -2, knives]
+type = varset
+trigger1 = var(20) = 1
+trigger1 = stateno != [3100,3300]
+var(20) = 0
+
+;;アドバンシングガード
+;[State -2]
+;type = Helper
+;triggerall = numhelper(8100) = 0
+;triggerall = stateno = 150 || stateno = 151 || stateno = 152 || stateno = 153
+;trigger1 = var(59) = 0
+;trigger1 = command = "x+y+z"|| command = "b"
+;trigger1 = var(23) := 1
+;;trigger2 = var(59)
+;;trigger2 = helper(99999),var(53) = 1
+;stateno = 8100
+;id = 8100
+;pos = 0,0
+;postype = p1
+;ownpal = 1
+;keyctrl = 0
+;size.ground.back = 16   ;前ぶつかり判定
+;size.ground.front = 16
+;size.air.back = 16
+;size.air.front = 16
+;size.height = 500       ;縦ぶつかり判定
+;persistent = 0
+;ignorehitpause = 1
+
+;[State -2]
+;type = null;Explod
+;triggerall = stateno = 150 || stateno = 151 || stateno = 152 || stateno = 153
+;trigger1 = var(59) = 0
+;trigger1 = command = "x+y+z"||command = "b"
+;;trigger2 = var(59)
+;;trigger2 = helper(99999),var(53) = 1
+;anim = 8101
+;id = 8101
+;postype = p1
+;pos = 17,-68
+;sprpriority = 4
+;bindtime = -1
+;persistent = 0
+;ignorehitpause = 1
+
+;[State 3010, 2]
+;type = velset
+;trigger1 = numhelper(8100) = 1
+;trigger1 = stateno = 150 || stateno = 151 || stateno = 152 || stateno = 153
+;x = 0
+
+;[State 3010, 2]
+;type = posfreeze
+;trigger1 = numhelper(8100) = 1
+;trigger1 = stateno = 150 || stateno = 151 || stateno = 152 || stateno = 153
+
+;[State 3010, 2]
+;type = changestate
+;trigger1 = alive
+;trigger1 = var(23) = 1
+;trigger1 = numhelper(8100) = 1
+;trigger1 = statetype = S
+;trigger1 = stateno != 151
+;value = 151
+
+;[State -2]
+;type = null;changestate
+;trigger1 = numhelper(8100) = 0
+;trigger1 = statetype = S
+;trigger1 = stateno = 151
+;value = 130
+;ctrl = 1
+
+;[State -2]
+;type = changestate
+;trigger1 = var(23) = 1
+;trigger1 = numhelper(8100) = 0
+;trigger1 = statetype = S
+;trigger1 = stateno = 151
+;value = 130
+;ctrl = 1
+
+;[State -2]
+;type = changestate
+;trigger1 = alive
+;trigger1 = var(23) = 1
+;trigger1 = numhelper(8100) = 1
+;trigger1 = statetype = C
+;trigger1 = stateno != 153
+;value = 153
+
+;[State -2]
+;type = null;changestate
+;trigger1 = numhelper(8100) = 0
+;trigger1 = statetype = C
+;trigger1 = stateno = 153
+;value = 130
+;ctrl = 1
+
+;[State -2]
+;type = null;changestate
+;trigger1 = var(23) = 1
+;trigger1 = numhelper(8100) = 0
+;trigger1 = statetype = C
+;trigger1 = stateno = 153
+;value = 130
+;ctrl = 1
+
+;===========================================================================
+; 常時監視ステート（－２）
+;===========================================================================
+;---------------------------------------------------------------------------
+; 通常の食らい状態（Statedef 5000～5199間）でも、
+; 相手に（「P2StateNo」や「TargetState」等で）制御を奪われても、
+; 常に登録したステートコントローラが有効になります。
+; サブシステム等を制御する時に重宝するでしょう。
+;---------------------------------------------------------------------------
+
+;[Statedef -2]
+
+;[State -2, クリップボード]
+;type = DisplayToClipboard
+;trigger1 = 1
+;text = "58=%d, 57=%d, 56=%d, 55=%d, 50=%d \n"
+;params = var(58), var(57), var(56), helper(99999),var(34),var(55)
+
+;[State -2, クリップボード（追加専用）]
+;type = AppendToClipboard
+;trigger1 = 1
+;text = "Position X=%d,Y=%d, BdistX=%d, DistX=%d, size=%d \n"
+;params = floor(Pos X),floor(Pos Y),floor(P2bodyDist X),floor(P2Dist X),enemy,animtime;Const(size.Head.Pos.Y)
+
+[State -2,a]
+type = AssertSpecial
+trigger1 = var(59)&&numhelper(99999)
+trigger1 = random < (10-helper(99999),var(55))*100
+flag = nowalk
+
+[state -2,1]
+type = Varadd
+triggerall = var(59)
+trigger1 = roundstate = 2
+trigger1 = movetype = H
+trigger1 = stateno != [5110,5120]
+var(55) = 1
+
+[state -2,2]
+type = Varadd
+triggerall = var(59)
+trigger1 = roundstate = 2
+trigger1 = stateno = [120,153]
+var(55) = 3
+
+[state -2,3]
+type = Varadd
+triggerall = var(59)
+triggerall = var(55) > 0
+triggerall = roundstate = 2
+trigger1 = stateno = 650
+var(55) = -10
+
+[state -2,3]
+type = Varadd
+triggerall = var(59)
+triggerall = var(55) > 0
+triggerall = roundstate = 2
+trigger1 = numhelper(8100) > 0
+var(55) = -5
+
+[state -2,4]
+type = Varset
+triggerall = var(59)
+triggerall = stateno != [120,153]
+triggerall = roundstate = 2
+trigger1 = var(59)
+trigger1 = movetype = A && movecontact
+trigger2 = stateno = 0 && ctrl = 0
+trigger3 = stateno = 1020
+trigger2 = stateno = 0 && ctrl = 0
+trigger4 = projhittime(1120) = 1
+trigger5 = var(55) < 0
+var(55) = 0
+
+[State -1, 敵判別]
+Type=varset
+triggerall = !ishelper
+Trigger1 = numenemy=1
+var(49) = enemynear,ID
+
+[State -1, 敵判別]
+Type=varset
+triggerall = !ishelper
+Trigger1 = numenemy=2
+var(49) = ifelse((EnemyNear(0),alive),(enemynear(0),ID),(enemynear(1),ID))
+
+;[State -2, 3]
+;type = AssertSpecial
+;triggerall = Var(59)
+;triggerall = helper(99999),var(52) = 0
+;trigger1 = stateno = [120,153]
+;flag = noautoturn
+;ignorehitpause = 1
+
+[state -2]
+type = null
+triggerall = var(59)
+triggerall = stateno = [120,153]
+triggerall = stateno != 140
+trigger1 = statetype = S
+trigger1 = playerID(var(49)),statetype != S
+trigger1 = var(30) := 1
+trigger2 = statetype = C
+trigger2 = playerID(var(49)),statetype != C
+trigger2 = var(30) := 2
+;trigger3 = statetype = A
+;trigger3 = playerID(var(49)),statetype != A
+;trigger3 = var(30) := 3
+
+[state -2, ]
+type = Varset
+triggerall = var(59)
+triggerall = var(54) > 0
+trigger1 = stateno != [120,153]
+var(54) = 0
+
+[State -2,コンボ失敗]
+type = Varset
+trigger1 = var(59)
+trigger1 = var(53) != 5
+trigger1 = stateno = 50
+trigger1 = playerID(var(49)),stateno = [1025,1027]
+var(53) = 1
+
+[State -2,コンボ失敗]
+type = Varset
+triggerall = var(59)
+triggerall = var(53) = 1
+trigger1 = stateno = 1313
+trigger2 = playerID(var(49)),statetype = L || playerID(var(49)),stateno =[5110,5120]
+var(53) = 0
+
+[State -2,コンボ失敗]
+type = Varset
+triggerall = var(59)
+triggerall = var(53) = 1
+trigger1 = stateno = 200 && !movehit
+trigger1 = animelemno(0) > 3
+trigger2 = stateno = 1310
+trigger2 = animelemtime(2) >= 16
+var(53) = 5
+
+[State -2,コンボ失敗]
+type = Varset
+triggerall = var(59)
+triggerall = var(53) = 5
+trigger1 = prevstateno = 420
+trigger1 = stateno = 1310
+trigger1 = animelemtime(2) >= 16
+var(53) = 6
+
+[state -3, ]
+type = Varset
+triggerall = var(59)
+Trigger1 = playerID(var(49)),stateno = [1025,1027]
+trigger2 = facing = playerID(var(49)),facing
+trigger3 = (numhelper(3510) || numhelper(3510)) && (numprojID(3511) && projhittime(3511) > 0)
+var(57) = 10
+
+[state -3, ]
+type = Varset
+triggerall = var(59)
+Trigger1 = playerID(var(49)),stateType = L
+trigger2 = roundstate != 2
+trigger3 = playerID(var(49)),MoveType != H
+trigger3 = random < 100
+var(57) = ifelse(random<850-250*(power>=1000&&helper(99999),var(46)),10,1)
+
+[state -3, ]
+type = Varset
+triggerall = var(59) >= 3
+trigger1 = var(57) < 30
+trigger1 = projcontacttime(1120) = 1
+trigger1 = backedgebodydist > 120
+trigger1 = random < 85
+trigger2 = stateno = 1600
+var(57) = 30
+
+[state -3, デバッグ57]
+type = Varset
+;trigger1 = var(59)
+trigger1 = 0
+var(57) = 0
+
+[state -3, デバッグ12]
+type = Varset
+;trigger1 = var(59)
+trigger1 = 0
+var(12) = 1
+
+[state -3,]
+type = Varset
+trigger1 = roundstate != 2
+trigger2 = roundstate = 2
+trigger2 = stateno = 0 && !ctrl
+var(57) = ifelse(random<430,0,10)
+
+[state -3,]
+type = Varset
+trigger1 = var(59) = 0
+trigger1 = roundstate = 2
+var(57) = 0
+
+[state -3,]
+type = Varset
+trigger1 = var(59) = 0
+trigger1 = roundstate = 2
+var(57) = 0
+
+[state -2,1]
+type = Varset
+trigger1 = var(59)
+fvar(30) = -1
+
+[state -2,1]
+type = Varset
+trigger1 = var(59)
+fvar(31) = -1
+
+;-----------------------------------
+
+;===========================================================================
+; 準常時監視ステート（－３）
+;===========================================================================
+;---------------------------------------------------------------------------
+; こちらは通常の食らい状態以外の「P2StateNo」や「TargetState」等で制御された、
+; 作成者が任意に指定した相手側の食らいステートに限り、
+; 登録したステートコントローラが有効にはなりません。
+; －１や－２と上手く使い分けて行きましょう。
+;---------------------------------------------------------------------------
+;-3
+
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+; ■最後に『コモンステート』について■
+; コモンステートとは、全キャラ共通の基本動作のステートです。
+; 通常は特に変更しない限り、M.U.G.E.N本体のdataフォルダにある
+;「common1.cns（コモンステートファイル）」を使います。
+;
+; しかし、もしもあなたのキャラのステートファイルでcommon1.cnsと同じ番号の
+; 基本動作のステートを作った場合は処理が上書きされ、
+; common1.cns側の同じ番号のステートは無効になります。
+;
+; common1.cnsのプログラム優先度は最低に属しているので、
+; ステートの作成には番号に注意しないといけません。
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+[Statedef -3]
+;-----------------------------------
+
+[State -3, 音を鳴らす]
+type = PlaySnd
+triggerall = Time = 1
+trigger1 = stateno = 52  ;着地ステート
+trigger2 = stateno = 106 ;バックステップ後の着地ステート
+value = 40, 0
+
+[state -3, snd]
+type = playsnd
+triggerall = random < 400
+triggerall = time = 0
+triggerall = alive
+trigger1 = stateno = 5000
+trigger2 = stateno = 5020
+trigger3 = stateno = 5070
+trigger4 = stateno = 5080
+trigger5 = stateno = 5100
+value = 4,0+GetHitVar(animtype)
+volume = 255
+channel = 0
+
+[state -3, ループ回数]
+type = VarSet
+triggerall = var(59)
+triggerall = numhelper(99999) && helper(99999),var(59) != 0
+trigger1 = roundstate != 2
+trigger2 = ctrl && playerID(var(49)),movetype != H
+trigger3 = movetype = H
+trigger4 = stateno = 400 && movehit
+trigger4 = var(58) <= 0 && var(58) != -1
+var(58) = helper(99999),var(59)
+
+[state -3, ]
+type = Varadd
+triggerall = var(59)
+triggerall = var(58) > 0
+trigger1 = stateno = 1000 && movehit = 1
+trigger2 = stateno = 620 && movehit = 1
+trigger2 = helper(99999),var(49) = 1
+var(58) = ifelse(var(58)=1,-2,-1)
+
+[state -3, ]
+type = VarSet
+triggerall = var(59)
+triggerall = helper(99999),var(59) != 0
+trigger1 = stateno = 1020 && movehit
+trigger2 = stateno = 1120
+trigger3 = stateno = 400 && moveguarded
+var(58) = 0
+
+[state -3, ]
+type = VarSet
+triggerall = var(59)
+trigger1 = helper(99999),var(59) = 0
+var(58) = -1
+
+[state -3,]
+type = Varset
+triggerall = var(59)
+trigger1 = var(58) != 0
+trigger1 = var(58) != -1
+trigger1 = stateno = 400 && movehit
+trigger1 = animelemtime(2) >= 0 && animelemtime(3) < 0
+;trigger1 = p2bodydist X = [25,45]
+var(56) = 1
+
+[state -3,]
+type = Varset
+triggerall = var(59)
+trigger1 = playerID(var(49)),stateno = [1025,1027];stateno = 1021
+trigger2 = projhittime(3511)=1||projhittime(3512)=1||projhittime(3513)=1
+var(56) = 9
+
+[state -3,]
+type = Varset
+triggerall = var(59)
+trigger1 = stateno = 1120
+var(56) = 10
+
+[state -3,]
+type = Varadd
+triggerall = var(59)
+trigger1 = var(56) >= 10
+var(56) = 1
+
+[state -3,]
+type = Varset
+triggerall = var(59)
+triggerall = var(56) < 10
+trigger1 = stateno = 400
+trigger1 = p2bodydist X <= 25
+trigger2 = stateno = 1000 && movehit
+Trigger3 = playerID(var(49)),stateno = [5110,5120]
+trigger4 = statetype = L
+trigger5 = playerID(var(49)),movetype = I
+var(56) = 0
+
+[state -3,]
+type = Varset
+triggerall = var(59)
+triggerall = var(56) >= 10
+trigger1 = statetype = L
+trigger2 = playerID(var(49)),movetype != H
+trigger3 = stateno > 300 && stateno != 1120
+trigger4 = playerID(var(49)),stateno = [1025,1027]
+var(56) = 0
+
+[State -3]
+type = varset
+triggerall = var(59)
+trigger1 = stateno = 400 && movehit
+trigger1 = p2bodydist x <= 54
+triggrt1 = vel X >= 0
+var(52) = 1
+ignorehitpause = 1
+
+[State -3]
+type = varset
+triggerall = var(59)
+trigger1 = stateno = 1000 && movehit
+trigger1 = var(52) = 1
+var(52) = -1
+ignorehitpause = 1
+
+[State -3]
+type = varset
+triggerall = var(59)
+trigger1 = playerID(var(49)),movetype != H
+var(52) = 0
+ignorehitpause = 1
+
+[State -3]
+type = varset
+triggerall = var(59)
+triggerall = playerID(var(49)),stateno != [1025,1027]
+trigger1 = stateno = 1120
+;trigger1 = p2bodydist X >= 10
+var(52) = 2
+ignorehitpause = 1
+
+[State -3]
+type = varset
+triggerall = var(59)
+triggerall = var(52) = 1
+triggerall = playerID(var(49)),stateno != [1025,1027]
+trigger1 = playerID(var(49)),StateType = A
+trigger2 = playerID(var(49)),StateType = L
+trigger3 = movetype = H
+trigger4 = playerID(var(49)),MoveType != H
+var(52) = 0
+ignorehitpause = 1
+
+[State -3]
+type = varset
+triggerall = var(59)
+triggerall = var(52) = 2
+trigger1 = playerID(var(49)),stateno = [1025,1027]
+trigger2 = playerID(var(49)),StateType = L
+trigger3 = movetype = H
+trigger4 = playerID(var(49)),MoveType != H
+trigger5 = p2bodydist X < 10
+var(52) = 0
+ignorehitpause = 1
+
+[state -3,5]
+type = Varadd
+triggerall = var(59)
+triggerall = var(50) < 0
+trigger1 = stateno != 1300
+trigger2 = stateno != 220
+var(50) = 1
+
+[state -3,6]
+type = Varrandom
+triggerall = var(59)
+trigger1 = stateno = 650
+trigger1 = var(57) != [30,40]
+v = 50
+range = 150,300
+
+[state -3,7]
+type = Varadd
+triggerall = var(59)
+triggerall = var(50) > 0
+trigger1 = stateno != 650
+var(50) = -1
+
+;----------
+
+[State -3]
+type = varset
+trigger1 = numhelper(99999)
+trigger1 = roundstate != 2 || (stateno = 0 && ctrl=0)
+trigger1 = helper(99999),var(5)!=0 || helper(99999),var(10)!=0
+var(38) = helper(99999),var(5)+helper(99999),var(10)*10000
+ignorehitpause = 1
+
+[State -3]
+type = varset
+trigger1 = numhelper(99999)
+trigger1 = roundstate != 2 || (stateno = 0 && ctrl=0)
+trigger1 = helper(99999),var(6)!=0 || helper(99999),var(11)!=0
+var(39) = helper(99999),var(6)+helper(99999),var(11)*10000
+ignorehitpause = 1
+
+[State -3]
+type = varset
+trigger1 = numhelper(99999)
+trigger1 = helper(99999),var(7)!=0 || helper(99999),var(12)!=0
+var(40) = helper(99999),var(7)+helper(99999),var(12)*10000
+ignorehitpause = 1
+
+[State -3]
+type = varset
+trigger1 = numhelper(99999)
+trigger1 = helper(99999),var(8)!=0 || helper(99999),var(13)!=0
+var(41) = helper(99999),var(8)+helper(99999),var(13)*10000
+ignorehitpause = 1
+
+[State -3]
+type = varset
+trigger1 = numhelper(99999)
+trigger1 = helper(99999),var(9)!=0 || helper(99999),var(14)!=0
+var(42) = helper(99999),var(9)+helper(99999),var(14)*10000
+ignorehitpause = 1
+
+:---
+
+[State -3]
+type = varset
+trigger1 = numhelper(99999)
+trigger1 = helper(99999),var(15)!=0 || helper(99999),var(16)!=0
+var(43) = helper(99999),var(15)+helper(99999),var(16)*10000
+ignorehitpause = 1
+
+[State -3]
+type = varset
+trigger1 = numhelper(99999)
+trigger1 = helper(99999),var(17)!=0 || helper(99999),var(18)!=0
+var(44) = helper(99999),var(17)+helper(99999),var(18)*10000
+ignorehitpause = 1
+
+[State -3]
+type = varset
+trigger1 = numhelper(99999)
+trigger1 = helper(99999),var(19)!=0 || helper(99999),var(34)!=0
+var(45) = helper(99999),var(19)+helper(99999),var(34)*10000
+ignorehitpause = 1
+
+[State -3]
+type = null
+trigger1 = teammode = turns
+trigger1 = var(38) := 0
+trigger1 = var(39) := 0
+trigger1 = var(40) := 0
+trigger1 = var(41) := 0
+trigger1 = var(42) := 0
+trigger1 = var(43) := 0
+trigger1 = var(44) := 0
+trigger1 = var(45) := 0
+ignorehitpause = 1
+
+;----------
+
+[state -3,]
+type = Varset
+trigger1 = roundstate < 2; || (stateno = 0 && ctrl=0)
+trigger1 = var(37) = 0
+trigger1 = command = "AI off"
+var(37) = 2
+
+[state -3,]
+type = Varset
+trigger1 = roundstate < 2; || (stateno = 0 && ctrl=0)
+trigger1 = var(37) = 1
+trigger1 = command = "AI off"
+var(37) = 0
+
+[state -3,]
+type = Varset
+trigger1 = roundstate = 2
+trigger1 = var(37) = 2
+var(37) = 1
+
+[state -3, ]
+type = Varrandom
+triggerall = var(59)
+trigger1 = movetype != A
+trigger2 = stateno = 1300
+v = 59
+range =1,5
+
+
+
+
+
+

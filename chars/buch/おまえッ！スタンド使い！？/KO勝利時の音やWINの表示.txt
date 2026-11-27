@@ -1,0 +1,154 @@
+;●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●
+
+;KO勝利時集中線と音
+[Statedef -2]
+
+[State -2]
+type = Helper
+trigger1 = TeamMode = single;シングル
+trigger1 = RoundState = 3 && Win && NumHelper(20053) = 0
+ID = 20053
+pos = 0,0
+stateno = 20053
+ignorehitpause = 1;とるすと、ヒット停止時間を無視
+
+[State -2]
+type = AssertSpecial
+trigger1 = winko   ;勝ったとき
+flag = nobardisplay;ゲージ類を非表示にします。
+ignorehitpause = 1
+
+;---------------------------------------------------------
+
+[Statedef 20053]
+type    = S
+;movetype= I
+;physics = N
+anim = 9999 ;空アニメ
+;velset = 0,0
+ctrl = 0
+
+[State 20053]
+type = Explod
+trigger1 = time = 0
+anim = 20053
+pos = 0,0
+postype = left
+sprpriority = 10
+ownpal = 1
+bindtime = -1	;発生させた親に常にくっ付ける
+persistent = 0  ;1回しかステコンが実行されません
+ignorehitpause = 1	;「ヒット硬直」を無視
+
+[State 20053]
+type = PlaySnd
+trigger1 = Time = 0
+value = 3, 15
+persistent = 0  ;1回しかステコンが実行されません
+ignorehitpause = 1;とるすと、ヒット停止時間を無視
+
+[State 20053]
+type = DestroySelf
+trigger1 = time = 120 && RoundState != 3
+
+;●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●
+
+[Statedef -2]
+
+;『ﾌﾞﾁｬﾗﾃｨ WIN』がしーん
+[State -2]
+type = helper
+triggerall = !Numhelper(20050)
+triggerall = stateno = 180    ;勝利ポーズ分岐
+trigger1 = Teamside=1 || Teamside=2  ; || は、もしくは
+id = 20050
+stateno = 20050
+pos = ifelse(Teamside=1,-110,290),-130
+postype = left
+ownpal = 1
+sprpriority = 10
+pausemovetime = 9999
+size.xscale = 0.9
+size.yscale = 0.9
+
+;『to be continued』
+[State -2]
+type = helper
+trigger1 = !NumHelper(20051)
+trigger1 = stateno = 180            ;勝利ポーズ分岐
+trigger1 = Teamside=1 || Teamside=2 ; || は、もしくは
+trigger1 = matchover                ;ﾗｳﾝﾄﾞ取って、試合が終わったとき。
+stateno = 20051
+id = 20051
+pos = ifelse(Teamside=1,290,-150),20
+postype = left
+ownpal = 1
+ontop = 1
+pausemovetime = 9999
+;---------------------------------------------------------
+
+;『ﾌﾞﾁｬﾗﾃｨ WIN』ヘルパー
+[Statedef 20050]
+type = S
+sprpriority = 10
+anim = 20050
+ctrl = 0
+
+[State 104, 影はない]
+type = AssertSpecial
+trigger1 = 1
+flag = Noshadow
+
+[State 20024,ガシーン！]
+type = PlaySnd
+trigger1 = Time = 10
+value = 3, 14
+
+[State -1,1]
+type = velset
+trigger1 = time = 0
+trigger2 = time >= 10 && time <= 72
+x = 0
+
+[State -1,1]
+type = velset
+trigger1 = time >= 0 && time <= 10
+x = ifelse(Teamside=1,12,-12)
+
+[State -1,1]
+type = velset
+trigger1 = time >= 72 && time <= 95
+x = ifelse(Teamside=1,-17,17)
+
+[State -1,1]
+type = destroyself
+trigger1 = roundstate = 2;バトル中
+
+;---------------------------
+;『to be continued』ヘルパー
+[Statedef 20051]
+type = S
+sprpriority = 10
+anim = ifelse(Teamside=1,20051,20052)
+ctrl = 0
+
+[State 20024, 0]
+type = AssertSpecial
+trigger1 = 1
+flag = Noshadow
+
+[State 20024, 0]
+type = velset
+trigger1 = time = 0
+trigger2 = time >= 25
+x = 0
+
+[State 20024, 0]
+type = velset
+trigger1 = time >= 0 && time <= 17
+x = ifelse(Teamside=1,-24,24)
+
+[State 20024, 0]
+type = velset
+trigger1 = time >= 17 && time <= 25
+x = ifelse(Teamside=1,13,-13)
